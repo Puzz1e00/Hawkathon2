@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relocation Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f5f6fa;
+            color: #2f3640;
+        }
+
+        header {
+            background-color: #40739e;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        main {
+            padding: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .intro {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .form-container {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #dcdde1;
+            border-radius: 8px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 12px 24px;
+            background-color: #44bd32;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #4cd137;
+        }
+    </style>
+</head>
+<body>
+    <header>Relocation Assistant</header>
+    <main>
+        <div class="intro">
+            Welcome! Answer a few questions so we can help you prepare for your move.
+        </div>
+        <div class="form-container">
+            <form id="relocationForm">
+                <label for="destination">Where are you moving to?</label>
+                <input type="text" id="destination" name="destination" required>
+
+                <label for="reason">Why are you relocating?</label>
+                <select id="reason" name="reason">
+                    <option value="job">Job</option>
+                    <option value="study">Study</option>
+                    <option value="family">Family</option>
+                    <option value="explore">Exploration</option>
+                </select>
+
+                <label for="timeline">When are you moving?</label>
+                <input type="date" id="timeline" name="timeline">
+
+                <button type="submit">Generate Checklist</button>
+            </form>
+        </div>
+    </main>
+    <script>
+        document.getElementById('relocationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const destination = document.getElementById('destination').value;
+            const reason = document.getElementById('reason').value;
+            const timeline = document.getElementById('timeline').value;
+
+            const params = new URLSearchParams({ destination, reason, timeline });
+            window.location.href = `checklist.html?${params.toString()}`;
+        });
+    </script>
+</body>
+</html>
+</body>
+
+</html>
