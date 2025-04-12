@@ -86,5 +86,35 @@
       </div>
     </div>
   </footer>
+
+  <!-- Add this somewhere appropriate in homepage.html, like near the bottom before the closing body tag -->
+  <div class="max-w-4xl mx-auto px-4 text-center mt-8 mb-16">
+    <button id="resetDataBtn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md shadow transition">
+      Reset Application Data
+    </button>
+  </div>
+
+  <script>
+    // Add event listener for the reset button
+    document.getElementById('resetDataBtn').addEventListener('click', function() {
+      // Ask for confirmation
+      if (confirm('WARNING: This will delete all donors and hospitals data. This action cannot be undone. Continue?')) {
+        
+        // Clear localStorage data
+        localStorage.removeItem('donors');
+        localStorage.removeItem('hospitals');
+        
+        // Clear any session data
+        sessionStorage.removeItem('loggedInHospitalId');
+        sessionStorage.removeItem('loggedInDonorId');
+        
+        // Alert the user
+        alert('All application data has been reset successfully.');
+        
+        // Redirect to homepage
+        window.location.href = 'homepage.html';
+      }
+    });
+  </script>
 </body>
 </html>
