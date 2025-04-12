@@ -152,7 +152,19 @@
 </head>
 
 <body class="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen py-12">
-    <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-lg transform transition-all duration-300 hover:shadow-xl">
+    <!-- Back Button -->
+    <div class="absolute top-4 left-4">
+        <a href="homepage.html" class="text-blue-600 hover:text-blue-800 transition">
+            <i class="fas fa-arrow-left text-2xl"></i>
+        </a>
+    </div>
+    
+    <!-- Logo -->
+    <div class="absolute top-4 right-4">
+        <img src="logo.png" alt="LifeLink Logo" class="h-12">
+    </div>
+
+    <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-lg transform transition-all duration-300 hover:shadow-xl mt-12">
         <div class="text-center mb-8">
             <h2 class="text-4xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-transparent bg-clip-text animate-fade-in">
                 Donor Information Form
@@ -160,6 +172,7 @@
             <p class="text-gray-600">Join us in saving lives through donation</p>
         </div>
         
+        <!-- Rest of your existing form content remains exactly the same -->
         <div class="progress-bar mb-8">
             <div class="progress-bar-fill" style="width: 0%"></div>
         </div>
@@ -212,12 +225,69 @@
                             <label>City</label>
                         </div>
                         <div class="floating-label form-group">
-                            <input type="text" name="state" placeholder=" " required class="w-full p-3 border rounded-md" />
+                            <select name="state" required class="w-full p-3 border rounded-md">
+                                <option value=""> </option>
+                                <option value="AL">Alabama (AL)</option>
+                                <option value="AK">Alaska (AK)</option>
+                                <option value="AZ">Arizona (AZ)</option>
+                                <option value="AR">Arkansas (AR)</option>
+                                <option value="CA">California (CA)</option>
+                                <option value="CO">Colorado (CO)</option>
+                                <option value="CT">Connecticut (CT)</option>
+                                <option value="DE">Delaware (DE)</option>
+                                <option value="FL">Florida (FL)</option>
+                                <option value="GA">Georgia (GA)</option>
+                                <option value="HI">Hawaii (HI)</option>
+                                <option value="ID">Idaho (ID)</option>
+                                <option value="IL">Illinois (IL)</option>
+                                <option value="IN">Indiana (IN)</option>
+                                <option value="IA">Iowa (IA)</option>
+                                <option value="KS">Kansas (KS)</option>
+                                <option value="KY">Kentucky (KY)</option>
+                                <option value="LA">Louisiana (LA)</option>
+                                <option value="ME">Maine (ME)</option>
+                                <option value="MD">Maryland (MD)</option>
+                                <option value="MA">Massachusetts (MA)</option>
+                                <option value="MI">Michigan (MI)</option>
+                                <option value="MN">Minnesota (MN)</option>
+                                <option value="MS">Mississippi (MS)</option>
+                                <option value="MO">Missouri (MO)</option>
+                                <option value="MT">Montana (MT)</option>
+                                <option value="NE">Nebraska (NE)</option>
+                                <option value="NV">Nevada (NV)</option>
+                                <option value="NH">New Hampshire (NH)</option>
+                                <option value="NJ">New Jersey (NJ)</option>
+                                <option value="NM">New Mexico (NM)</option>
+                                <option value="NY">New York (NY)</option>
+                                <option value="NC">North Carolina (NC)</option>
+                                <option value="ND">North Dakota (ND)</option>
+                                <option value="OH">Ohio (OH)</option>
+                                <option value="OK">Oklahoma (OK)</option>
+                                <option value="OR">Oregon (OR)</option>
+                                <option value="PA">Pennsylvania (PA)</option>
+                                <option value="RI">Rhode Island (RI)</option>
+                                <option value="SC">South Carolina (SC)</option>
+                                <option value="SD">South Dakota (SD)</option>
+                                <option value="TN">Tennessee (TN)</option>
+                                <option value="TX">Texas (TX)</option>
+                                <option value="UT">Utah (UT)</option>
+                                <option value="VT">Vermont (VT)</option>
+                                <option value="VA">Virginia (VA)</option>
+                                <option value="WA">Washington (WA)</option>
+                                <option value="WV">West Virginia (WV)</option>
+                                <option value="WI">Wisconsin (WI)</option>
+                                <option value="WY">Wyoming (WY)</option>
+                            </select>
                             <label>State</label>
+                            <i class="fas fa-map-marker-alt absolute right-3 top-3 text-gray-400"></i>
                         </div>
                         <div class="floating-label form-group">
-                            <input type="text" name="zipcode" placeholder=" " required class="w-full p-3 border rounded-md" />
+                            <input type="text" name="zipcode" placeholder=" " required 
+                                   pattern="\d{5}" 
+                                   title="Zip code must be 5 digits"
+                                   class="w-full p-3 border rounded-md" />
                             <label>Zip Code</label>
+                            <i class="fas fa-map-pin absolute right-3 top-3 text-gray-400"></i>
                         </div>
                     </div>
                 </div>
@@ -236,7 +306,7 @@
 
             <div class="form-group">
                 <label class="block font-medium mb-4 text-gray-700">What would you like to donate?</label>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div class="checkbox-container p-3 rounded-lg border hover:border-blue-500 transition-all duration-300">
                         <label class="inline-flex items-center cursor-pointer">
                             <input type="checkbox" name="donationTypes" value="Blood" class="form-checkbox h-5 w-5 text-blue-600 transition duration-150 ease-in-out" />
@@ -253,30 +323,6 @@
                         <label class="inline-flex items-center cursor-pointer">
                             <input type="checkbox" name="donationTypes" value="Platelets" class="form-checkbox h-5 w-5 text-blue-600 transition duration-150 ease-in-out" />
                             <span class="ml-3 text-gray-700">Platelets</span>
-                        </label>
-                    </div>
-                    <div class="checkbox-container p-3 rounded-lg border hover:border-blue-500 transition-all duration-300">
-                        <label class="inline-flex items-center cursor-pointer">
-                            <input type="checkbox" name="donationTypes" value="Bone Marrow" class="form-checkbox h-5 w-5 text-blue-600 transition duration-150 ease-in-out" />
-                            <span class="ml-3 text-gray-700">Bone Marrow</span>
-                        </label>
-                    </div>
-                    <div class="checkbox-container p-3 rounded-lg border hover:border-blue-500 transition-all duration-300">
-                        <label class="inline-flex items-center cursor-pointer">
-                            <input type="checkbox" name="donationTypes" value="Organ Donation Pledge" class="form-checkbox h-5 w-5 text-blue-600 transition duration-150 ease-in-out" />
-                            <span class="ml-3 text-gray-700">Organ Donation Pledge</span>
-                        </label>
-                    </div>
-                    <div class="checkbox-container p-3 rounded-lg border hover:border-blue-500 transition-all duration-300">
-                        <label class="inline-flex items-center cursor-pointer">
-                            <input type="checkbox" name="donationTypes" value="Hair Donation" class="form-checkbox h-5 w-5 text-blue-600 transition duration-150 ease-in-out" />
-                            <span class="ml-3 text-gray-700">Hair Donation</span>
-                        </label>
-                    </div>
-                    <div class="checkbox-container p-3 rounded-lg border hover:border-blue-500 transition-all duration-300">
-                        <label class="inline-flex items-center cursor-pointer">
-                            <input type="checkbox" name="donationTypes" value="Tissue/Eye Pledge" class="form-checkbox h-5 w-5 text-blue-600 transition duration-150 ease-in-out" />
-                            <span class="ml-3 text-gray-700">Tissue/Eye Pledge</span>
                         </label>
                     </div>
                 </div>
@@ -297,8 +343,15 @@
         document.addEventListener('DOMContentLoaded', () => {
             const donorForm = document.getElementById('donorForm');
             const progressBar = document.querySelector('.progress-bar-fill');
+            const zipInput = document.querySelector('input[name="zipcode"]');
             
-            // Update progress bar as user fills the form
+            zipInput.addEventListener('input', (e) => {
+                e.target.value = e.target.value.replace(/\D/g, '');
+                if (e.target.value.length > 5) {
+                    e.target.value = e.target.value.slice(0, 5);
+                }
+            });
+
             const updateProgress = () => {
                 const formElements = donorForm.elements;
                 let filledCount = 0;
@@ -317,10 +370,8 @@
                 progressBar.style.width = `${progress}%`;
             };
             
-            // Add input event listeners to all form elements
             donorForm.addEventListener('input', updateProgress);
             
-            // Add focus effects
             const formGroups = document.querySelectorAll('.form-group');
             formGroups.forEach(group => {
                 const input = group.querySelector('input, select, textarea');
@@ -334,11 +385,9 @@
                 }
             });
             
-            // Form submission
             donorForm.addEventListener('submit', (event) => {
                 event.preventDefault();
                 
-                // Get form values
                 const formData = new FormData(donorForm);
                 const donationTypes = Array.from(document.querySelectorAll('input[name="donationTypes"]:checked'))
                     .map(checkbox => checkbox.value);
@@ -362,16 +411,10 @@
                     registrationDate: new Date().toISOString()
                 };
                 
-                // Get existing donors or initialize empty array
                 const donors = JSON.parse(localStorage.getItem('donors')) || [];
-                
-                // Add new donor
                 donors.push(donor);
-                
-                // Save to localStorage
                 localStorage.setItem('donors', JSON.stringify(donors));
                 
-                // Show success message with animation
                 const submitBtn = document.querySelector('button[type="submit"]');
                 submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Registration Successful!';
                 submitBtn.classList.add('bg-green-600', 'hover:bg-green-700');
@@ -383,5 +426,4 @@
         });
     </script>
 </body>
-
 </html>
