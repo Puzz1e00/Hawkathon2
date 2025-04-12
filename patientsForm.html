@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Patient Information Form</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 1.15rem;
+      background-color: #fffdf7;
+      color: #222;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="date"],
+    input[type="number"],
+    select,
+    textarea {
+      font-size: 1.1rem;
+      padding: 0.8em;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    label {
+      font-size: 1.1rem;
+      text-align: left;
+    }
+
+    table {
+      width: 100%;
+    }
+
+    table td {
+      padding: 16px 20px;
+      vertical-align: top;
+    }
+
+    td label {
+      display: block;
+      margin-bottom: 6px;
+      text-align: left;
+    }
+
+    td input:not([type="radio"]),
+    td select {
+      display: block;
+      margin: 0 auto;
+    }
+
+    #gender-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-top: 6px;
+    }
+
+    #gender-group label {
+      display: inline;
+      margin-bottom: 0;
+      text-align: left;
+    }
+
+    .header {
+      background-color: lightgray;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 30px;
+    }
+
+    .title {
+      text-align: center;
+      flex: 1;
+    }
+
+    .title h1 {
+      margin: 0;
+      font-size: 2.2rem;
+      font-weight: bold;
+      margin-left:150px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .logo h1 {
+      font-size: 28px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      margin: 0 auto;
+      width: 75vw;
+    }
+
+    fieldset {
+      margin: 25px 0;
+      padding: 25px 15px 20px 15px;
+      border: 1px solid #999;
+      position: relative;
+    }
+
+    legend {
+      font-weight: bold;
+      font-size: 1.2rem;
+      padding: 0 10px;
+      background-color: white;
+      margin-left: 10px;
+    }
+
+    .submit-btn {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      width: fit-content;
+      margin: 40px auto 50px auto;
+      font-size: 1.1rem;
+    }
+  </style>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const hospitalId = sessionStorage.getItem('loggedInHospitalId');
+      let hospitalState = '';
+
+      if (hospitalId) {
+        const hospitals = JSON.parse(localStorage.getItem('hospitals')) || [];
+        const hospital = hospitals.find(h => h.id == hospitalId);
+
+        if (hospital) {
+          document.getElementById('hospitalName').textContent = hospital.name;
+          hospitalState = hospital.state || (hospital.address && hospital.address.state) || '';
+        }
+      }
+
+      const findDonorBtn = document.getElementById('findDonorBtn');
+      if (findDonorBtn) {
+        findDonorBtn.addEventListener('click', function () {
+          const bloodType = document.getElementById('bloodType').value;
+          if (!bloodType) {
+            alert('Please select a blood type');
+            return;
+          }
+          findMatchingDonors(bloodType, hospitalState);
+        });
+      }
+    });
+
+    function findMatchingDonors(bloodType, hospitalState) {
+      const donors = JSON.parse(localStorage.getItem('donors')) || [];
+      const matchingDonors = donors.filter(donor => {
+        const donorState = donor.state || (donor.address && donor.address.state) || '';
+        return donor.bloodGroup === bloodType &&
+          (!hospitalState || donorState.toLowerCase() === hospitalState.toLowerCase());
+      });
+
+      const resultsSection = document.getElementById('donorsResults');
+      resultsSection.style.display = 'block';
+
+      document.getElementById('resultsHeading').textContent =
+        `Donors with ${bloodType} Blood Type`;
+
+      const donorsList = document.getElementById('donorsList');
+      if (matchingDonors.length > 0) {
+        donorsList.innerHTML = matchingDonors.map(donor => `
+          <div style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; background-color: white;">
+            <div><strong>Name:</strong> ${donor.name || 'N/A'}</div>
+            <div style="color: #dc3545; font-weight: bold;"><strong>Blood Group:</strong> ${donor.bloodGroup || 'N/A'}</div>
+            <div><strong>Contact:</strong> ${donor.contact || 'N/A'}</div>
+            <div><strong>City:</strong> ${donor.city || (donor.address && donor.address.city) || 'N/A'}</div>
+            <div><strong>State:</strong> ${donor.state || (donor.address && donor.address.state) || 'N/A'}</div>
+            <a href="send_message.html?id=${donor.id}" 
+               style="display: block; width: 100%; padding: 8px; background-color: #28a745; color: white; text-align: center; border-radius: 4px; margin-top: 10px; text-decoration: none;">
+              Contact Donor
+            </a>
+          </div>
+        `).join('');
+      } else {
+        donorsList.innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; padding: 20px; background-color: #f8f9fa; border-radius: 8px;">
+            <p style="margin: 0; font-size: 16px; color: #6c757d;">No donors found with ${bloodType} blood type.</p>
+          </div>
+        `;
+      }
+    }
+  </script>
+</head>
+<body>
+  <header>
+    <div class="header">
+      <div class="title">
+        <h1>Patient Information Form</h1>
+      </div>
+      <div class="logo">
+        <h1 id="hospitalName">Hospital Name</h1>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <form id="donorSearchForm" onsubmit="return false;">
+      <fieldset id="personal-information">
+        <legend>Personal Information</legend>
+        <table>
+          <tr>
+            <td>
+              <label for="name-first">First Name:</label>
+              <input id="name-first" type="text" placeholder="Enter your first name" required>
+            </td>
+            <td>
+              <label for="name-last">Last Name:</label>
+              <input id="name-last" type="text" placeholder="Enter your last name" required>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label for="dob">Date of Birth:</label>
+              <input id="dob" type="date" required>
+            </td>
+            <td>
+              <label for="gender">Gender:</label>
+              <div id="gender-group">
+                <input id="male" type="radio" name="gender" value="male" required>
+                <label for="male">Male</label>
+                <input id="female" type="radio" name="gender" value="female">
+                <label for="female">Female</label>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label for="phone-number">Phone Number:</label>
+              <input id="phone-number" type="number" placeholder="Enter your phone number" required>
+            </td>
+            <td>
+              <label for="email">Email:</label>
+              <input id="email" type="email" placeholder="Enter your email">
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <label for="address">Address:</label>
+              <input id="address" type="text" placeholder="Enter your address" required>
+            </td>
+          </tr>
+        </table>
+      </fieldset>
+
+      <fieldset id="patient-information">
+        <legend>Patient Medical Request</legend>
+        <table>
+          <tr>
+            <td>
+              <label for="bloodType">Blood Type:</label>
+              <select name="bloodType" id="bloodType" required>
+                <option value="">Select</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+              </select>
+            </td>
+            <td>
+              <label for="units-needed">Units Needed:</label>
+              <input type="number" id="units-needed" placeholder="e.g. 2" required>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label for="urgency">Urgency Level:</label>
+              <select id="urgency" required>
+                <option value="normal">Normal</option>
+                <option value="urgent">Urgent</option>
+                <option value="emergency">Emergency</option>
+              </select>
+            </td>
+            <td>
+              <label for="blood-product">Type of Blood Product:</label>
+              <select id="blood-product" required>
+                <option value="">Select</option>
+                <option value="whole">Whole Blood</option>
+                <option value="plasma">Plasma</option>
+                <option value="platelets">Platelets</option>
+              </select>
+            </td>
+          </tr>
+        </table>
+      </fieldset>
+
+      <button type="button" id="findDonorBtn" class="submit-btn">
+        Find Matching Donors
+      </button>
+    </form>
+
+    <div id="donorsResults" style="margin-top: 30px; display: none;">
+      <h3 id="resultsHeading">Matching Donors</h3>
+      <div id="donorsList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-top: 15px;"></div>
+    </div>
+  </main>
+</body>
+</html>
