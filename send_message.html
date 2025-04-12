@@ -222,6 +222,23 @@
         
         <textarea id="messageInput" placeholder="Enter your urgent message here...">Urgent: We need your blood type at our hospital immediately. Please respond if you can donate.</textarea>
         
+        <!-- AI Message Recommendations -->
+        <div id="messageRecommendations" style="margin-top: 15px; margin-bottom: 15px; background-color: #f0f9ff; border-radius: 8px; padding: 12px; border: 1px solid #bfdbfe;">
+          <div style="display: flex; align-items: center; margin-bottom: 10px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="14.31" y1="8" x2="20.05" y2="17.94"></line>
+              <line x1="9.69" y1="8" x2="21.17" y2="8"></line>
+              <line x1="7.38" y1="12" x2="13.12" y2="2.06"></line>
+              <line x1="9.69" y1="16" x2="3.95" y2="6.06"></line>
+              <line x1="14.31" y1="16" x2="2.83" y2="16"></line>
+              <line x1="16.62" y1="12" x2="10.88" y2="21.94"></line>
+            </svg>
+            <strong style="color: #0284c7;">AI Message Recommendations</strong>
+          </div>
+          <div id="recommendationsList" style="display: flex; flex-direction: column; gap: 8px;"></div>
+        </div>
+        
         <button id="sendSMSBtn" class="send-btn">Send Urgent SMS</button>
       </div>
     </div>
@@ -293,6 +310,9 @@
         // Get hospital info for signature
         const hospitalSignature = hospital ? 
           `\n\n— ${hospital.name}\n${hospital.contact}` : '\n\n— LifeLink System';
+        
+        // Generate AI message recommendations
+        generateMessageRecommendations(donor, patientBloodType, unitsNeeded, urgencyLevel, bloodProduct);
         
         // Set default urgent message using patient details if available
         let messageText = '';
@@ -393,6 +413,108 @@
         statusDiv.style.display = 'block';
       }
       
+      // Generate AI-powered message recommendations
+      function generateMessageRecommendations(donor, patientBloodType, unitsNeeded, urgencyLevel, bloodProduct) {
+        const recommendationsList = document.getElementById('recommendationsList');
+        
+        // Clear previous recommendations
+        recommendationsList.innerHTML = '';
+        
+        // Different message templates based on various factors
+        const recommendations = [];
+        
+        // Base on donor-patient compatibility
+        const donorBloodType = donor.bloodGroup;
+        let compatibilityNote = '';
+        
+        // Check special compatibility cases
+        if (donorBloodType === 'O-') {
+          compatibilityNote = 'As a universal donor, your blood can help anyone in need.';
+          recommendations.push(`${donor.name}, your O- blood is universally compatible and critically needed right now. Could you donate today?`);
+        }
+        else if (patientBloodType === 'AB+' && donorBloodType) {
+          compatibilityNote = 'The patient is a universal recipient and can receive your blood type.';
+          recommendations.push(`${donor.name}, we have an AB+ patient who can receive your ${donorBloodType} blood. Are you available to donate?`);
+        }
+        else if (isCompatible(donorBloodType, patientBloodType)) {
+          compatibilityNote = `Your ${donorBloodType} blood is compatible with the patient's ${patientBloodType} type.`;
+          recommendations.push(`${donor.name}, your ${donorBloodType} blood is a direct match for our ${patientBloodType} patient. Could you help by donating today?`);
+        }
+        
+        // Based on urgency level
+        if (urgencyLevel === 'emergency') {
+          recommendations.push(`EMERGENCY: ${donor.name}, we urgently need your ${donorBloodType} blood donation for a critical patient. Please respond ASAP if you can come in.`);
+        }
+        
+        // Based on units needed
+        if (unitsNeeded && parseInt(unitsNeeded) > 1) {
+          recommendations.push(`${donor.name}, we need ${unitsNeeded} units of ${patientBloodType || donorBloodType} blood. Your donation would help us reach this goal.`);
+        }
+        
+        // Based on previous donation history
+        const donationTypes = donor.donationTypes || ['Blood'];
+        if (bloodProduct && donationTypes.some(type => type.toLowerCase().includes(bloodProduct.toLowerCase()))) {
+          recommendations.push(`${donor.name}, based on your donation history, could you specifically donate ${bloodProduct} today? We have a patient in need.`);
+        }
+        
+        // If no specific recommendations are generated, add a default one
+        if (recommendations.length === 0) {
+          recommendations.push(`${donor.name}, we need your ${donorBloodType} blood donation at our hospital. Can you help us today?`);
+        }
+        
+        // Add the recommendations to the UI
+        recommendations.forEach(recommendation => {
+          const recommendationElement = document.createElement('div');
+          recommendationElement.style.padding = '10px';
+          recommendationElement.style.backgroundColor = 'white';
+          recommendationElement.style.borderRadius = '6px';
+          recommendationElement.style.border = '1px solid #e5e7eb';
+          recommendationElement.style.cursor = 'pointer';
+          recommendationElement.textContent = recommendation;
+          
+          // Click to use this recommendation
+          recommendationElement.addEventListener('click', () => {
+            document.getElementById('messageInput').value = recommendation;
+          });
+          
+          recommendationsList.appendChild(recommendationElement);
+        });
+        
+        // Add compatibility note if any
+        if (compatibilityNote) {
+          const noteElement = document.createElement('div');
+          noteElement.style.marginTop = '8px';
+          noteElement.style.fontSize = '12px';
+          noteElement.style.color = '#0284c7';
+          noteElement.textContent = `ℹ️ ${compatibilityNote}`;
+          recommendationsList.appendChild(noteElement);
+        }
+      }
+      
+      // Helper function to check blood compatibility
+      function isCompatible(donorType, patientType) {
+        if (!donorType || !patientType) return false;
+        
+        // Universal donor
+        if (donorType === 'O-') return true;
+        
+        // Universal recipient
+        if (patientType === 'AB+') return true;
+        
+        // Compatibility rules
+        const compatibility = {
+          'O-': ['O-', 'O+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+'],
+          'O+': ['O+', 'A+', 'B+', 'AB+'],
+          'A-': ['A-', 'A+', 'AB-', 'AB+'],
+          'A+': ['A+', 'AB+'],
+          'B-': ['B-', 'B+', 'AB-', 'AB+'],
+          'B+': ['B+', 'AB+'],
+          'AB-': ['AB-', 'AB+'],
+          'AB+': ['AB+']
+        };
+        
+        return compatibility[donorType] && compatibility[donorType].includes(patientType);
+      }
     });
   </script>
 </body>

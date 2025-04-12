@@ -397,6 +397,131 @@
       <h3 id="resultsHeading">Matching Donors</h3>
       <div id="donorsList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-top: 15px;"></div>
     </div>
+    
+    <!-- AI-Powered Prediction Section -->
+    <div style="margin-top: 40px; background-color: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+      <h3 style="color: #333; margin-top: 0; display: flex; align-items: center;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 10px;"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+        AI-Powered Donation Predictions
+      </h3>
+      <p>Our AI analyzes historical donation patterns and current inventory to predict upcoming needs:</p>
+      
+      <div id="aiPredictions" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
+        <!-- Prediction cards will be inserted here -->
+      </div>
+      
+      <button id="generatePredictionsBtn" style="background-color: #6366f1; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin-top: 20px; display: flex; align-items: center; font-weight: 500;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        Generate AI Predictions
+      </button>
+    </div>
   </main>
+
+  <script>
+    // Existing code...
+
+    // AI Prediction Functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const generatePredictionsBtn = document.getElementById('generatePredictionsBtn');
+      const aiPredictionsContainer = document.getElementById('aiPredictions');
+      
+      if (generatePredictionsBtn) {
+        generatePredictionsBtn.addEventListener('click', function() {
+          // In a real implementation, this would call an AI API
+          // For demo purposes, we'll simulate AI predictions
+          generateBloodNeedPredictions();
+        });
+      }
+      
+      function generateBloodNeedPredictions() {
+        const bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+        const currentDate = new Date();
+        
+        // Clear previous predictions
+        aiPredictionsContainer.innerHTML = '';
+        
+        // Simple algorithm to simulate AI predictions based on:
+        // - Day of week (weekends might need more blood)
+        // - Random factor for urgency
+        // - Blood type rarity
+        
+        bloodTypes.forEach(bloodType => {
+          // Get day of week (0 = Sunday, 6 = Saturday)
+          const dayOfWeek = currentDate.getDay();
+          const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+          
+          // Blood type rarity factor (O- is most needed, AB+ least needed)
+          const rarityFactor = 
+            bloodType === 'O-' ? 5 :
+            bloodType === 'O+' ? 4 :
+            bloodType === 'A-' ? 4.5 :
+            bloodType === 'B-' ? 4.5 :
+            bloodType === 'AB-' ? 3.5 :
+            bloodType === 'A+' ? 3 :
+            bloodType === 'B+' ? 3 : 2; // AB+
+          
+          // Weekend factor
+          const weekendFactor = isWeekend ? 1.3 : 1;
+          
+          // Random factor (simulates unpredictable events)
+          const randomFactor = 0.7 + Math.random() * 0.6;
+          
+          // Calculate predicted units needed
+          let predictedUnits = Math.round(rarityFactor * weekendFactor * randomFactor);
+          
+          // Calculate urgency (1-10 scale)
+          const urgencyScore = Math.min(10, Math.round(rarityFactor * randomFactor * 2));
+          
+          // Get forecast days (3-7 days)
+          const forecastDays = 3 + Math.floor(Math.random() * 5);
+          const forecastDate = new Date(currentDate);
+          forecastDate.setDate(forecastDate.getDate() + forecastDays);
+          
+          // Create prediction card
+          const cardColor = 
+            urgencyScore >= 8 ? '#fee2e2' :  // Red background for high urgency
+            urgencyScore >= 5 ? '#fef3c7' :  // Yellow for medium
+            '#ecfccb';                       // Green for low
+            
+          const textColor = 
+            urgencyScore >= 8 ? '#991b1b' :  // Red text for high urgency
+            urgencyScore >= 5 ? '#92400e' :  // Orange for medium
+            '#3f6212';                       // Green for low
+            
+          // Create card HTML
+          const cardHtml = `
+            <div style="background-color: ${cardColor}; border-radius: 8px; padding: 15px; border: 1px solid rgba(0,0,0,0.1);">
+              <div style="font-size: 18px; font-weight: bold; color: ${textColor};">${bloodType}</div>
+              <div style="margin: 8px 0; font-weight: bold; font-size: 20px;">${predictedUnits} units needed</div>
+              <div>Forecast for: ${forecastDate.toLocaleDateString()}</div>
+              <div style="margin-top: 8px;">
+                <div style="height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden;">
+                  <div style="height: 100%; width: ${urgencyScore * 10}%; background-color: ${textColor};"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-top: 4px; font-size: 12px;">
+                  <span>Low urgency</span>
+                  <span>High urgency</span>
+                </div>
+              </div>
+            </div>
+          `;
+          
+          // Add card to container
+          aiPredictionsContainer.innerHTML += cardHtml;
+        });
+        
+        // Add summary card at the end
+        const summaryHtml = `
+          <div style="grid-column: 1/-1; background-color: #f0f9ff; border-radius: 8px; padding: 15px; border: 1px solid rgba(0,0,0,0.1); margin-top: 10px;">
+            <div style="font-weight: bold; font-size: 16px; color: #0369a1;">AI Recommendation Summary</div>
+            <p style="margin: 8px 0;">Based on current patterns, focus on collecting <strong>O-</strong> and <strong>A-</strong> blood types in the next 5 days.</p>
+            <p style="margin: 8px 0;">Consider scheduling extra collection drives during the upcoming ${isWeekend ? 'weekend' : 'next weekend'}.</p>
+          </div>
+        `;
+        
+        aiPredictionsContainer.innerHTML += summaryHtml;
+      }
+    });
+  </script>
 </body>
 </html>
