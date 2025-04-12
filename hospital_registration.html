@@ -5,7 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hospital Registration</title>
     <link rel="stylesheet" href="hl_style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        :root {
+            --primary-500: #22c55e;
+            --primary-600: #16a34a;
+            --primary-700: #15803d;
+            --primary-light: #dcfce7;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f0fdf4 0%, var(--primary-light) 100%);
+            min-height: 100vh;
+        }
         .nav-container {
             display: flex;
             justify-content: flex-end;
@@ -24,9 +36,13 @@
             background-color: #4CAF50;
             color: white;
         }
+
     </style>
 </head>
-<body>
+    <a href="homepage.html" class="back-btn" style="position: absolute; top: 20px; left: 20px; color: var(--primary-600); text-decoration: none; font-size: 24px;">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+
     <div class="nav-container">
         <a href="hospital_login.html" class="nav-link">Hospital Login</a>
     </div>
@@ -58,12 +74,16 @@
                         <input type="text" id="city" required>
                     </div>
                     <div class="form-group">
+                        <label for="zip">Zip Code:</label>
+                        <input type="number" id="zip" required maxlength="5" minlength="5">
+                    </div>
+                    <div class="form-group">
                         <label for="state">State:</label>
                         <input type="text" id="state" required>
                     </div>
                     <div class="form-group">
                         <label for="contact">Contact Number:</label>
-                        <input type="tel" id="contact" required>
+                        <input type="tel" id="contact" required maxlength="10" minlength="10">
                     </div>
                     <div class="form-group">
                         <label for="services">Services (comma-separated):</label>
@@ -76,7 +96,7 @@
             <!-- Display Hospitals -->
             <div class="hospitals-container">
                 <div class="hospitals-header">
-                    <h2>Hospital Connected with US</h2>
+                    <h2>Hospital Connected with us</h2>
                 </div>
                 <div id="hospitalList"></div>
             </div>
