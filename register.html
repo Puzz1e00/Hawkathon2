@@ -225,6 +225,12 @@
                     <div class="error-message contact-error">Please enter a valid phone number (digits only)</div>
                 </div>
                 
+                <div class="floating-label form-group">
+                    <input type="email" name="email" placeholder=" " class="w-full p-3 border rounded-md" />
+                    <label>Email Address</label>
+                    <i class="fas fa-envelope absolute right-3 top-3 text-gray-400"></i>
+                </div>
+                
                 <div class="col-span-2">
                     <label class="block font-medium mb-4 text-gray-700">Address</label>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -459,6 +465,7 @@
                     age: formData.get('age'),
                     bloodGroup: formData.get('bloodType'),
                     contact: formData.get('contact'),
+                    email: formData.get('email'),
                     emergencyContact: formData.get('emergencyContact'),
                     address: {
                         street: formData.get('street'),

@@ -164,6 +164,7 @@
             alert('Please select a blood type');
             return;
           }
+          
           findMatchingDonors(bloodType, hospitalState);
         });
       }
@@ -171,28 +172,87 @@
 
     function findMatchingDonors(bloodType, hospitalState) {
       const donors = JSON.parse(localStorage.getItem('donors')) || [];
-      const matchingDonors = donors.filter(donor => {
-        const donorState = donor.state || (donor.address && donor.address.state) || '';
-        return donor.bloodGroup === bloodType &&
-          (!hospitalState || donorState.toLowerCase() === hospitalState.toLowerCase());
-      });
+      let matchingDonors = [];
+      let headerMessage = '';
+      
+      // Get units needed and blood product type
+      const unitsNeeded = document.getElementById('units-needed').value;
+      const bloodProduct = document.getElementById('blood-product').value;
+      const urgencyLevel = document.getElementById('urgency').value;
+      
+      // For AB+ (universal receiver), show all blood types
+      if (bloodType === 'AB+') {
+        matchingDonors = donors.filter(donor => {
+          const donorState = donor.state || (donor.address && donor.address.state) || '';
+          return !hospitalState || donorState.toLowerCase() === hospitalState.toLowerCase();
+        });
+        headerMessage = `Donors for AB+ Blood Type (Universal Receiver - Can Receive Any Blood Type)`;
+      } else {
+        // Find donors matching the selected blood type
+        matchingDonors = donors.filter(donor => {
+          const donorState = donor.state || (donor.address && donor.address.state) || '';
+          return donor.bloodGroup === bloodType &&
+            (!hospitalState || donorState.toLowerCase() === hospitalState.toLowerCase());
+        });
+        
+        // Always include O- donors (universal donors) if selected blood type is not already O-
+        if (bloodType !== 'O-') {
+          const universalDonors = donors.filter(donor => {
+            const donorState = donor.state || (donor.address && donor.address.state) || '';
+            return donor.bloodGroup === 'O-' &&
+              (!hospitalState || donorState.toLowerCase() === hospitalState.toLowerCase());
+          });
+          
+          if (universalDonors.length > 0) {
+            // Combine both donor lists (avoiding duplicates by using ids)
+            const allDonorIds = new Set(matchingDonors.map(d => d.id));
+            universalDonors.forEach(donor => {
+              if (!allDonorIds.has(donor.id)) {
+                matchingDonors.push(donor);
+              }
+            });
+          }
+        }
+        
+        headerMessage = bloodType === 'O-' ? 
+          `Donors with O- Blood Type (Universal Donors)` : 
+          `Donors with ${bloodType} Blood Type + Universal Donors (O-)`;
+      }
+
+      // Sort donors to group by blood type
+      matchingDonors.sort((a, b) => a.bloodGroup.localeCompare(b.bloodGroup));
 
       const resultsSection = document.getElementById('donorsResults');
       resultsSection.style.display = 'block';
 
-      document.getElementById('resultsHeading').textContent =
-        `Donors with ${bloodType} Blood Type`;
+      document.getElementById('resultsHeading').textContent = headerMessage;
 
       const donorsList = document.getElementById('donorsList');
       if (matchingDonors.length > 0) {
-        donorsList.innerHTML = matchingDonors.map(donor => `
+        // Add an info message for AB+ (universal receiver)
+        let infoMessage = '';
+        if (bloodType === 'AB+') {
+          infoMessage = `
+            <div style="grid-column: 1/-1; text-align: center; margin-bottom: 20px; background-color: #cce5ff; padding: 15px; border-radius: 8px; border: 1px solid #b8daff;">
+              <p style="margin: 0; font-size: 16px; color: #004085;">
+                <strong>Universal Receiver Information:</strong> AB+ blood type can receive donations from all other blood types, making AB+ patients "universal receivers."
+              </p>
+            </div>
+          `;
+        }
+
+        donorsList.innerHTML = infoMessage + matchingDonors.map(donor => `
           <div style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; background-color: white;">
             <div><strong>Name:</strong> ${donor.name || 'N/A'}</div>
-            <div style="color: #dc3545; font-weight: bold;"><strong>Blood Group:</strong> ${donor.bloodGroup || 'N/A'}</div>
+            <div style="color: ${getBloodTypeColor(donor.bloodGroup)}; font-weight: bold;">
+              <strong>Blood Group:</strong> ${donor.bloodGroup || 'N/A'} 
+              ${getBloodTypeLabel(donor.bloodGroup)}
+            </div>
             <div><strong>Contact:</strong> ${donor.contact || 'N/A'}</div>
+            <div><strong>Email:</strong> ${donor.email || 'N/A'}</div>
             <div><strong>City:</strong> ${donor.city || (donor.address && donor.address.city) || 'N/A'}</div>
             <div><strong>State:</strong> ${donor.state || (donor.address && donor.address.state) || 'N/A'}</div>
-            <a href="send_message.html?id=${donor.id}" 
+            <a href="send_message.html?id=${donor.id}&bloodType=${bloodType}&unitsNeeded=${unitsNeeded}&urgency=${urgencyLevel}&bloodProduct=${bloodProduct}" 
                style="display: block; width: 100%; padding: 8px; background-color: #28a745; color: white; text-align: center; border-radius: 4px; margin-top: 10px; text-decoration: none;">
               Contact Donor
             </a>
@@ -205,6 +265,20 @@
           </div>
         `;
       }
+    }
+    
+    // Helper function to get color based on blood type
+    function getBloodTypeColor(bloodType) {
+      if (bloodType === 'O-') return '#dc3545'; // Red for universal donor
+      if (bloodType === 'AB+') return '#0d6efd'; // Blue for universal receiver
+      return '#28a745'; // Green for other blood types
+    }
+    
+    // Helper function to get label based on blood type
+    function getBloodTypeLabel(bloodType) {
+      if (bloodType === 'O-') return '(Universal Donor)';
+      if (bloodType === 'AB+') return '(Universal Receiver)';
+      return '';
     }
   </script>
 </head>
@@ -253,7 +327,7 @@
           <tr>
             <td>
               <label for="phone-number">Phone Number:</label>
-              <input id="phone-number" type="number" placeholder="Enter your phone number" required>
+              <input id="phone-number" type="number" placeholder="Enter your phone number"  pattern="\d{10}" minlength="10" maxlength="10" required>
             </td>
             <td>
               <label for="email">Email:</label>

@@ -119,15 +119,6 @@
       align-items: center;
       margin-bottom: 20px;
     }
-    #debug-info {
-      margin-top: 20px;
-      padding: 10px;
-      background-color: #f8f9fa;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      white-space: pre-wrap;
-      display: none;
-    }
     #status {
       position: fixed;
       top: 20px;
@@ -179,7 +170,7 @@
           </div>
           
           <div class="detail-item">
-            <span class="detail-label">Email</span>
+            <span class="detail-label" hidden>Email</span>
             <div id="donorEmail" class="detail-value">-</div>
           </div>
         </div>
@@ -223,13 +214,11 @@
           </div>
         </div>
         
-        <button id="debugBtn" onclick="toggleDebug()" style="padding: 5px 10px; margin-top: 10px; background-color: #f0f0f0; border: 1px solid #ddd; border-radius: 4px;">Show Debug Info</button>
-        <div id="debug-info"></div>
       </div>
       
       <div class="notify-panel">
         <h3>Send Notification</h3>
-        <p>Send an urgent SMS to this donor</p>
+        <p>Send an SMS to this donor</p>
         
         <textarea id="messageInput" placeholder="Enter your urgent message here...">Urgent: We need your blood type at our hospital immediately. Please respond if you can donate.</textarea>
         
@@ -237,7 +226,7 @@
       </div>
     </div>
     
-    <a href="patientForm.html" class="back-link">← Back to Donors List</a>
+    <a href="patientsForm.html" class="back-link">← Back to Donors List</a>
   </div>
 
   <!-- Status notification element -->
@@ -258,6 +247,18 @@
       const debugInfo = document.getElementById('debug-info');
       const statusDiv = document.getElementById('status');
       const sendBtn = document.getElementById('sendSMSBtn');
+      
+      // Get patient details from URL
+      const patientBloodType = urlParams.get('bloodType') || '';
+      const unitsNeeded = urlParams.get('unitsNeeded') || '';
+      const urgencyLevel = urlParams.get('urgency') || '';
+      const bloodProduct = urlParams.get('bloodProduct') || '';
+      const messageInput = document.getElementById('messageInput');
+      
+      // Get hospital info
+      const hospitalId = sessionStorage.getItem('loggedInHospitalId');
+      const hospitals = JSON.parse(localStorage.getItem('hospitals')) || [];
+      const hospital = hospitals.find(h => h.id == hospitalId) || { name: 'our hospital', contact: '' };
       
       // Find donor data
       const donors = JSON.parse(localStorage.getItem('donors')) || [];
@@ -289,10 +290,42 @@
           new Date(donor.registrationDate).toLocaleDateString() : 'Unknown';
         document.getElementById('registrationDate').textContent = regDate;
         
-        // Set default urgent message
-        document.getElementById('messageInput').value = 
-          `URGENT: ${donor.name}, we need your ${donor.bloodGroup} blood donation immediately. ` +
-          `Please respond to this message if you can come to the hospital today.`;
+        // Get hospital info for signature
+        const hospitalSignature = hospital ? 
+          `\n\n— ${hospital.name}\n${hospital.contact}` : '\n\n— LifeLink System';
+        
+        // Set default urgent message using patient details if available
+        let messageText = '';
+        
+        if (patientBloodType && unitsNeeded) {
+          // Create urgency text
+          let urgencyText = '';
+          if (urgencyLevel === 'emergency') {
+            urgencyText = 'This is an EMERGENCY situation. ';
+          } else if (urgencyLevel === 'urgent') {
+            urgencyText = 'This is URGENT. ';
+          }
+          
+          // Create blood product text
+          const productName = bloodProduct ? 
+            (bloodProduct === 'whole' ? 'whole blood' : 
+             bloodProduct === 'plasma' ? 'plasma' : 
+             bloodProduct === 'platelets' ? 'platelets' : 'blood') : 'blood';
+          
+          const bloodProductText = unitsNeeded > 1 ? 'units' : 'unit';
+          
+          // Build the message - use the hospital name if available
+          const hospitalName = hospital && hospital.name ? hospital.name : 'our hospital';
+          messageText = `URGENT: ${donor.name}, we need ${unitsNeeded} ${bloodProductText} of your ${donor.bloodGroup} blood for ${productName}. ` +
+            `${urgencyText}Please respond to this message if you can come to ${hospitalName} as soon as possible.`;
+        } else {
+          // Fallback message - use the hospital name if available
+          const hospitalName = hospital && hospital.name ? hospital.name : 'our hospital';
+          messageText = `URGENT: ${donor.name}, we need your ${donor.bloodGroup} blood donation immediately. ` +
+            `Please respond to this message if you can come to ${hospitalName} as soon as possible.`;
+        }
+        
+        messageInput.value = messageText;
       }
 
       // SMS Notification Handler
@@ -308,10 +341,7 @@
           return;
         }
         
-        // Get hospital info for signature
-        const hospitalId = sessionStorage.getItem('loggedInHospitalId');
-        const hospitals = JSON.parse(localStorage.getItem('hospitals')) || [];
-        const hospital = hospitals.find(h => h.id == hospitalId);
+        // Get hospital signature for SMS
         const hospitalSignature = hospital ? 
           `\n\n— ${hospital.name}\n${hospital.contact}` : '\n\n— LifeLink System';
         
@@ -363,11 +393,6 @@
         statusDiv.style.display = 'block';
       }
       
-      function toggleDebug() {
-        debugInfo.style.display = debugInfo.style.display === 'none' ? 'block' : 'none';
-        document.getElementById('debugBtn').textContent = 
-          debugInfo.style.display === 'none' ? 'Show Debug Info' : 'Hide Debug Info';
-      }
     });
   </script>
 </body>

@@ -19,7 +19,9 @@
         "Plasma"
       ],
       "notes": "",
-      "registrationDate": "2007-05-13T07:30:05"
+      "registrationDate": "2007-05-13T07:30:05",
+      "email": "norma.bennett22@example.com",
+      "healthHistory": "Underwent treatment for high blood pressure. Currently stable."
     },
     {
       "id": 6901085817701,
@@ -40,7 +42,9 @@
         "Platelets"
       ],
       "notes": "",
-      "registrationDate": "2011-12-18T19:54:50"
+      "registrationDate": "2011-12-18T19:54:50",
+      "email": "robin.abbott54@example.com",
+      "healthHistory": "No chronic illnesses. Participated in annual health screenings."
     },
     {
       "id": 9800005030276,
@@ -60,7 +64,9 @@
         "Platelets"
       ],
       "notes": "",
-      "registrationDate": "1992-08-18T19:30:31"
+      "registrationDate": "1992-08-18T19:30:31",
+      "email": "elizabeth.hill34@example.com",
+      "healthHistory": "Previous surgery in 2015. Fully recovered. Passed all donor eligibility tests."
     },
     {
       "id": 5852248831237,
@@ -81,7 +87,9 @@
         "Platelets"
       ],
       "notes": "",
-      "registrationDate": "2020-10-15T23:26:28"
+      "registrationDate": "2020-10-15T23:26:28",
+      "email": "deborah.lin34@example.com",
+      "healthHistory": "Had chickenpox in childhood. Immune to common bloodborne infections."
     },
     {
       "id": 1061565303434,
@@ -102,7 +110,9 @@
         "Platelets"
       ],
       "notes": "",
-      "registrationDate": "2015-03-09T03:47:25"
+      "registrationDate": "2015-03-09T03:47:25",
+      "email": "melody.martinez23@example.com",
+      "healthHistory": "Previous surgery in 2015. Fully recovered. Passed all donor eligibility tests."
     },
     {
       "id": 7290220140567,
@@ -122,7 +132,9 @@
         "Plasma"
       ],
       "notes": "",
-      "registrationDate": "2015-04-10T02:30:11"
+      "registrationDate": "2015-04-10T02:30:11",
+      "email": "amy.barrett25@example.com",
+      "healthHistory": "Vegetarian diet. Slightly low hemoglobin once, but within safe limits."
     },
     {
       "id": 7690028482246,
@@ -143,7 +155,9 @@
         "Blood"
       ],
       "notes": "",
-      "registrationDate": "1983-08-06T23:50:18"
+      "registrationDate": "1983-08-06T23:50:18",
+      "email": "mark.garrison56@example.com",
+      "healthHistory": "Vegetarian diet. Slightly low hemoglobin once, but within safe limits."
     },
     {
       "id": 9587776505529,
@@ -164,7 +178,9 @@
         "Plasma"
       ],
       "notes": "",
-      "registrationDate": "1991-02-22T10:00:34"
+      "registrationDate": "1991-02-22T10:00:34",
+      "email": "brianna.mccarty46@example.com",
+      "healthHistory": "Previous surgery in 2015. Fully recovered. Passed all donor eligibility tests."
     },
     {
       "id": 6710487006518,
@@ -185,7 +201,9 @@
         "Blood"
       ],
       "notes": "",
-      "registrationDate": "1997-06-14T17:18:54"
+      "registrationDate": "1997-06-14T17:18:54",
+      "email": "marc.powell55@example.com",
+      "healthHistory": "Underwent treatment for high blood pressure. Currently stable."
     },
     {
       "id": 7718308002252,
@@ -206,7 +224,9 @@
         "Platelets"
       ],
       "notes": "",
-      "registrationDate": "2008-12-26T15:17:15"
+      "registrationDate": "2008-12-26T15:17:15",
+      "email": "brandon.crane47@example.com",
+      "healthHistory": "Previous surgery in 2015. Fully recovered. Passed all donor eligibility tests."
     },
     {
       "id": 5069926227422,
@@ -227,7 +247,9 @@
         "Blood"
       ],
       "notes": "",
-      "registrationDate": "2005-04-04T13:22:46"
+      "registrationDate": "2005-04-04T13:22:46",
+      "email": "jerry.chan41@example.com",
+      "healthHistory": "Underwent treatment for high blood pressure. Currently stable."
     },
     {
       "id": 9222804944356,
@@ -247,7 +269,9 @@
         "Blood"
       ],
       "notes": "",
-      "registrationDate": "1974-06-04T22:52:47"
+      "registrationDate": "1974-06-04T22:52:47",
+      "email": "nicholas.mcdaniel22@example.com",
+      "healthHistory": "Asthma managed with inhalers. No restrictions on donating."
     },
     {
       "id": 6076522010176,
@@ -268,7 +292,9 @@
         "Platelets"
       ],
       "notes": "",
-      "registrationDate": "1982-03-05T06:41:02"
+      "registrationDate": "1982-03-05T06:41:02",
+      "email": "patrick.phd46@example.com",
+      "healthHistory": "Recovered from COVID-19 in 2021. No complications. Eligible for plasma donation."
     },
     {
       "id": 9424078031022,
@@ -288,7 +314,9 @@
         "Plasma"
       ],
       "notes": "",
-      "registrationDate": "2020-07-15T18:31:00"
+      "registrationDate": "2020-07-15T18:31:00",
+      "email": "charles.saunders56@example.com",
+      "healthHistory": "No known allergies. Regular blood donor. Negative for hepatitis and HIV."
     },
     {
       "id": 1935311051007,
@@ -309,7 +337,9 @@
         "Plasma"
       ],
       "notes": "",
-      "registrationDate": "2014-08-24T03:46:37"
+      "registrationDate": "2014-08-24T03:46:37",
+      "email": "martin.johnson20@example.com",
+      "healthHistory": "Diagnosed with mild anemia in 2019, now resolved. Fit for donation."
     },
     {
       "id": 1769766933860,
@@ -329,7 +359,9 @@
         "Platelets"
       ],
       "notes": "",
-      "registrationDate": "1980-01-10T20:21:34"
+      "registrationDate": "1980-01-10T20:21:34",
+      "email": "william.harrison54@example.com",
+      "healthHistory": "No known allergies. Regular blood donor. Negative for hepatitis and HIV."
     },
     {
       "id": 4301406886331,
@@ -350,7 +382,9 @@
         "Platelets"
       ],
       "notes": "",
-      "registrationDate": "1971-08-02T15:09:36"
+      "registrationDate": "1971-08-02T15:09:36",
+      "email": "bryan.rodriguez54@example.com",
+      "healthHistory": "Previous surgery in 2015. Fully recovered. Passed all donor eligibility tests."
     },
     {
       "id": 5981235609120,
@@ -371,7 +405,9 @@
         "Platelets"
       ],
       "notes": "",
-      "registrationDate": "1970-04-25T12:08:52"
+      "registrationDate": "1970-04-25T12:08:52",
+      "email": "natasha.cortez52@example.com",
+      "healthHistory": "Underwent treatment for high blood pressure. Currently stable."
     },
     {
       "id": 6318744115914,
@@ -392,7 +428,9 @@
         "Blood"
       ],
       "notes": "",
-      "registrationDate": "1972-10-05T17:32:33"
+      "registrationDate": "1972-10-05T17:32:33",
+      "email": "david.lee21@example.com",
+      "healthHistory": "Underwent treatment for high blood pressure. Currently stable."
     },
     {
       "id": 5939149634124,
@@ -412,7 +450,9 @@
         "Plasma"
       ],
       "notes": "",
-      "registrationDate": "1981-12-10T17:28:52"
+      "registrationDate": "1981-12-10T17:28:52",
+      "email": "elizabeth.arnold29@example.com",
+      "healthHistory": "Had chickenpox in childhood. Immune to common bloodborne infections."
     },
     {
       "id": 5421725682319,
@@ -433,7 +473,9 @@
         "Platelets"
       ],
       "notes": "",
-      "registrationDate": "2023-10-01T21:25:29"
+      "registrationDate": "2023-10-01T21:25:29",
+      "email": "hunter.bass55@example.com",
+      "healthHistory": "No chronic illnesses. Participated in annual health screenings."
     },
     {
       "id": 8573095487871,
@@ -453,7 +495,9 @@
         "Blood"
       ],
       "notes": "",
-      "registrationDate": "1978-09-22T07:47:58"
+      "registrationDate": "1978-09-22T07:47:58",
+      "email": "melissa.hernandez50@example.com",
+      "healthHistory": "Recovered from COVID-19 in 2021. No complications. Eligible for plasma donation."
     },
     {
       "id": 9079429378587,
@@ -473,7 +517,9 @@
         "Blood"
       ],
       "notes": "",
-      "registrationDate": "2018-07-22T04:47:33"
+      "registrationDate": "2018-07-22T04:47:33",
+      "email": "gabrielle.dennis49@example.com",
+      "healthHistory": "No chronic illnesses. Participated in annual health screenings."
     },
     {
       "id": 2357478517421,
@@ -494,7 +540,9 @@
         "Plasma"
       ],
       "notes": "",
-      "registrationDate": "2017-11-20T09:00:38"
+      "registrationDate": "2017-11-20T09:00:38",
+      "email": "christian.rodriguez28@example.com",
+      "healthHistory": "No known allergies. Regular blood donor. Negative for hepatitis and HIV."
     },
     {
       "id": 9610663147692,
@@ -515,7 +563,9 @@
         "Blood"
       ],
       "notes": "",
-      "registrationDate": "2017-06-03T10:39:03"
+      "registrationDate": "2017-06-03T10:39:03",
+      "email": "melinda.cain53@example.com",
+      "healthHistory": "Underwent treatment for high blood pressure. Currently stable."
     },
     {
       "id": 6075216008061,
@@ -535,7 +585,9 @@
         "Plasma"
       ],
       "notes": "",
-      "registrationDate": "2002-07-21T04:04:05"
+      "registrationDate": "2002-07-21T04:04:05",
+      "email": "mary.ryan56@example.com",
+      "healthHistory": "Previous surgery in 2015. Fully recovered. Passed all donor eligibility tests."
     },
     {
       "id": 2108433012985,
@@ -556,7 +608,9 @@
         "Platelets"
       ],
       "notes": "",
-      "registrationDate": "2009-11-07T22:44:02"
+      "registrationDate": "2009-11-07T22:44:02",
+      "email": "michelle.griffin36@example.com",
+      "healthHistory": "Fitness enthusiast. No prior illness. Iron levels in healthy range."
     },
     {
       "id": 6913263624677,
@@ -576,7 +630,9 @@
         "Plasma"
       ],
       "notes": "",
-      "registrationDate": "1997-02-11T23:41:10"
+      "registrationDate": "1997-02-11T23:41:10",
+      "email": "michael.warner23@example.com",
+      "healthHistory": "Asthma managed with inhalers. No restrictions on donating."
     },
     {
       "id": 1240164651691,
@@ -596,7 +652,9 @@
         "Plasma"
       ],
       "notes": "",
-      "registrationDate": "2019-03-06T07:50:47"
+      "registrationDate": "2019-03-06T07:50:47",
+      "email": "amanda.mack40@example.com",
+      "healthHistory": "No chronic illnesses. Participated in annual health screenings."
     },
     {
       "id": 4918649511456,
@@ -617,7 +675,9 @@
         "Platelets"
       ],
       "notes": "",
-      "registrationDate": "1982-12-24T02:51:02"
+      "registrationDate": "1982-12-24T02:51:02",
+      "email": "scott.harrington56@example.com",
+      "healthHistory": "Asthma managed with inhalers. No restrictions on donating."
     },
     {
       "id": 2729346461930,
@@ -638,7 +698,9 @@
         "Platelets"
       ],
       "notes": "",
-      "registrationDate": "1992-12-14T14:28:56"
+      "registrationDate": "1992-12-14T14:28:56",
+      "email": "jamie.kelly64@example.com",
+      "healthHistory": "No known allergies. Regular blood donor. Negative for hepatitis and HIV."
     },
     {
       "id": 3995477666504,
@@ -658,7 +720,9 @@
         "Platelets"
       ],
       "notes": "",
-      "registrationDate": "1994-04-24T14:44:37"
+      "registrationDate": "1994-04-24T14:44:37",
+      "email": "mikayla.barnes36@example.com",
+      "healthHistory": "Diagnosed with mild anemia in 2019, now resolved. Fit for donation."
     },
     {
       "id": 1839633627201,
@@ -679,7 +743,9 @@
         "Blood"
       ],
       "notes": "",
-      "registrationDate": "1982-10-31T15:26:39"
+      "registrationDate": "1982-10-31T15:26:39",
+      "email": "alyssa.smith55@example.com",
+      "healthHistory": "Previous surgery in 2015. Fully recovered. Passed all donor eligibility tests."
     },
     {
       "id": 1312200589215,
@@ -700,7 +766,9 @@
         "Blood"
       ],
       "notes": "",
-      "registrationDate": "2014-04-26T15:52:52"
+      "registrationDate": "2014-04-26T15:52:52",
+      "email": "stephanie.carroll32@example.com",
+      "healthHistory": "Underwent treatment for high blood pressure. Currently stable."
     },
     {
       "id": 1423081835327,
@@ -721,7 +789,9 @@
         "Plasma"
       ],
       "notes": "",
-      "registrationDate": "2006-05-03T23:55:00"
+      "registrationDate": "2006-05-03T23:55:00",
+      "email": "matthew.young57@example.com",
+      "healthHistory": "Underwent treatment for high blood pressure. Currently stable."
     },
     {
       "id": 4854205935791,
@@ -742,7 +812,9 @@
         "Platelets"
       ],
       "notes": "",
-      "registrationDate": "1975-01-31T03:24:05"
+      "registrationDate": "1975-01-31T03:24:05",
+      "email": "katherine.russell18@example.com",
+      "healthHistory": "Underwent treatment for high blood pressure. Currently stable."
     },
     {
       "id": 5974897444241,
@@ -763,7 +835,9 @@
         "Plasma"
       ],
       "notes": "",
-      "registrationDate": "1971-09-10T15:01:58"
+      "registrationDate": "1971-09-10T15:01:58",
+      "email": "travis.iii57@example.com",
+      "healthHistory": "Recovered from COVID-19 in 2021. No complications. Eligible for plasma donation."
     },
     {
       "id": 5700007217081,
@@ -784,7 +858,9 @@
         "Blood"
       ],
       "notes": "",
-      "registrationDate": "2016-01-24T04:48:58"
+      "registrationDate": "2016-01-24T04:48:58",
+      "email": "nicole.smith28@example.com",
+      "healthHistory": "Had chickenpox in childhood. Immune to common bloodborne infections."
     },
     {
       "id": 6199462338749,
@@ -804,7 +880,9 @@
         "Platelets"
       ],
       "notes": "",
-      "registrationDate": "1985-05-30T01:14:01"
+      "registrationDate": "1985-05-30T01:14:01",
+      "email": "keith.cook30@example.com",
+      "healthHistory": "Underwent treatment for high blood pressure. Currently stable."
     },
     {
       "id": 9697090983025,
@@ -824,7 +902,9 @@
         "Plasma"
       ],
       "notes": "",
-      "registrationDate": "2013-04-17T14:05:55"
+      "registrationDate": "2013-04-17T14:05:55",
+      "email": "cody.santos28@example.com",
+      "healthHistory": "No known allergies. Regular blood donor. Negative for hepatitis and HIV."
     },
     {
       "id": 4567582553489,
@@ -844,7 +924,9 @@
         "Platelets"
       ],
       "notes": "",
-      "registrationDate": "2010-09-02T12:50:43"
+      "registrationDate": "2010-09-02T12:50:43",
+      "email": "michael.kelly50@example.com",
+      "healthHistory": "No known allergies. Regular blood donor. Negative for hepatitis and HIV."
     },
     {
       "id": 5526931464878,
@@ -865,7 +947,9 @@
         "Plasma"
       ],
       "notes": "",
-      "registrationDate": "1993-10-30T18:44:21"
+      "registrationDate": "1993-10-30T18:44:21",
+      "email": "eric.koch64@example.com",
+      "healthHistory": "Underwent treatment for high blood pressure. Currently stable."
     },
     {
       "id": 3365902894040,
@@ -885,7 +969,9 @@
         "Plasma"
       ],
       "notes": "",
-      "registrationDate": "1974-11-23T14:14:03"
+      "registrationDate": "1974-11-23T14:14:03",
+      "email": "peter.smith37@example.com",
+      "healthHistory": "No known allergies. Regular blood donor. Negative for hepatitis and HIV."
     },
     {
       "id": 4956338005506,
@@ -906,7 +992,9 @@
         "Plasma"
       ],
       "notes": "",
-      "registrationDate": "1987-10-20T17:37:23"
+      "registrationDate": "1987-10-20T17:37:23",
+      "email": "craig.chavez43@example.com",
+      "healthHistory": "Recovered from COVID-19 in 2021. No complications. Eligible for plasma donation."
     },
     {
       "id": 6905979167026,
@@ -926,7 +1014,9 @@
         "Plasma"
       ],
       "notes": "",
-      "registrationDate": "1996-12-05T13:36:06"
+      "registrationDate": "1996-12-05T13:36:06",
+      "email": "adam.sparks46@example.com",
+      "healthHistory": "Diagnosed with mild anemia in 2019, now resolved. Fit for donation."
     },
     {
       "id": 8942029617190,
@@ -947,7 +1037,9 @@
         "Platelets"
       ],
       "notes": "",
-      "registrationDate": "2010-08-25T16:21:38"
+      "registrationDate": "2010-08-25T16:21:38",
+      "email": "shannon.thomas20@example.com",
+      "healthHistory": "Underwent treatment for high blood pressure. Currently stable."
     },
     {
       "id": 3138756872096,
@@ -967,7 +1059,9 @@
         "Platelets"
       ],
       "notes": "",
-      "registrationDate": "1993-03-26T22:04:40"
+      "registrationDate": "1993-03-26T22:04:40",
+      "email": "carla.clements33@example.com",
+      "healthHistory": "Previous surgery in 2015. Fully recovered. Passed all donor eligibility tests."
     },
     {
       "id": 5079682615194,
@@ -987,7 +1081,9 @@
         "Plasma"
       ],
       "notes": "",
-      "registrationDate": "1972-03-04T20:14:35"
+      "registrationDate": "1972-03-04T20:14:35",
+      "email": "traci.chavez55@example.com",
+      "healthHistory": "No chronic illnesses. Participated in annual health screenings."
     },
     {
       "id": 4357380649399,
@@ -1008,7 +1104,9 @@
         "Plasma"
       ],
       "notes": "",
-      "registrationDate": "1981-01-04T06:23:20"
+      "registrationDate": "1981-01-04T06:23:20",
+      "email": "alyssa.lowery63@example.com",
+      "healthHistory": "Had chickenpox in childhood. Immune to common bloodborne infections."
     },
     {
       "id": 4510543382857,
@@ -1029,7 +1127,9 @@
         "Platelets"
       ],
       "notes": "",
-      "registrationDate": "1999-03-23T12:31:38"
+      "registrationDate": "1999-03-23T12:31:38",
+      "email": "brian.young24@example.com",
+      "healthHistory": "Asthma managed with inhalers. No restrictions on donating."
     }
   ],
   "hospitals": [

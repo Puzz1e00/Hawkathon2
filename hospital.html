@@ -176,8 +176,12 @@
                                             <span>${donor.contact || 'N/A'}</span>
                                         </div>
                                         <div class="donor-detail">
+                                            <label style="font-weight: bold;">Street:</label>
+                                            <span>${donor.street || (donor.address && donor.address.street) || 'N/A'}</span>
+                                        </div>
+                                        <div class="donor-detail">
                                             <label style="font-weight: bold;">City:</label>
-                                            <span>${donor.city || 'N/A'}</span>
+                                            <span>${donor.city || (donor.address && donor.address.city) || 'N/A'}</span>
                                         </div>
                                         <div class="donor-detail">
                                             <label style="font-weight: bold;">State:</label>
