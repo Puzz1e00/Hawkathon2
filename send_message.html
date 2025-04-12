@@ -5,25 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Donor Details</title>
   <style>
+    :root {
+        --primary-500: #22c55e;
+        --primary-600: #16a34a;
+        --primary-700: #15803d;
+        --primary-light: #dcfce7;
+    }
     body {
       font-family: Arial, sans-serif;
       line-height: 1.6;
       margin: 0;
       padding: 20px;
-      background-color: #f5f5f5;
-    }
-
-    :root {
-            --primary-500: #22c55e;
-            --primary-600: #16a34a;
-            --primary-700: #15803d;
-            --primary-light: #dcfce7;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #f0fdf4 0%, var(--primary-light) 100%);
+      background: linear-gradient(135deg, #f0fdf4 0%, var(--primary-light) 100%);
             min-height: 100vh;
-        }
+    }
     .container {
       max-width: 900px;
       margin: 0 auto;
@@ -101,9 +96,14 @@
       border-radius: 4px;
       cursor: pointer;
       width: 100%;
+      transition: background-color 0.3s;
     }
     .send-btn:hover {
       background-color: #218838;
+    }
+    .send-btn:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
     }
     .back-link {
       display: inline-block;
@@ -127,6 +127,32 @@
       border-radius: 4px;
       white-space: pre-wrap;
       display: none;
+    }
+    #status {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 12px 24px;
+      border-radius: 8px;
+      display: none;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      font-weight: bold;
+    }
+    .status-sending {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeeba;
+    }
+    .status-success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .status-error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
     }
   </style>
 </head>
@@ -152,7 +178,7 @@
             <div id="donorContact" class="detail-value">-</div>
           </div>
           
-          <div class="detail-item" hidden>
+          <div class="detail-item">
             <span class="detail-label">Email</span>
             <div id="donorEmail" class="detail-value">-</div>
           </div>
@@ -197,51 +223,48 @@
           </div>
         </div>
         
-        <button id="debugBtn" onclick="toggleDebug()" style="padding: 5px 10px; margin-top: 10px; background-color: #f0f0f0; border: 1px solid #ddd; border-radius: 4px;" hidden>Show Debug Info</button>
+        <button id="debugBtn" onclick="toggleDebug()" style="padding: 5px 10px; margin-top: 10px; background-color: #f0f0f0; border: 1px solid #ddd; border-radius: 4px;">Show Debug Info</button>
         <div id="debug-info"></div>
       </div>
       
       <div class="notify-panel">
         <h3>Send Notification</h3>
-        <p>Send an SMS to this donor</p>
+        <p>Send an urgent SMS to this donor</p>
         
-        <textarea id="messageInput" placeholder="Enter your message here...">Hello, we are currently in need of your blood type. Are you available to donate? Thank you for your help.</textarea>
+        <textarea id="messageInput" placeholder="Enter your urgent message here...">Urgent: We need your blood type at our hospital immediately. Please respond if you can donate.</textarea>
         
-        <button id="sendSMSBtn" class="send-btn">Send SMS</button>
+        <button id="sendSMSBtn" class="send-btn">Send Urgent SMS</button>
       </div>
     </div>
     
-    <a href="patientsForm.html" class="back-link">← Back to Donors List</a>
+    <a href="patientForm.html" class="back-link">← Back to Donors List</a>
   </div>
+
+  <!-- Status notification element -->
+  <div id="status"></div>
+  
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
   
   <script>
+    // Initialize EmailJS
+    (function() {
+      emailjs.init('yCWU4AkltHj8zi78b'); // Replace with your actual User ID
+    })();
+
     document.addEventListener('DOMContentLoaded', function() {
       const urlParams = new URLSearchParams(window.location.search);
       const donorId = urlParams.get('id');
       const debugInfo = document.getElementById('debug-info');
+      const statusDiv = document.getElementById('status');
+      const sendBtn = document.getElementById('sendSMSBtn');
       
-      // Debug info
-      debugInfo.innerHTML += `URL Parameters: ${window.location.search}\n`;
-      debugInfo.innerHTML += `Donor ID from URL: ${donorId}\n\n`;
-      
-      // Get donor data
+      // Find donor data
       const donors = JSON.parse(localStorage.getItem('donors')) || [];
-      debugInfo.innerHTML += `Total donors in localStorage: ${donors.length}\n\n`;
-      
-      // Log all donors for debugging
-      donors.forEach((d, index) => {
-        debugInfo.innerHTML += `Donor ${index}: ID=${d.id}, Name=${d.name}\n`;
-      });
-      
-      // Find the specific donor (try both string and number comparison)
       const donor = donors.find(d => String(d.id) === String(donorId));
-      debugInfo.innerHTML += `\nFound donor: ${donor ? 'Yes' : 'No'}\n`;
-      if (donor) {
-        debugInfo.innerHTML += `Donor details: ${JSON.stringify(donor, null, 2)}\n`;
-      }
       
       if (donor) {
-        // Set donor details in the UI
+        // Populate donor details
         document.getElementById('donorName').textContent = donor.name || 'Unknown';
         document.getElementById('bloodType').textContent = donor.bloodGroup || 'Unknown';
         document.getElementById('donorAge').textContent = donor.age || 'Unknown';
@@ -251,14 +274,9 @@
         // Address details
         if (donor.address) {
           document.getElementById('donorStreet').textContent = donor.address.street || 'Unknown';
-          document.getElementById('donorCity').textContent = donor.address.city || donor.city || 'Unknown';
-          document.getElementById('donorState').textContent = donor.address.state || donor.state || 'Unknown';
+          document.getElementById('donorCity').textContent = donor.address.city || 'Unknown';
+          document.getElementById('donorState').textContent = donor.address.state || 'Unknown';
           document.getElementById('donorZip').textContent = donor.address.zipcode || 'Unknown';
-        } else {
-          document.getElementById('donorStreet').textContent = 'Unknown';
-          document.getElementById('donorCity').textContent = donor.city || 'Unknown';
-          document.getElementById('donorState').textContent = donor.state || 'Unknown';
-          document.getElementById('donorZip').textContent = 'Unknown';
         }
         
         // Health and donation info
@@ -266,60 +284,91 @@
         document.getElementById('donorDonationTypes').textContent = 
           donor.donationTypes ? donor.donationTypes.join(', ') : 'Blood';
         
-        // Format date if available
+        // Format registration date
         const regDate = donor.registrationDate ? 
           new Date(donor.registrationDate).toLocaleDateString() : 'Unknown';
         document.getElementById('registrationDate').textContent = regDate;
         
-        // Pre-fill message
-        const messageInput = document.getElementById('messageInput');
-        messageInput.value = 
-          `Hello ${donor.name},\n\nWe are currently in need of ${donor.bloodGroup} blood donation. Would you be available to donate soon?\n\nThank you.`;
-      } else {
-        // If donor not found, show error
-        alert('Donor not found. Please go back and try again.');
+        // Set default urgent message
+        document.getElementById('messageInput').value = 
+          `URGENT: ${donor.name}, we need your ${donor.bloodGroup} blood donation immediately. ` +
+          `Please respond to this message if you can come to the hospital today.`;
       }
-      
-      // Handle SMS sending
-      document.getElementById('sendSMSBtn').addEventListener('click', function() {
+
+      // SMS Notification Handler
+      sendBtn.addEventListener('click', async function() {
         if (!donor || !donor.contact) {
-          alert('No contact information available for this donor.');
+          showStatus('No contact information available for this donor', 'error');
           return;
         }
         
         const message = document.getElementById('messageInput').value.trim();
         if (!message) {
-          alert('Please enter a message.');
+          showStatus('Please enter a message', 'error');
           return;
         }
         
-        // Get hospital info
+        // Get hospital info for signature
         const hospitalId = sessionStorage.getItem('loggedInHospitalId');
         const hospitals = JSON.parse(localStorage.getItem('hospitals')) || [];
         const hospital = hospitals.find(h => h.id == hospitalId);
+        const hospitalSignature = hospital ? 
+          `\n\n— ${hospital.name}\n${hospital.contact}` : '\n\n— LifeLink System';
         
-        // Add hospital signature
-        const hospitalInfo = hospital ? 
-          `\n\nFrom: ${hospital.name}\nContact: ${hospital.contact}` : '';
+        const fullMessage = message + hospitalSignature;
         
-        const fullMessage = message + hospitalInfo;
-        const encodedMessage = encodeURIComponent(fullMessage);
-        
-        // Open SMS client
-        window.location.href = `sms:${donor.contact}?body=${encodedMessage}`;
+        try {
+          // Show sending status
+          sendBtn.disabled = true;
+          showStatus('Sending urgent notification...', 'sending');
+          
+          // Send via EmailJS
+          const response = await emailjs.send(
+            'service_ue2qd91', // Replace with your Service ID
+            'template_b9pjy1s', // Replace with your Template ID
+            {
+              to_email: donor.contact + '@txt.att.net', // Using AT&T SMS gateway
+              message: fullMessage
+            }
+          );
+          
+          // Show success
+          showStatus('Urgent notification sent!', 'success');
+          console.log('SMS sent successfully:', response);
+          
+        } catch (error) {
+          // Show error
+          showStatus('Failed to send via SMS gateway', 'error');
+          console.error('EmailJS error:', error);
+          
+          // Fallback to native SMS
+          try {
+            const encodedMessage = encodeURIComponent(fullMessage);
+            window.location.href = `sms:${donor.contact}?body=${encodedMessage}`;
+          } catch (fallbackError) {
+            console.error('Fallback SMS failed:', fallbackError);
+            showStatus('Failed to open SMS app', 'error');
+          }
+        } finally {
+          sendBtn.disabled = false;
+          setTimeout(() => {
+            statusDiv.style.display = 'none';
+          }, 3000);
+        }
       });
-    });
-    
-    function toggleDebug() {
-      const debugInfo = document.getElementById('debug-info');
-      if (debugInfo.style.display === 'none' || !debugInfo.style.display) {
-        debugInfo.style.display = 'block';
-        document.getElementById('debugBtn').textContent = 'Hide Debug Info';
-      } else {
-        debugInfo.style.display = 'none';
-        document.getElementById('debugBtn').textContent = 'Show Debug Info';
+      
+      function showStatus(message, type) {
+        statusDiv.textContent = message;
+        statusDiv.className = `status-${type}`;
+        statusDiv.style.display = 'block';
       }
-    }
+      
+      function toggleDebug() {
+        debugInfo.style.display = debugInfo.style.display === 'none' ? 'block' : 'none';
+        document.getElementById('debugBtn').textContent = 
+          debugInfo.style.display === 'none' ? 'Show Debug Info' : 'Hide Debug Info';
+      }
+    });
   </script>
 </body>
 </html>
