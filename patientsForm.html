@@ -12,6 +12,18 @@
       color: #222;
     }
 
+    :root {
+            --primary-500: #22c55e;
+            --primary-600: #16a34a;
+            --primary-700: #15803d;
+            --primary-light: #dcfce7;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f0fdf4 0%, var(--primary-light) 100%);
+            min-height: 100vh;
+        }
+
     input[type="text"],
     input[type="email"],
     input[type="date"],
@@ -203,7 +215,7 @@
         <h1>Patient Information Form</h1>
       </div>
       <div class="logo">
-        <h1 id="hospitalName">Hospital Name</h1>
+        <h1 id="hospitalName"><a href="hospital.html">Hospital Name</a></h1>
       </div>
     </div>
   </header>

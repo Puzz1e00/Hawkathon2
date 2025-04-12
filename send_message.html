@@ -12,6 +12,18 @@
       padding: 20px;
       background-color: #f5f5f5;
     }
+
+    :root {
+            --primary-500: #22c55e;
+            --primary-600: #16a34a;
+            --primary-700: #15803d;
+            --primary-light: #dcfce7;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f0fdf4 0%, var(--primary-light) 100%);
+            min-height: 100vh;
+        }
     .container {
       max-width: 900px;
       margin: 0 auto;
@@ -140,7 +152,7 @@
             <div id="donorContact" class="detail-value">-</div>
           </div>
           
-          <div class="detail-item">
+          <div class="detail-item" hidden>
             <span class="detail-label">Email</span>
             <div id="donorEmail" class="detail-value">-</div>
           </div>
@@ -185,7 +197,7 @@
           </div>
         </div>
         
-        <button id="debugBtn" onclick="toggleDebug()" style="padding: 5px 10px; margin-top: 10px; background-color: #f0f0f0; border: 1px solid #ddd; border-radius: 4px;">Show Debug Info</button>
+        <button id="debugBtn" onclick="toggleDebug()" style="padding: 5px 10px; margin-top: 10px; background-color: #f0f0f0; border: 1px solid #ddd; border-radius: 4px;" hidden>Show Debug Info</button>
         <div id="debug-info"></div>
       </div>
       
@@ -199,7 +211,7 @@
       </div>
     </div>
     
-    <a href="patientForm.html" class="back-link">← Back to Donors List</a>
+    <a href="patientsForm.html" class="back-link">← Back to Donors List</a>
   </div>
   
   <script>
