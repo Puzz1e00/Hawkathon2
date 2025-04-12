@@ -6,6 +6,17 @@
     <title>Hospital Dashboard</title>
     <link rel="stylesheet" href="style.css">
     <style>
+        :root {
+            --primary-500: #22c55e;
+            --primary-600: #16a34a;
+            --primary-700: #15803d;
+            --primary-light: #dcfce7;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f0fdf4 0%, var(--primary-light) 100%);
+            min-height: 100vh;
+        }
         .dashboard-container {
             max-width: 800px;
             margin: 50px auto;
@@ -62,15 +73,9 @@
 <body>
     <div class="container">
         <div class="dashboard-container">
-            <h1>Hospital Dashboard</h1>
+            <h1 style="text-align: center;">Hospital Dashboard</h1>
             <div id="hospitalDetails" class="hospital-details">
                 <!-- Hospital details will be loaded here -->
-            </div>
-            
-            <!-- Add localStorage viewer -->
-            <div class="storage-viewer">
-                <button id="viewStorageBtn" style="margin-bottom: 15px; padding: 8px 15px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">View LocalStorage Data</button>
-                <div id="storageDisplay" style="display: none; background-color: #f8f9fa; padding: 15px; border-radius: 4px; max-height: 300px; overflow-y: auto; font-family: monospace; white-space: pre;"></div>
             </div>
 
             <button class="add-patient-btn" style="background-color: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin: 20px 0; transition: background-color 0.3s;">
@@ -188,26 +193,6 @@
                 
                 // Call the function to display donors
                 displayStateDonors();
-                
-                // Add localStorage viewer functionality
-                const viewStorageBtn = document.getElementById('viewStorageBtn');
-                const storageDisplay = document.getElementById('storageDisplay');
-                
-                viewStorageBtn.addEventListener('click', () => {
-                    // Get data from localStorage
-                    const hospitals = JSON.parse(localStorage.getItem('hospitals')) || [];
-                    const donors = JSON.parse(localStorage.getItem('donors')) || [];
-                    
-                    // Format the data nicely
-                    const storageData = {
-                        hospitals: hospitals,
-                        donors: donors
-                    };
-                    
-                    // Display the formatted data
-                    storageDisplay.textContent = JSON.stringify(storageData, null, 2);
-                    storageDisplay.style.display = storageDisplay.style.display === 'none' ? 'block' : 'none';
-                });
             }
 
             // Add logout functionality
