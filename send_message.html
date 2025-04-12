@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Donor Details</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+    h1 {
+      color: #333;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .donor-profile {
+      display: flex;
+      gap: 30px;
+    }
+    .donor-info {
+      flex: 2;
+    }
+    .notify-panel {
+      flex: 1;
+      border-left: 1px solid #ddd;
+      padding-left: 20px;
+    }
+    .blood-badge {
+      display: inline-block;
+      background-color: #dc3545;
+      color: white;
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 18px;
+      margin-right: 10px;
+    }
+    .detail-card {
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+      background-color: #f9f9f9;
+    }
+    .detail-item {
+      margin-bottom: 15px;
+    }
+    .detail-label {
+      font-weight: bold;
+      color: #555;
+      display: block;
+      margin-bottom: 5px;
+    }
+    .detail-value {
+      background-color: white;
+      padding: 8px 12px;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+    }
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      min-height: 150px;
+      margin-bottom: 15px;
+      resize: vertical;
+    }
+    .send-btn {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%;
+    }
+    .send-btn:hover {
+      background-color: #218838;
+    }
+    .back-link {
+      display: inline-block;
+      margin-top: 20px;
+      color: #007bff;
+      text-decoration: none;
+    }
+    .back-link:hover {
+      text-decoration: underline;
+    }
+    .donor-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    #debug-info {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #f8f9fa;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      white-space: pre-wrap;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Donor Details</h1>
+    
+    <div class="donor-profile">
+      <div class="donor-info">
+        <div class="donor-header">
+          <span id="bloodType" class="blood-badge">A+</span>
+          <h2 id="donorName">Donor Name</h2>
+        </div>
+        
+        <div class="detail-card">
+          <div class="detail-item">
+            <span class="detail-label">Age</span>
+            <div id="donorAge" class="detail-value">-</div>
+          </div>
+          
+          <div class="detail-item">
+            <span class="detail-label">Contact Number</span>
+            <div id="donorContact" class="detail-value">-</div>
+          </div>
+          
+          <div class="detail-item">
+            <span class="detail-label">Email</span>
+            <div id="donorEmail" class="detail-value">-</div>
+          </div>
+        </div>
+        
+        <div class="detail-card">
+          <div class="detail-item">
+            <span class="detail-label">Street</span>
+            <div id="donorStreet" class="detail-value">-</div>
+          </div>
+          
+          <div class="detail-item">
+            <span class="detail-label">City</span>
+            <div id="donorCity" class="detail-value">-</div>
+          </div>
+          
+          <div class="detail-item">
+            <span class="detail-label">State</span>
+            <div id="donorState" class="detail-value">-</div>
+          </div>
+          
+          <div class="detail-item">
+            <span class="detail-label">Zip Code</span>
+            <div id="donorZip" class="detail-value">-</div>
+          </div>
+        </div>
+        
+        <div class="detail-card">
+          <div class="detail-item">
+            <span class="detail-label">Health Conditions</span>
+            <div id="donorHealth" class="detail-value">-</div>
+          </div>
+          
+          <div class="detail-item">
+            <span class="detail-label">Donation Types</span>
+            <div id="donorDonationTypes" class="detail-value">-</div>
+          </div>
+          
+          <div class="detail-item">
+            <span class="detail-label">Registration Date</span>
+            <div id="registrationDate" class="detail-value">-</div>
+          </div>
+        </div>
+        
+        <button id="debugBtn" onclick="toggleDebug()" style="padding: 5px 10px; margin-top: 10px; background-color: #f0f0f0; border: 1px solid #ddd; border-radius: 4px;">Show Debug Info</button>
+        <div id="debug-info"></div>
+      </div>
+      
+      <div class="notify-panel">
+        <h3>Send Notification</h3>
+        <p>Send an SMS to this donor</p>
+        
+        <textarea id="messageInput" placeholder="Enter your message here...">Hello, we are currently in need of your blood type. Are you available to donate? Thank you for your help.</textarea>
+        
+        <button id="sendSMSBtn" class="send-btn">Send SMS</button>
+      </div>
+    </div>
+    
+    <a href="patientForm.html" class="back-link">← Back to Donors List</a>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const donorId = urlParams.get('id');
+      const debugInfo = document.getElementById('debug-info');
+      
+      // Debug info
+      debugInfo.innerHTML += `URL Parameters: ${window.location.search}\n`;
+      debugInfo.innerHTML += `Donor ID from URL: ${donorId}\n\n`;
+      
+      // Get donor data
+      const donors = JSON.parse(localStorage.getItem('donors')) || [];
+      debugInfo.innerHTML += `Total donors in localStorage: ${donors.length}\n\n`;
+      
+      // Log all donors for debugging
+      donors.forEach((d, index) => {
+        debugInfo.innerHTML += `Donor ${index}: ID=${d.id}, Name=${d.name}\n`;
+      });
+      
+      // Find the specific donor (try both string and number comparison)
+      const donor = donors.find(d => String(d.id) === String(donorId));
+      debugInfo.innerHTML += `\nFound donor: ${donor ? 'Yes' : 'No'}\n`;
+      if (donor) {
+        debugInfo.innerHTML += `Donor details: ${JSON.stringify(donor, null, 2)}\n`;
+      }
+      
+      if (donor) {
+        // Set donor details in the UI
+        document.getElementById('donorName').textContent = donor.name || 'Unknown';
+        document.getElementById('bloodType').textContent = donor.bloodGroup || 'Unknown';
+        document.getElementById('donorAge').textContent = donor.age || 'Unknown';
+        document.getElementById('donorContact').textContent = donor.contact || 'Unknown';
+        document.getElementById('donorEmail').textContent = donor.email || 'Unknown';
+        
+        // Address details
+        if (donor.address) {
+          document.getElementById('donorStreet').textContent = donor.address.street || 'Unknown';
+          document.getElementById('donorCity').textContent = donor.address.city || donor.city || 'Unknown';
+          document.getElementById('donorState').textContent = donor.address.state || donor.state || 'Unknown';
+          document.getElementById('donorZip').textContent = donor.address.zipcode || 'Unknown';
+        } else {
+          document.getElementById('donorStreet').textContent = 'Unknown';
+          document.getElementById('donorCity').textContent = donor.city || 'Unknown';
+          document.getElementById('donorState').textContent = donor.state || 'Unknown';
+          document.getElementById('donorZip').textContent = 'Unknown';
+        }
+        
+        // Health and donation info
+        document.getElementById('donorHealth').textContent = donor.healthConditions || 'None provided';
+        document.getElementById('donorDonationTypes').textContent = 
+          donor.donationTypes ? donor.donationTypes.join(', ') : 'Blood';
+        
+        // Format date if available
+        const regDate = donor.registrationDate ? 
+          new Date(donor.registrationDate).toLocaleDateString() : 'Unknown';
+        document.getElementById('registrationDate').textContent = regDate;
+        
+        // Pre-fill message
+        const messageInput = document.getElementById('messageInput');
+        messageInput.value = 
+          `Hello ${donor.name},\n\nWe are currently in need of ${donor.bloodGroup} blood donation. Would you be available to donate soon?\n\nThank you.`;
+      } else {
+        // If donor not found, show error
+        alert('Donor not found. Please go back and try again.');
+      }
+      
+      // Handle SMS sending
+      document.getElementById('sendSMSBtn').addEventListener('click', function() {
+        if (!donor || !donor.contact) {
+          alert('No contact information available for this donor.');
+          return;
+        }
+        
+        const message = document.getElementById('messageInput').value.trim();
+        if (!message) {
+          alert('Please enter a message.');
+          return;
+        }
+        
+        // Get hospital info
+        const hospitalId = sessionStorage.getItem('loggedInHospitalId');
+        const hospitals = JSON.parse(localStorage.getItem('hospitals')) || [];
+        const hospital = hospitals.find(h => h.id == hospitalId);
+        
+        // Add hospital signature
+        const hospitalInfo = hospital ? 
+          `\n\nFrom: ${hospital.name}\nContact: ${hospital.contact}` : '';
+        
+        const fullMessage = message + hospitalInfo;
+        const encodedMessage = encodeURIComponent(fullMessage);
+        
+        // Open SMS client
+        window.location.href = `sms:${donor.contact}?body=${encodedMessage}`;
+      });
+    });
+    
+    function toggleDebug() {
+      const debugInfo = document.getElementById('debug-info');
+      if (debugInfo.style.display === 'none' || !debugInfo.style.display) {
+        debugInfo.style.display = 'block';
+        document.getElementById('debugBtn').textContent = 'Hide Debug Info';
+      } else {
+        debugInfo.style.display = 'none';
+        document.getElementById('debugBtn').textContent = 'Show Debug Info';
+      }
+    }
+  </script>
+</body>
+</html>

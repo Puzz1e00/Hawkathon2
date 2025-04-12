@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .dashboard-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .hospital-details {
+            margin-bottom: 30px;
+        }
+        .detail-group {
+            margin-bottom: 15px;
+        }
+        .detail-group label {
+            font-weight: bold;
+            color: #333;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .detail-group p {
+            margin: 0;
+            padding: 8px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        .services-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .service-tag {
+            background-color: #e9ecef;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .logout-btn {
+            background-color: #dc3545;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .logout-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="dashboard-container">
+            <h1>Hospital Dashboard</h1>
+            <div id="hospitalDetails" class="hospital-details">
+                <!-- Hospital details will be loaded here -->
+            </div>
+            
+            <!-- Add localStorage viewer -->
+            <div class="storage-viewer">
+                <button id="viewStorageBtn" style="margin-bottom: 15px; padding: 8px 15px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">View LocalStorage Data</button>
+                <div id="storageDisplay" style="display: none; background-color: #f8f9fa; padding: 15px; border-radius: 4px; max-height: 300px; overflow-y: auto; font-family: monospace; white-space: pre;"></div>
+            </div>
+
+            <button class="add-patient-btn" style="background-color: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin: 20px 0; transition: background-color 0.3s;">
+                <a href="patientform.html" style="color: white; text-decoration: none;">Add New Patient</a>
+            </button>
+            
+            <button id="logoutBtn" class="logout-btn"><a href="hospital_login.html">Logout</a></button>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if user is logged in
+            const hospitalId = sessionStorage.getItem('loggedInHospitalId');
+            if (!hospitalId) {
+                window.location.href = 'hospital_login.html';
+                return;
+            }
+
+            // Get hospital details
+            const hospitals = JSON.parse(localStorage.getItem('hospitals')) || [];
+            const hospital = hospitals.find(h => h.id === parseInt(hospitalId));
+
+            if (hospital) {
+                // Display hospital information
+                const hospitalDetails = document.getElementById('hospitalDetails');
+                hospitalDetails.innerHTML = `
+                    <div class="detail-group">
+                        <label>Hospital Name:</label>
+                        <p>${hospital.name}</p>
+                    </div>
+                    <div class="detail-group">
+                        <label>Address:</label>
+                        <p>${hospital.address}, ${hospital.city}, ${hospital.state}</p>
+                    </div>
+                    <div class="detail-group">
+                        <label>Contact Number:</label>
+                        <p>${hospital.contact}</p>
+                    </div>
+                    <div class="detail-group">
+                        <label>Services:</label>
+                        <div class="services-list">
+                            ${hospital.services.map(service => 
+                                `<span class="service-tag">${service}</span>`
+                            ).join('')}
+                        </div>
+                    </div>
+                `;
+
+                // Function to display donors from the same state
+                function displayStateDonors() {
+                    // Get all registered donors
+                    const donors = JSON.parse(localStorage.getItem('donors')) || [];
+                    console.log('All donors:', donors);
+                    console.log('Hospital state:', hospital.state);
+                    
+                    // Get hospital state, handling different possible structures
+                    const hospitalState = hospital.state || (hospital.address && hospital.address.state);
+                    
+                    if (!hospitalState) {
+                        console.error('Hospital state information not found');
+                        return;
+                    }
+                    
+                    // Filter donors to show only those from the same state as the hospital
+                    const stateDonors = donors.filter(donor => {
+                        const donorState = donor.state || (donor.address && donor.address.state);
+                        return donorState === hospitalState;
+                    });
+                    
+                    console.log('Filtered donors from same state:', stateDonors);
+
+                    // Get or create donors display section
+                    let donorsSection = document.getElementById('donorsSection');
+                    if (!donorsSection) {
+                        donorsSection = document.createElement('div');
+                        donorsSection.id = 'donorsSection';
+                        donorsSection.className = 'dashboard-container';
+                        document.querySelector('.container').appendChild(donorsSection);
+                    }
+
+                    // Create donors list HTML
+                    donorsSection.innerHTML = `
+                        <h2>Blood Donors in ${hospitalState}</h2>
+                        <div class="donors-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px;">
+                            ${stateDonors.length > 0 ? 
+                                stateDonors.map(donor =>
+                                    `<div class="donor-card" style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; background-color: #f8f9fa;">
+                                        <div class="donor-detail">
+                                            <label style="font-weight: bold;">Name:</label>
+                                            <span>${donor.name || 'N/A'}</span>
+                                        </div>
+                                        <div class="donor-detail">
+                                            <label style="font-weight: bold;">Blood Group:</label>
+                                            <span>${donor.bloodGroup || 'N/A'}</span>
+                                        </div>
+                                        <div class="donor-detail">
+                                            <label style="font-weight: bold;">Contact:</label>
+                                            <span>${donor.contact || 'N/A'}</span>
+                                        </div>
+                                        <div class="donor-detail">
+                                            <label style="font-weight: bold;">City:</label>
+                                            <span>${donor.city || 'N/A'}</span>
+                                        </div>
+                                        <div class="donor-detail">
+                                            <label style="font-weight: bold;">State:</label>
+                                            <span>${(donor.state || (donor.address && donor.address.state) || 'N/A')}</span>
+                                        </div>
+                                    </div>`
+                                ).join('') 
+                                : `<p>No donors found.</p>`
+                            }
+                        </div>
+                    `;
+                }
+                
+                // Call the function to display donors
+                displayStateDonors();
+                
+                // Add localStorage viewer functionality
+                const viewStorageBtn = document.getElementById('viewStorageBtn');
+                const storageDisplay = document.getElementById('storageDisplay');
+                
+                viewStorageBtn.addEventListener('click', () => {
+                    // Get data from localStorage
+                    const hospitals = JSON.parse(localStorage.getItem('hospitals')) || [];
+                    const donors = JSON.parse(localStorage.getItem('donors')) || [];
+                    
+                    // Format the data nicely
+                    const storageData = {
+                        hospitals: hospitals,
+                        donors: donors
+                    };
+                    
+                    // Display the formatted data
+                    storageDisplay.textContent = JSON.stringify(storageData, null, 2);
+                    storageDisplay.style.display = storageDisplay.style.display === 'none' ? 'block' : 'none';
+                });
+            }
+
+            // Add logout functionality
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', () => {
+                    sessionStorage.removeItem('loggedInHospitalId');
+                    window.location.href = 'hospital_login.html';
+                });
+            }
+        });
+    </script>
+</body>
+</html>

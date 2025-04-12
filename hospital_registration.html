@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Registration</title>
+    <link rel="stylesheet" href="hl_style.css">
+    <style>
+        .nav-container {
+            display: flex;
+            justify-content: flex-end;
+            padding: 20px;
+        }
+        .nav-link {
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 8px 16px;
+            border: 2px solid #4CAF50;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        .nav-link:hover {
+            background-color: #4CAF50;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-container">
+        <a href="hospital_login.html" class="nav-link">Hospital Login</a>
+    </div>
+    <div class="container">
+        <h1>Hospital Registration</h1>
+        
+        <div class="main-content">
+            <!-- Hospital Registration Form -->
+            <div class="form-container">
+                <form id="hospitalRegistrationForm">
+                    <div class="form-group">
+                        <label for="username">Username:</label>
+                        <input type="text" id="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password:</label>
+                        <input type="password" id="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="name">Hospital Name:</label>
+                        <input type="text" id="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Address:</label>
+                        <input type="text" id="address" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="city">City:</label>
+                        <input type="text" id="city" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="state">State:</label>
+                        <input type="text" id="state" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="contact">Contact Number:</label>
+                        <input type="tel" id="contact" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="services">Services (comma-separated):</label>
+                        <input type="text" id="services" required>
+                    </div>
+                    <button type="submit">Add Hospital</button>
+                </form>
+            </div>
+
+            <!-- Display Hospitals -->
+            <div class="hospitals-container">
+                <div class="hospitals-header">
+                    <h2>Hospital Connected with US</h2>
+                </div>
+                <div id="hospitalList"></div>
+            </div>
+        </div>
+    </div>
+    <script src="hl_script.js"></script>
+</body>
+</html>

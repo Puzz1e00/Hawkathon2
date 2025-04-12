@@ -6,26 +6,181 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Donor Information</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        .animate-pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        .form-group {
+            transition: all 0.3s ease;
+        }
+        
+        .form-group:focus-within {
+            transform: translateY(-2px);
+        }
+        
+        .checkbox-container {
+            transition: all 0.3s ease;
+        }
+        
+        .checkbox-container:hover {
+            transform: scale(1.02);
+            background-color: #f0f9ff;
+        }
+        
+        .progress-bar {
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            background: #3b82f6;
+            transition: width 0.3s ease;
+        }
+        
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .floating-label {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .floating-label input,
+        .floating-label select,
+        .floating-label textarea {
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .floating-label input:focus,
+        .floating-label select:focus,
+        .floating-label textarea:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            outline: none;
+        }
+        
+        .floating-label label {
+            position: absolute;
+            left: 12px;
+            top: 12px;
+            color: #6b7280;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+        
+        .floating-label input:focus + label,
+        .floating-label input:not(:placeholder-shown) + label,
+        .floating-label select:focus + label,
+        .floating-label select:not([value=""]) + label {
+            top: -8px;
+            left: 8px;
+            font-size: 12px;
+            background-color: white;
+            padding: 0 4px;
+            color: #3b82f6;
+        }
+        
+        .submit-btn {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .submit-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+            transform: translateX(100%);
+            animation: shine 3s infinite;
+        }
+        
+        @keyframes shine {
+            100% { transform: translateX(-100%); }
+        }
+    </style>
 </head>
 
-<body class="bg-gray-100 py-12">
-    <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-md">
-        <h2 class="text-3xl font-bold mb-6 text-blue-600 text-center">Donor Information Form</h2>
-        <form action="/submit-donor-data" method="POST">
+<body class="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen py-12">
+    <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-lg transform transition-all duration-300 hover:shadow-xl">
+        <div class="text-center mb-8">
+            <h2 class="text-4xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-transparent bg-clip-text animate-fade-in">
+                Donor Information Form
+            </h2>
+            <p class="text-gray-600">Join us in saving lives through donation</p>
+        </div>
+        
+        <div class="progress-bar mb-8">
+            <div class="progress-bar-fill" style="width: 0%"></div>
+        </div>
+        
+        <form id="donorForm" class="space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Existing form fields -->
-                <div>
-                    <label class="block font-medium">Full Name</label>
-                    <input type="text" name="fullName" required class="w-full p-3 border rounded-md mt-1" />
+                <div class="floating-label form-group">
+                    <input type="text" name="fullName" required placeholder=" " class="w-full p-3 border rounded-md" />
+                    <label>Full Name</label>
+                    <i class="fas fa-user absolute right-3 top-3 text-gray-400"></i>
                 </div>
-                <div>
-                    <label class="block font-medium">Age</label>
-                    <input type="number" name="age" required class="w-full p-3 border rounded-md mt-1" />
+                
+                <div class="floating-label form-group">
+                    <input type="number" name="age" required placeholder=" " class="w-full p-3 border rounded-md" min="18" max="65" />
+                    <label>Age</label>
+                    <i class="fas fa-birthday-cake absolute right-3 top-3 text-gray-400"></i>
                 </div>
-                <div>
-                    <label class="block font-medium">Blood Type</label>
-                    <select name="bloodType" required class="w-full p-3 border rounded-md mt-1">
-                        <option value="">Select</option>
+                
+                <div class="floating-label form-group">
+                    <select name="bloodType" required class="w-full p-3 border rounded-md">
+                        <option value=""> </option>
                         <option>A+</option>
                         <option>A-</option>
                         <option>B+</option>
@@ -35,85 +190,198 @@
                         <option>O+</option>
                         <option>O-</option>
                     </select>
+                    <label>Blood Type</label>
+                    <i class="fas fa-tint absolute right-3 top-3 text-gray-400"></i>
                 </div>
-                <div>
-                    <label class="block font-medium">Contact Number</label>
-                    <input type="tel" name="contact" required class="w-full p-3 border rounded-md mt-1" />
+                
+                <div class="floating-label form-group">
+                    <input type="tel" name="contact" required placeholder=" " class="w-full p-3 border rounded-md" />
+                    <label>Contact Number</label>
+                    <i class="fas fa-phone absolute right-3 top-3 text-gray-400"></i>
                 </div>
-                <!-- Address Section -->
+                
                 <div class="col-span-2">
-                    <label class="block font-medium mb-2">Address</label>
+                    <label class="block font-medium mb-4 text-gray-700">Address</label>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <input type="text" name="street" placeholder="Street Address" required
-                                class="w-full p-3 border rounded-md" />
+                        <div class="floating-label form-group">
+                            <input type="text" name="street" placeholder=" " required class="w-full p-3 border rounded-md" />
+                            <label>Street Address</label>
                         </div>
-                        <div>
-                            <input type="text" name="city" placeholder="City" required
-                                class="w-full p-3 border rounded-md" />
+                        <div class="floating-label form-group">
+                            <input type="text" name="city" placeholder=" " required class="w-full p-3 border rounded-md" />
+                            <label>City</label>
                         </div>
-                        <div>
-                            <input type="text" name="state" placeholder="State" required
-                                class="w-full p-3 border rounded-md" />
+                        <div class="floating-label form-group">
+                            <input type="text" name="state" placeholder=" " required class="w-full p-3 border rounded-md" />
+                            <label>State</label>
                         </div>
-                        <div>
-                            <input type="text" name="zipcode" placeholder="Zip Code" required
-                                class="w-full p-3 border rounded-md" />
+                        <div class="floating-label form-group">
+                            <input type="text" name="zipcode" placeholder=" " required class="w-full p-3 border rounded-md" />
+                            <label>Zip Code</label>
                         </div>
                     </div>
                 </div>
-
-                <div>
-                    <label class="block font-medium">Emergency Contact</label>
-                    <input type="tel" name="emergencyContact" required class="w-full p-3 border rounded-md mt-1" />
+                
+                <div class="floating-label form-group">
+                    <input type="tel" name="emergencyContact" required placeholder=" " class="w-full p-3 border rounded-md" />
+                    <label>Emergency Contact</label>
+                    <i class="fas fa-phone-alt absolute right-3 top-3 text-gray-400"></i>
                 </div>
             </div>
 
-            <div class="mt-6">
-                <label class="block font-medium">Previous Health Conditions</label>
-                <textarea name="healthConditions" rows="3" class="w-full p-3 border rounded-md mt-1"></textarea>
+            <div class="form-group">
+                <label class="block font-medium mb-2 text-gray-700">Previous Health Conditions</label>
+                <textarea name="healthConditions" rows="3" class="w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"></textarea>
             </div>
 
-            <div class="mt-6">
-                <label class="block font-medium mb-2">What would you like to donate?</label>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pl-2">
-                    <label class="inline-flex items-center">
-                        <input type="checkbox" name="donationTypes" value="Blood" class="mr-2" /> Blood
-                    </label>
-                    <label class="inline-flex items-center">
-                        <input type="checkbox" name="donationTypes" value="Plasma" class="mr-2" /> Plasma
-                    </label>
-                    <label class="inline-flex items-center">
-                        <input type="checkbox" name="donationTypes" value="Platelets" class="mr-2" /> Platelets
-                    </label>
-                    <label class="inline-flex items-center">
-                        <input type="checkbox" name="donationTypes" value="Bone Marrow" class="mr-2" /> Bone Marrow
-                    </label>
-                    <label class="inline-flex items-center">
-                        <input type="checkbox" name="donationTypes" value="Organ Donation Pledge" class="mr-2" /> Organ
-                        Donation Pledge
-                    </label>
-                    <label class="inline-flex items-center">
-                        <input type="checkbox" name="donationTypes" value="Hair Donation" class="mr-2" /> Hair Donation
-                    </label>
-                    <label class="inline-flex items-center">
-                        <input type="checkbox" name="donationTypes" value="Tissue/Eye Pledge" class="mr-2" /> Tissue/Eye
-                        Pledge
-                    </label>
+            <div class="form-group">
+                <label class="block font-medium mb-4 text-gray-700">What would you like to donate?</label>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="checkbox-container p-3 rounded-lg border hover:border-blue-500 transition-all duration-300">
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="donationTypes" value="Blood" class="form-checkbox h-5 w-5 text-blue-600 transition duration-150 ease-in-out" />
+                            <span class="ml-3 text-gray-700">Blood</span>
+                        </label>
+                    </div>
+                    <div class="checkbox-container p-3 rounded-lg border hover:border-blue-500 transition-all duration-300">
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="donationTypes" value="Plasma" class="form-checkbox h-5 w-5 text-blue-600 transition duration-150 ease-in-out" />
+                            <span class="ml-3 text-gray-700">Plasma</span>
+                        </label>
+                    </div>
+                    <div class="checkbox-container p-3 rounded-lg border hover:border-blue-500 transition-all duration-300">
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="donationTypes" value="Platelets" class="form-checkbox h-5 w-5 text-blue-600 transition duration-150 ease-in-out" />
+                            <span class="ml-3 text-gray-700">Platelets</span>
+                        </label>
+                    </div>
+                    <div class="checkbox-container p-3 rounded-lg border hover:border-blue-500 transition-all duration-300">
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="donationTypes" value="Bone Marrow" class="form-checkbox h-5 w-5 text-blue-600 transition duration-150 ease-in-out" />
+                            <span class="ml-3 text-gray-700">Bone Marrow</span>
+                        </label>
+                    </div>
+                    <div class="checkbox-container p-3 rounded-lg border hover:border-blue-500 transition-all duration-300">
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="donationTypes" value="Organ Donation Pledge" class="form-checkbox h-5 w-5 text-blue-600 transition duration-150 ease-in-out" />
+                            <span class="ml-3 text-gray-700">Organ Donation Pledge</span>
+                        </label>
+                    </div>
+                    <div class="checkbox-container p-3 rounded-lg border hover:border-blue-500 transition-all duration-300">
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="donationTypes" value="Hair Donation" class="form-checkbox h-5 w-5 text-blue-600 transition duration-150 ease-in-out" />
+                            <span class="ml-3 text-gray-700">Hair Donation</span>
+                        </label>
+                    </div>
+                    <div class="checkbox-container p-3 rounded-lg border hover:border-blue-500 transition-all duration-300">
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="donationTypes" value="Tissue/Eye Pledge" class="form-checkbox h-5 w-5 text-blue-600 transition duration-150 ease-in-out" />
+                            <span class="ml-3 text-gray-700">Tissue/Eye Pledge</span>
+                        </label>
+                    </div>
                 </div>
             </div>
 
-            <div class="mt-6">
-                <label class="block font-medium">Additional Notes</label>
-                <textarea name="notes" rows="3" class="w-full p-3 border rounded-md mt-1"></textarea>
+            <div class="form-group">
+                <label class="block font-medium mb-2 text-gray-700">Additional Notes</label>
+                <textarea name="notes" rows="3" class="w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"></textarea>
             </div>
-            <form action="confirmation.html" method="POST">
-
-            <button type="submit"
-                class="w-full bg-blue-600 text-white p-3 rounded-md mt-6 hover:bg-blue-700">Submit</button>
+            
+            <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 rounded-lg font-semibold text-lg hover:from-blue-700 hover:to-indigo-700 transform transition-all duration-300 hover:scale-[1.02] submit-btn">
+                Submit Registration
+            </button>
         </form>
-
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const donorForm = document.getElementById('donorForm');
+            const progressBar = document.querySelector('.progress-bar-fill');
+            
+            // Update progress bar as user fills the form
+            const updateProgress = () => {
+                const formElements = donorForm.elements;
+                let filledCount = 0;
+                let totalCount = 0;
+                
+                for (let element of formElements) {
+                    if (element.type !== 'submit' && element.type !== 'button') {
+                        totalCount++;
+                        if (element.value.trim() !== '') {
+                            filledCount++;
+                        }
+                    }
+                }
+                
+                const progress = (filledCount / totalCount) * 100;
+                progressBar.style.width = `${progress}%`;
+            };
+            
+            // Add input event listeners to all form elements
+            donorForm.addEventListener('input', updateProgress);
+            
+            // Add focus effects
+            const formGroups = document.querySelectorAll('.form-group');
+            formGroups.forEach(group => {
+                const input = group.querySelector('input, select, textarea');
+                if (input) {
+                    input.addEventListener('focus', () => {
+                        group.classList.add('ring-2', 'ring-blue-500', 'ring-opacity-50');
+                    });
+                    input.addEventListener('blur', () => {
+                        group.classList.remove('ring-2', 'ring-blue-500', 'ring-opacity-50');
+                    });
+                }
+            });
+            
+            // Form submission
+            donorForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                
+                // Get form values
+                const formData = new FormData(donorForm);
+                const donationTypes = Array.from(document.querySelectorAll('input[name="donationTypes"]:checked'))
+                    .map(checkbox => checkbox.value);
+                
+                const donor = {
+                    id: Date.now(),
+                    name: formData.get('fullName'),
+                    age: formData.get('age'),
+                    bloodGroup: formData.get('bloodType'),
+                    contact: formData.get('contact'),
+                    emergencyContact: formData.get('emergencyContact'),
+                    address: {
+                        street: formData.get('street'),
+                        city: formData.get('city'),
+                        state: formData.get('state'),
+                        zipcode: formData.get('zipcode')
+                    },
+                    healthConditions: formData.get('healthConditions'),
+                    donationTypes: donationTypes,
+                    notes: formData.get('notes'),
+                    registrationDate: new Date().toISOString()
+                };
+                
+                // Get existing donors or initialize empty array
+                const donors = JSON.parse(localStorage.getItem('donors')) || [];
+                
+                // Add new donor
+                donors.push(donor);
+                
+                // Save to localStorage
+                localStorage.setItem('donors', JSON.stringify(donors));
+                
+                // Show success message with animation
+                const submitBtn = document.querySelector('button[type="submit"]');
+                submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Registration Successful!';
+                submitBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+                
+                setTimeout(() => {
+                    window.location.href = 'confirmation.html';
+                }, 1500);
+            });
+        });
+    </script>
 </body>
 
 </html>
