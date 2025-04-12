@@ -148,20 +148,27 @@
         @keyframes shine {
             100% { transform: translateX(-100%); }
         }
+        
+        .error-message {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+        
+        .input-error {
+            border-color: #ef4444 !important;
+        }
     </style>
 </head>
 
 <body class="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen py-12">
-    <!-- Back Button -->
+    
+    <!-- Back Button (kept in original position) -->
     <div class="absolute top-4 left-4">
         <a href="homepage.html" class="text-blue-600 hover:text-blue-800 transition">
             <i class="fas fa-arrow-left text-2xl"></i>
         </a>
-    </div>
-    
-    <!-- Logo -->
-    <div class="absolute top-4 right-4">
-        <img src="logo.png" alt="LifeLink Logo" class="h-12">
     </div>
 
     <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-lg transform transition-all duration-300 hover:shadow-xl mt-12">
@@ -172,7 +179,6 @@
             <p class="text-gray-600">Join us in saving lives through donation</p>
         </div>
         
-        <!-- Rest of your existing form content remains exactly the same -->
         <div class="progress-bar mb-8">
             <div class="progress-bar-fill" style="width: 0%"></div>
         </div>
@@ -208,9 +214,15 @@
                 </div>
                 
                 <div class="floating-label form-group">
-                    <input type="tel" name="contact" required placeholder=" " class="w-full p-3 border rounded-md" />
+                    <input type="tel" name="contact" required placeholder=" " 
+                           class="w-full p-3 border rounded-md contact-input" 
+                           pattern="[0-9]{10,15}" 
+                           title="Please enter only digits (10-15 digits)"
+                           minlength="10"
+                           maxlength="10" />
                     <label>Contact Number</label>
                     <i class="fas fa-phone absolute right-3 top-3 text-gray-400"></i>
+                    <div class="error-message contact-error">Please enter a valid phone number (digits only)</div>
                 </div>
                 
                 <div class="col-span-2">
@@ -293,9 +305,15 @@
                 </div>
                 
                 <div class="floating-label form-group">
-                    <input type="tel" name="emergencyContact" required placeholder=" " class="w-full p-3 border rounded-md" />
+                    <input type="tel" name="emergencyContact" required placeholder=" " 
+                           class="w-full p-3 border rounded-md contact-input" 
+                           pattern="[0-9]{10,15}" 
+                           title="Please enter only digits (10-15 digits)"
+                           minlength="10"
+                           maxlength="10" />
                     <label>Emergency Contact</label>
                     <i class="fas fa-phone-alt absolute right-3 top-3 text-gray-400"></i>
+                    <div class="error-message emergency-contact-error">Please enter a valid phone number (digits only)</div>
                 </div>
             </div>
 
@@ -344,7 +362,9 @@
             const donorForm = document.getElementById('donorForm');
             const progressBar = document.querySelector('.progress-bar-fill');
             const zipInput = document.querySelector('input[name="zipcode"]');
+            const contactInputs = document.querySelectorAll('.contact-input');
             
+            // Zip code validation
             zipInput.addEventListener('input', (e) => {
                 e.target.value = e.target.value.replace(/\D/g, '');
                 if (e.target.value.length > 5) {
@@ -352,6 +372,39 @@
                 }
             });
 
+            // Contact number validation (digits only)
+            contactInputs.forEach(input => {
+                input.addEventListener('input', (e) => {
+                    // Remove any non-digit characters
+                    e.target.value = e.target.value.replace(/\D/g, '');
+                    
+                    // Validate and show error if needed
+                    validateContactInput(e.target);
+                });
+                
+                // Validate on blur as well
+                input.addEventListener('blur', (e) => {
+                    validateContactInput(e.target);
+                });
+            });
+            
+            function validateContactInput(input) {
+                const errorElement = input.name === 'contact' 
+                    ? document.querySelector('.contact-error') 
+                    : document.querySelector('.emergency-contact-error');
+                
+                // Check if the input has at least 10 digits
+                if (input.value.length < 10 || input.value.length > 15) {
+                    input.classList.add('input-error');
+                    errorElement.style.display = 'block';
+                    return false;
+                } else {
+                    input.classList.remove('input-error');
+                    errorElement.style.display = 'none';
+                    return true;
+                }
+            }
+            
             const updateProgress = () => {
                 const formElements = donorForm.elements;
                 let filledCount = 0;
@@ -387,6 +440,14 @@
             
             donorForm.addEventListener('submit', (event) => {
                 event.preventDefault();
+                
+                // Validate contact inputs before submission
+                const contactValid = validateContactInput(document.querySelector('input[name="contact"]'));
+                const emergencyContactValid = validateContactInput(document.querySelector('input[name="emergencyContact"]'));
+                
+                if (!contactValid || !emergencyContactValid) {
+                    return; // Don't submit if validation fails
+                }
                 
                 const formData = new FormData(donorForm);
                 const donationTypes = Array.from(document.querySelectorAll('input[name="donationTypes"]:checked'))
