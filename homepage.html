@@ -1,120 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Relocation Assistant</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-        * {
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
-
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #f5f6fa;
-            color: #2f3640;
-        }
-
-        header {
-            background-color: #40739e;
-            color: white;
-            padding: 20px;
-            text-align: center;
-            font-size: 24px;
-            font-weight: 600;
-        }
-
-        main {
-            padding: 30px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .intro {
-            margin-bottom: 20px;
-            font-size: 18px;
-        }
-
-        .form-container {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        label {
-            display: block;
-            margin-top: 15px;
-            font-weight: 600;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            border: 1px solid #dcdde1;
-            border-radius: 8px;
-        }
-
-        button {
-            margin-top: 20px;
-            padding: 12px 24px;
-            background-color: #44bd32;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        button:hover {
-            background-color: #4cd137;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LifeLink - Donor Match Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <header>Relocation Assistant</header>
-    <main>
-        <div class="intro">
-            Welcome! Answer a few questions so we can help you prepare for your move.
+<body class="bg-gray-50 text-gray-900">
+  <!-- Header -->
+  <header class="bg-white shadow">
+    <div class="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
+      <h1 class="text-2xl font-bold text-blue-600">LifeLink</h1>
+      <nav>
+        <ul class="flex gap-6 text-sm font-medium">
+          <li><a href="#" class="hover:text-blue-600">Home</a></li>
+          <li><a href="#" class="hover:text-blue-600">How It Works</a></li>
+          <li><a href="#" class="hover:text-blue-600">Become a Donor</a></li>
+          <li><a href="#" class="hover:text-blue-600">Find a Match</a></li>
+          <li><a href="#" class="hover:text-blue-600">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="bg-blue-100 py-20">
+    <div class="max-w-4xl mx-auto px-4 text-center">
+      <h2 class="text-4xl font-bold mb-4">Connecting Lives. One Match at a Time.</h2>
+      <p class="text-lg mb-6">Our platform helps hospitals connect patients in need with generous donors.</p>
+      <a href="login.html" class="bg-blue-600 text-white px-6 py-3 rounded-xl shadow hover:bg-blue-700 transition">
+        Become a Donor
+      </a>
+      <a href="#" class="ml-4 text-blue-600 underline">Learn More</a>
+    </div>
+  </section>
+  
+
+  <!-- How It Works -->
+  <section class="py-16 bg-white">
+    <div class="max-w-6xl mx-auto px-4">
+      <h3 class="text-3xl font-semibold text-center mb-12">How It Works</h3>
+      <div class="grid md:grid-cols-3 gap-10">
+        <div class="bg-gray-100 p-6 rounded-xl shadow hover:shadow-lg transition">
+          <h4 class="text-xl font-bold mb-2">1. Register</h4>
+          <p>Sign up as a donor or a patient through your hospital. Fill out your health profile securely.</p>
         </div>
-        <div class="form-container">
-            <form id="relocationForm">
-                <label for="destination">Where are you moving to?</label>
-                <input type="text" id="destination" name="destination" required>
-
-                <label for="reason">Why are you relocating?</label>
-                <select id="reason" name="reason">
-                    <option value="job">Job</option>
-                    <option value="study">Study</option>
-                    <option value="family">Family</option>
-                    <option value="explore">Exploration</option>
-                </select>
-
-                <label for="timeline">When are you moving?</label>
-                <input type="date" id="timeline" name="timeline">
-
-                <button type="submit">Generate Checklist</button>
-            </form>
+        <div class="bg-gray-100 p-6 rounded-xl shadow hover:shadow-lg transition">
+          <h4 class="text-xl font-bold mb-2">2. Match</h4>
+          <p>We use medical data and compatibility algorithms to find the closest match between donors and patients.</p>
         </div>
-    </main>
-    <script>
-        document.getElementById('relocationForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const destination = document.getElementById('destination').value;
-            const reason = document.getElementById('reason').value;
-            const timeline = document.getElementById('timeline').value;
+        <div class="bg-gray-100 p-6 rounded-xl shadow hover:shadow-lg transition">
+          <h4 class="text-xl font-bold mb-2">3. Connect</h4>
+          <p>Hospitals coordinate the next steps for donation, ensuring safety, care, and transparency throughout.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-            const params = new URLSearchParams({ destination, reason, timeline });
-            window.location.href = `checklist.html?${params.toString()}`;
-        });
-    </script>
-</body>
-</html>
-</body>
+  <!-- Call to Action -->
+  <section class="bg-blue-600 text-white py-16 text-center">
+    <h3 class="text-3xl font-bold mb-4">Ready to Save a Life?</h3>
+    <p class="mb-6">Join thousands of donors making a difference through LifeLink and your local hospital.</p>
+    <a href="login.html" class="bg-white text-blue-600 font-semibold px-8 py-3 rounded-xl hover:bg-blue-100 transition">Register Now</a>
+  </section>
 
+  <!-- Footer -->
+  <footer class="bg-white border-t py-6 mt-10">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-sm">
+      <p>&copy; 2025 LifeLink. All rights reserved.</p>
+      <div class="flex gap-4 mt-2 md:mt-0">
+        <a href="#" class="hover:underline">Privacy</a>
+        <a href="#" class="hover:underline">Terms</a>
+        <a href="#" class="hover:underline">Support</a>
+      </div>
+    </div>
+  </footer>
+</body>
 </html>

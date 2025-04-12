@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Donor Information</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 py-12">
+    <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-md">
+        <h2 class="text-3xl font-bold mb-6 text-blue-600 text-center">Donor Information Form</h2>
+        <form action="/submit-donor-data" method="POST">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Existing form fields -->
+                <div>
+                    <label class="block font-medium">Full Name</label>
+                    <input type="text" name="fullName" required class="w-full p-3 border rounded-md mt-1" />
+                </div>
+                <div>
+                    <label class="block font-medium">Age</label>
+                    <input type="number" name="age" required class="w-full p-3 border rounded-md mt-1" />
+                </div>
+                <div>
+                    <label class="block font-medium">Blood Type</label>
+                    <select name="bloodType" required class="w-full p-3 border rounded-md mt-1">
+                        <option value="">Select</option>
+                        <option>A+</option>
+                        <option>A-</option>
+                        <option>B+</option>
+                        <option>B-</option>
+                        <option>AB+</option>
+                        <option>AB-</option>
+                        <option>O+</option>
+                        <option>O-</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-medium">Contact Number</label>
+                    <input type="tel" name="contact" required class="w-full p-3 border rounded-md mt-1" />
+                </div>
+                <!-- Address Section -->
+                <div class="col-span-2">
+                    <label class="block font-medium mb-2">Address</label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <input type="text" name="street" placeholder="Street Address" required
+                                class="w-full p-3 border rounded-md" />
+                        </div>
+                        <div>
+                            <input type="text" name="city" placeholder="City" required
+                                class="w-full p-3 border rounded-md" />
+                        </div>
+                        <div>
+                            <input type="text" name="state" placeholder="State" required
+                                class="w-full p-3 border rounded-md" />
+                        </div>
+                        <div>
+                            <input type="text" name="zipcode" placeholder="Zip Code" required
+                                class="w-full p-3 border rounded-md" />
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-medium">Emergency Contact</label>
+                    <input type="tel" name="emergencyContact" required class="w-full p-3 border rounded-md mt-1" />
+                </div>
+            </div>
+
+            <div class="mt-6">
+                <label class="block font-medium">Previous Health Conditions</label>
+                <textarea name="healthConditions" rows="3" class="w-full p-3 border rounded-md mt-1"></textarea>
+            </div>
+
+            <div class="mt-6">
+                <label class="block font-medium mb-2">What would you like to donate?</label>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pl-2">
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" name="donationTypes" value="Blood" class="mr-2" /> Blood
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" name="donationTypes" value="Plasma" class="mr-2" /> Plasma
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" name="donationTypes" value="Platelets" class="mr-2" /> Platelets
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" name="donationTypes" value="Bone Marrow" class="mr-2" /> Bone Marrow
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" name="donationTypes" value="Organ Donation Pledge" class="mr-2" /> Organ
+                        Donation Pledge
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" name="donationTypes" value="Hair Donation" class="mr-2" /> Hair Donation
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" name="donationTypes" value="Tissue/Eye Pledge" class="mr-2" /> Tissue/Eye
+                        Pledge
+                    </label>
+                </div>
+            </div>
+
+            <div class="mt-6">
+                <label class="block font-medium">Additional Notes</label>
+                <textarea name="notes" rows="3" class="w-full p-3 border rounded-md mt-1"></textarea>
+            </div>
+            <form action="confirmation.html" method="POST">
+
+            <button type="submit"
+                class="w-full bg-blue-600 text-white p-3 rounded-md mt-6 hover:bg-blue-700">Submit</button>
+        </form>
+
+    </div>
+</body>
+
+</html>
