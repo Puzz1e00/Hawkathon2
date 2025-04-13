@@ -217,8 +217,30 @@
                 <!-- Hospital details will be loaded here -->
             </div>
 
+            <!-- Blood Inventory Management Section -->
+            <div class="blood-inventory-section" style="margin-bottom: 30px; padding: 20px; background-color: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef;">
+                <h2 style="margin-top: 0; color: #333; font-size: 1.4rem; display: flex; align-items: center;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 10px;">
+                        <path d="M18 21a6 6 0 0 0 0-12h-5c-.47 0-.94-.06-1.4-.17a6 6 0 0 1-5.24-5.95 6 6 0 0 1 11.28-2.88"></path>
+                        <path d="m15.54 10.5-4.54-2 2 4.5-2 4.5 4.54-2"></path>
+                    </svg>
+                    Blood Inventory Management
+                </h2>
+                <p style="margin-bottom: 15px; color: #6c757d;">Update your hospital's current blood inventory levels:</p>
+                
+                <div id="bloodInventoryForm" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
+                    <!-- Blood type inputs will be generated here -->
+                </div>
+                
+                <div style="display: flex; justify-content: flex-end; margin-top: 15px;">
+                    <button id="updateInventoryBtn" style="background-color: #28a745; color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
+                        Update Inventory
+                    </button>
+                </div>
+            </div>
+
             <button class="add-patient-btn" style="background-color: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin: 20px 0; transition: background-color 0.3s;">
-                <a href="patientsform.html" style="color: white; text-decoration: none;">Add New Patient</a>
+                <a href="patientsform.html" style="color: white; text-decoration: none;">Request Donor</a>
             </button>
             
             <button id="logoutBtn" class="logout-btn"><a href="hospital_login.html">Logout</a></button>
@@ -291,6 +313,9 @@
                     </div>
                 `;
 
+                // Initialize Blood Inventory Form
+                initializeBloodInventory(hospital);
+                
                 // Function to display donors from the same state
                 function displayStateDonors() {
                     // Get all registered donors
@@ -312,7 +337,21 @@
                         return donorState === hospitalState;
                     });
                     
+                    // Filter donors from other states
+                    const otherStateDonors = donors.filter(donor => {
+                        const donorState = donor.state || (donor.address && donor.address.state);
+                        return donorState !== hospitalState;
+                    });
+                    
+                    // Sort other state donors alphabetically by state
+                    otherStateDonors.sort((a, b) => {
+                        const stateA = a.state || (a.address && a.address.state) || '';
+                        const stateB = b.state || (b.address && b.address.state) || '';
+                        return stateA.localeCompare(stateB);
+                    });
+                    
                     console.log('Filtered donors from same state:', stateDonors);
+                    console.log('Filtered donors from other states:', otherStateDonors);
 
                     // Get or create donors display section
                     let donorsSection = document.getElementById('donorsSection');
@@ -323,7 +362,7 @@
                         document.querySelector('.container').appendChild(donorsSection);
                     }
 
-                    // Create donors list HTML
+                    // Create donors list HTML for same state
                     donorsSection.innerHTML = `
                         <h2>Blood Donors in ${hospitalState}</h2>
                         <div class="donors-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px;">
@@ -359,6 +398,40 @@
                                 : `<p>No donors found.</p>`
                             }
                         </div>
+
+                        <h2 style="margin-top: 30px;">Blood Donors in Other States</h2>
+                        <div class="other-states-container" style="max-height: 400px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px;">
+                            <div class="donors-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px;">
+                                ${otherStateDonors.length > 0 ? 
+                                    otherStateDonors.map(donor => {
+                                        const donorState = donor.state || (donor.address && donor.address.state) || 'N/A';
+                                        return `<div class="donor-card" style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; background-color: #f8f9fa; border-left: 4px solid #3b82f6;">
+                                            <div class="donor-detail">
+                                                <label style="font-weight: bold;">State:</label>
+                                                <span style="background-color: #dbeafe; padding: 2px 6px; border-radius: 4px;">${donorState}</span>
+                                            </div>
+                                            <div class="donor-detail">
+                                                <label style="font-weight: bold;">Name:</label>
+                                                <span>${donor.name || 'N/A'}</span>
+                                            </div>
+                                            <div class="donor-detail">
+                                                <label style="font-weight: bold;">Blood Group:</label>
+                                                <span style="color: ${donor.bloodGroup === 'O-' ? '#dc2626' : '#2563eb'}; font-weight: bold;">${donor.bloodGroup || 'N/A'}</span>
+                                            </div>
+                                            <div class="donor-detail">
+                                                <label style="font-weight: bold;">Contact:</label>
+                                                <span>${donor.contact || 'N/A'}</span>
+                                            </div>
+                                            <div class="donor-detail">
+                                                <label style="font-weight: bold;">City:</label>
+                                                <span>${donor.city || (donor.address && donor.address.city) || 'N/A'}</span>
+                                            </div>
+                                        </div>`;
+                                    }).join('') 
+                                    : `<p>No donors found in other states.</p>`
+                                }
+                            </div>
+                        </div>
                     `;
                 }
                 
@@ -373,6 +446,88 @@
                     sessionStorage.removeItem('loggedInHospitalId');
                     window.location.href = 'hospital_login.html';
                 });
+            }
+            
+            // Initialize Blood Inventory Form
+            function initializeBloodInventory(hospital) {
+                const bloodInventoryForm = document.getElementById('bloodInventoryForm');
+                if (!bloodInventoryForm) return;
+                
+                // Define all blood types
+                const bloodTypes = [
+                    { type: 'A+', id: 'inv_Apos', color: '#78c2ad' },
+                    { type: 'A-', id: 'inv_Aneg', color: '#78c2ad' },
+                    { type: 'B+', id: 'inv_Bpos', color: '#6cc3d5' },
+                    { type: 'B-', id: 'inv_Bneg', color: '#6cc3d5' },
+                    { type: 'AB+', id: 'inv_ABpos', color: '#81c995' },
+                    { type: 'AB-', id: 'inv_ABneg', color: '#81c995' },
+                    { type: 'O+', id: 'inv_Opos', color: '#ffce67' },
+                    { type: 'O-', id: 'inv_Oneg', color: '#ff7851' },  // Universal donor
+                ];
+                
+                // Initialize the inventory object if not already present
+                if (!hospital.bloodInventory) {
+                    hospital.bloodInventory = {
+                        'A+': 0, 'A-': 0, 'B+': 0, 'B-': 0, 
+                        'AB+': 0, 'AB-': 0, 'O+': 0, 'O-': 0
+                    };
+                }
+                
+                // Generate inputs for each blood type
+                bloodTypes.forEach(bloodType => {
+                    const currentUnits = hospital.bloodInventory[bloodType.type] || 0;
+                    const isUniversalDonor = bloodType.type === 'O-';
+                    const isUniversalRecipient = bloodType.type === 'AB+';
+                    
+                    const inputHtml = `
+                        <div style="background-color: ${isUniversalDonor ? '#fff5f5' : '#f8f9fa'}; border: 1px solid ${isUniversalDonor ? '#dc2626' : '#dee2e6'}; border-radius: 8px; padding: 10px; display: flex; flex-direction: column;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <span style="font-weight: bold; color: ${isUniversalDonor ? '#dc2626' : '#333'}; font-size: 16px;">${bloodType.type}</span>
+                                ${isUniversalDonor ? '<span style="font-size: 12px; background-color: #dc2626; color: white; padding: 2px 6px; border-radius: 10px;">Universal Donor</span>' : ''}
+                                ${isUniversalRecipient ? '<span style="font-size: 12px; background-color: #3b82f6; color: white; padding: 2px 6px; border-radius: 10px;">Universal Recipient</span>' : ''}
+                            </div>
+                            <div style="display: flex; align-items: center;">
+                                <input 
+                                    type="number" 
+                                    id="${bloodType.id}" 
+                                    min="0" 
+                                    value="${currentUnits}" 
+                                    style="width: 100%; padding: 8px; border: 1px solid ${isUniversalDonor ? '#dc2626' : '#dee2e6'}; border-radius: 4px;"
+                                >
+                                <span style="margin-left: 5px; color: #6c757d;">units</span>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Append to the form
+                    const div = document.createElement('div');
+                    div.innerHTML = inputHtml;
+                    bloodInventoryForm.appendChild(div);
+                });
+                
+                // Add update button event listener
+                const updateInventoryBtn = document.getElementById('updateInventoryBtn');
+                if (updateInventoryBtn) {
+                    updateInventoryBtn.addEventListener('click', () => {
+                        // Update hospital blood inventory
+                        bloodTypes.forEach(bloodType => {
+                            const inputValue = parseInt(document.getElementById(bloodType.id).value) || 0;
+                            hospital.bloodInventory[bloodType.type] = inputValue;
+                        });
+                        
+                        // Save to localStorage
+                        const hospitals = JSON.parse(localStorage.getItem('hospitals')) || [];
+                        const hospitalIndex = hospitals.findIndex(h => h.id === parseInt(hospitalId));
+                        
+                        if (hospitalIndex !== -1) {
+                            hospitals[hospitalIndex] = hospital;
+                            localStorage.setItem('hospitals', JSON.stringify(hospitals));
+                            
+                            // Show success message
+                            alert('Blood inventory updated successfully!');
+                        }
+                    });
+                }
             }
             
             // Chatbot Functionality
@@ -486,72 +641,366 @@
             // Process user message and generate a response
             function processMessage(message) {
                 // In a real implementation, this would call an AI API like OpenAI
-                // For this demo, we'll use predefined responses
-
+                // For this demo, we'll use enhanced NLP simulation
+ 
+                // NLP Pipeline:
+                // 1. Preprocess the message (lowercase, remove extra spaces)
+                // 2. Extract entities (blood types, dates, locations, numbers)
+                // 3. Classify intent (question, request, information)
+                // 4. Determine sentiment (urgent, neutral, positive)
+                // 5. Generate appropriate response
+                
+                // Step 1: Preprocess
+                const preprocessedMessage = message.toLowerCase().trim();
+                
+                // Step 2: Entity extraction
+                const entities = extractEntities(preprocessedMessage);
+                
+                // Step 3: Intent classification
+                const intent = classifyIntent(preprocessedMessage, entities);
+                
+                // Step 4: Sentiment analysis
+                const sentiment = analyzeSentiment(preprocessedMessage);
+                
+                // Step 5: Generate response based on intent and entities
+                const response = generateResponse(intent, entities, sentiment);
+                
+                // For debugging
+                console.log({
+                  message: preprocessedMessage,
+                  entities,
+                  intent,
+                  sentiment,
+                  response
+                });
+                
+                return response;
+            }
+            
+            // Entity extraction (blood types, locations, numbers, dates)
+            function extractEntities(text) {
+                const entities = {
+                    bloodTypes: [],
+                    locations: [],
+                    numbers: [],
+                    dates: [],
+                    people: []
+                };
+                
+                // Extract blood types
+                const bloodTypePatterns = [
+                    /\b(a|b|ab|o)(\s*|\-)(positive|negative|\+|\-)\b/g,
+                    /\b(a|b|ab|o)(\s*)(type)\b/gi,
+                    /\bo\s*neg(ative)?\b/gi,
+                    /\bo\s*pos(itive)?\b/gi
+                ];
+                
+                bloodTypePatterns.forEach(pattern => {
+                    const matches = text.match(pattern);
+                    if (matches) {
+                        matches.forEach(match => {
+                            // Normalize blood type format
+                            let normalizedType = match.toUpperCase()
+                                .replace(/\s+/g, '')
+                                .replace('POSITIVE', '+')
+                                .replace('NEGATIVE', '-')
+                                .replace('TYPE', '');
+                            
+                            // Fix common patterns
+                            if (normalizedType === 'ONEG') normalizedType = 'O-';
+                            if (normalizedType === 'OPOS') normalizedType = 'O+';
+                            
+                            if (!entities.bloodTypes.includes(normalizedType) && 
+                                ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].includes(normalizedType)) {
+                                entities.bloodTypes.push(normalizedType);
+                            }
+                        });
+                    }
+                });
+                
+                // Extract numbers
+                const numberMatches = text.match(/\b\d+\b/g);
+                if (numberMatches) {
+                    entities.numbers = numberMatches.map(n => parseInt(n));
+                }
+                
+                // Extract locations (simplified - would use a gazetteer in a real NLP system)
+                const commonLocations = [
+                    'hospital', 'clinic', 'center', 'ward', 'emergency', 'er', 'icu', 
+                    'department', 'lab', 'laboratory', 'blood bank', 'donation center'
+                ];
+                
+                commonLocations.forEach(location => {
+                    if (text.includes(location)) {
+                        entities.locations.push(location);
+                    }
+                });
+                
+                // Extract date-related terms
+                const dateTerms = [
+                    'today', 'tomorrow', 'yesterday', 'next week', 'last week',
+                    'this week', 'this month', 'weekend', 'monday', 'tuesday',
+                    'wednesday', 'thursday', 'friday', 'saturday', 'sunday'
+                ];
+                
+                dateTerms.forEach(term => {
+                    if (text.includes(term)) {
+                        entities.dates.push(term);
+                    }
+                });
+                
+                return entities;
+            }
+            
+            // Intent classification
+            function classifyIntent(text, entities) {
+                // Define intent patterns
+                const intentPatterns = {
+                    compatibility_question: [
+                        /compatible|compatibility|match|matching|can.*donate to|who can.*receive/i,
+                    ],
+                    count_query: [
+                        /how many|count|total|number of|do we have/i,
+                    ],
+                    urgent_request: [
+                        /urgent|emergency|critical|immediately|asap|right away/i,
+                    ],
+                    inventory_query: [
+                        /inventory|supply|stock|available|have enough/i,
+                    ],
+                    educational_question: [
+                        /what is|why is|how does|explain|tell me about/i,
+                    ],
+                    recommendation_request: [
+                        /recommend|suggest|advice|advise|should we|what should/i,
+                    ],
+                    donation_process: [
+                        /process|procedure|steps|how to donate|donation procedure/i,
+                    ],
+                    eligibility_question: [
+                        /eligible|eligibility|can donate|requirements|qualify|allowed to/i,
+                    ],
+                    greeting: [
+                        /^(hi|hello|hey|greetings|good morning|good afternoon|good evening)( there)?$/i,
+                    ],
+                    gratitude: [
+                        /thank|thanks|appreciate|grateful/i,
+                    ]
+                };
+                
+                // Check each intent pattern
+                for (const [intent, patterns] of Object.entries(intentPatterns)) {
+                    for (const pattern of patterns) {
+                        if (pattern.test(text)) {
+                            return intent;
+                        }
+                    }
+                }
+                
+                // Default intents based on entities
+                if (entities.bloodTypes.length > 0) {
+                    return 'blood_type_query';
+                }
+                
+                // Fallback intent
+                return 'general_query';
+            }
+            
+            // Sentiment analysis
+            function analyzeSentiment(text) {
+                // Define sentiment markers
+                const sentimentMarkers = {
+                    urgent: [
+                        'urgent', 'emergency', 'critical', 'immediately', 'asap', 'crisis', 
+                        'severe', 'serious', 'life-threatening', 'dying', 'death', 'fatal', 
+                        'quickly', 'fast', 'hurry'
+                    ],
+                    negative: [
+                        'bad', 'worried', 'concerned', 'problem', 'issue', 'trouble', 'difficult',
+                        'challenge', 'shortage', 'lack', 'insufficient', 'not enough', 'running out',
+                        'depleted', 'low'
+                    ],
+                    positive: [
+                        'good', 'great', 'excellent', 'perfect', 'wonderful', 'amazing', 'fantastic',
+                        'helpful', 'useful', 'beneficial', 'appreciate', 'thanks', 'thank you',
+                        'grateful', 'happy', 'satisfied'
+                    ]
+                };
+                
+                // Count occurrences of each sentiment marker
+                let urgentCount = 0;
+                let negativeCount = 0;
+                let positiveCount = 0;
+                
+                sentimentMarkers.urgent.forEach(marker => {
+                    if (text.includes(marker)) urgentCount++;
+                });
+                
+                sentimentMarkers.negative.forEach(marker => {
+                    if (text.includes(marker)) negativeCount++;
+                });
+                
+                sentimentMarkers.positive.forEach(marker => {
+                    if (text.includes(marker)) positiveCount++;
+                });
+                
+                // Determine overall sentiment
+                if (urgentCount > 0) return 'urgent';
+                if (positiveCount > negativeCount) return 'positive';
+                if (negativeCount > positiveCount) return 'negative';
+                return 'neutral';
+            }
+            
+            // Generate response based on intent, entities, and sentiment
+            function generateResponse(intent, entities, sentiment) {
                 // Get hospital state
                 const hospitalState = hospital.state || (hospital.address && hospital.address.state) || '';
                 
                 // Get all donors data
                 const donors = JSON.parse(localStorage.getItem('donors')) || [];
                 
-                // Blood type count
+                // Count blood types
                 const bloodTypeCounts = {};
                 donors.forEach(donor => {
                     const bloodType = donor.bloodGroup || 'Unknown';
                     bloodTypeCounts[bloodType] = (bloodTypeCounts[bloodType] || 0) + 1;
                 });
                 
-                // Keywords to detect in the message
-                const messageLower = message.toLowerCase();
-                
-                // Blood type compatibility question
-                if (messageLower.includes('compatible') || messageLower.includes('compatibility')) {
-                    return {
-                        text: `Here's a quick guide to blood type compatibility:\n\n• O- is the universal donor (can donate to all types)\n• AB+ is the universal recipient (can receive from all types)\n• Type A can donate to A and AB\n• Type B can donate to B and AB\n• Type AB can donate only to AB\n• Type O can donate to all types\n\nNegative types can donate to both negative and positive of the same letter, but positive types can only donate to positive.`,
-                        suggestions: ["How many O- donors do we have?", "What is a universal donor?", "Rarest blood types"]
-                    };
-                }
-                
-                // O- donor count
-                if (messageLower.includes('o-') || (messageLower.includes('o') && messageLower.includes('negative'))) {
-                    const oNegCount = bloodTypeCounts['O-'] || 0;
-                    const oNegInState = donors.filter(d => d.bloodGroup === 'O-' && (d.state || (d.address && d.address.state)) === hospitalState).length;
-                    
-                    return {
-                        text: `We currently have ${oNegCount} donors with O- blood type in our database` + 
-                            (hospitalState ? `, with ${oNegInState} of them in ${hospitalState}.` : '.') +
-                            `\n\nO- is the universal donor blood type and in high demand, especially in emergency situations.`,
-                        suggestions: ["What is a universal donor?", "Blood donation requirements", "List all blood types"]
-                    };
-                }
-                
-                // Universal donor
-                if (messageLower.includes('universal donor')) {
-                    return {
-                        text: `O- (O negative) is the universal donor blood type. It can be given to anyone regardless of their blood type, making it extremely valuable, especially in emergency situations when there's no time to determine a patient's blood type.\n\nOnly about 7% of the population has O- blood, making it relatively rare but in high demand.`,
-                        suggestions: ["How many O- donors do we have?", "Universal recipient", "Blood shortages"]
-                    };
-                }
-                
-                // Blood donation requirements
-                if (messageLower.includes('requirement') || messageLower.includes('eligible') || messageLower.includes('can donate')) {
-                    return {
-                        text: `General requirements for blood donation include:\n\n• Age: 17 or older (16 with parental consent in some areas)\n• Weight: At least 110 pounds\n• Health: Generally good health and feeling well\n• Time since last donation: At least 8 weeks for whole blood\n\nSome factors that might disqualify someone temporarily or permanently include:\n• Recent illness or certain medications\n• Low iron levels\n• Travel to certain countries\n• Certain medical conditions`,
-                        suggestions: ["How often can someone donate?", "Donation process", "Blood types most needed"]
-                    };
-                }
-                
-                // Blood types list/count
-                if (messageLower.includes('list') && messageLower.includes('blood type')) {
-                    const typesList = Object.entries(bloodTypeCounts)
-                        .sort((a, b) => b[1] - a[1])  // Sort by count descending
-                        .map(([type, count]) => `• ${type}: ${count} donors`)
-                        .join('\n');
-                    
-                    return {
-                        text: `Here's a breakdown of our donor database by blood type:\n\n${typesList || "No donors with known blood types in our database yet."}`,
-                        suggestions: ["Rarest blood types", "Most needed blood types", "O- donors"]
-                    };
+                // Create response based on intent
+                switch (intent) {
+                    case 'compatibility_question':
+                        return {
+                            text: `Here's a quick guide to blood type compatibility:\n\n• O- is the universal donor (can donate to all types)\n• AB+ is the universal recipient (can receive from all types)\n• Type A can donate to A and AB\n• Type B can donate to B and AB\n• Type AB can donate only to AB\n• Type O can donate to all types\n\nNegative types can donate to both negative and positive of the same letter, but positive types can only donate to positive.`,
+                            suggestions: ["How many O- donors do we have?", "What is a universal donor?", "Rarest blood types"]
+                        };
+                        
+                    case 'count_query':
+                        // If specific blood type is mentioned
+                        if (entities.bloodTypes.length > 0) {
+                            const bloodType = entities.bloodTypes[0];
+                            const count = bloodTypeCounts[bloodType] || 0;
+                            const stateCount = donors.filter(d => 
+                                d.bloodGroup === bloodType && 
+                                (d.state || (d.address && d.address.state)) === hospitalState
+                            ).length;
+                            
+                            let responseText = `We currently have ${count} donors with ${bloodType} blood type`;
+                            if (hospitalState) {
+                                responseText += `, with ${stateCount} of them in ${hospitalState}`;
+                            }
+                            responseText += '.';
+                            
+                            // Add urgency info for O-
+                            if (bloodType === 'O-') {
+                                responseText += `\n\nO- is the universal donor blood type and in high demand, especially in emergency situations.`;
+                            }
+                            
+                            return {
+                                text: responseText,
+                                suggestions: ["Blood type compatibility", "Donation requirements", "List all blood types"]
+                            };
+                        } else {
+                            // Total donor count
+                            return {
+                                text: `We currently have ${donors.length} total registered donors across all blood types.${hospitalState ? ` ${donors.filter(d => (d.state || (d.address && d.address.state)) === hospitalState).length} of them are in ${hospitalState}.` : ''}`,
+                                suggestions: ["Show donors by blood type", "O- donors", "Most needed blood types"]
+                            };
+                        }
+                        
+                    case 'blood_type_query':
+                        if (entities.bloodTypes.length > 0) {
+                            const bloodType = entities.bloodTypes[0];
+                            let responseText = '';
+                            
+                            switch (bloodType) {
+                                case 'O-':
+                                    responseText = `O- (O negative) is the universal donor blood type. It can be given to anyone regardless of their blood type, making it extremely valuable, especially in emergency situations when there's no time to determine a patient's blood type.\n\nOnly about 7% of the population has O- blood, making it relatively rare but in high demand.`;
+                                    break;
+                                case 'AB+':
+                                    responseText = `AB+ (AB positive) is the universal recipient blood type. People with AB+ can receive blood from any donor type, which makes their treatment options much more flexible.\n\nHowever, AB+ donors can only donate to other AB+ recipients. It's the rarest blood type, occurring in only about 3% of the population.`;
+                                    break;
+                                default:
+                                    const compatibilityInfo = getBloodTypeCompatibility(bloodType);
+                                    responseText = `${bloodType} blood type:\n• Can donate to: ${compatibilityInfo.canDonateTo.join(', ')}\n• Can receive from: ${compatibilityInfo.canReceiveFrom.join(', ')}\n\nWe currently have ${bloodTypeCounts[bloodType] || 0} registered donors with this blood type.`;
+                            }
+                            
+                            return {
+                                text: responseText,
+                                suggestions: ["Blood type compatibility", `How many ${bloodType} donors?`, "Rare blood types"]
+                            };
+                        }
+                        break;
+                        
+                    case 'educational_question':
+                        // Generic educational response
+                        if (text.includes('universal donor')) {
+                            return {
+                                text: `O- (O negative) is the universal donor blood type. It can be given to anyone regardless of their blood type, making it extremely valuable, especially in emergency situations when there's no time to determine a patient's blood type.\n\nOnly about 7% of the population has O- blood, making it relatively rare but in high demand.`,
+                                suggestions: ["How many O- donors do we have?", "Universal recipient", "Blood shortages"]
+                            };
+                        } else if (text.includes('universal recipient')) {
+                            return {
+                                text: `AB+ (AB positive) is the universal recipient blood type. People with AB+ can receive blood from any donor type, which makes their treatment options much more flexible.\n\nHowever, AB+ donors can only donate to other AB+ recipients. It's the rarest blood type, occurring in only about 3% of the population.`,
+                                suggestions: ["How many AB+ patients?", "Universal donor", "Blood type compatibility"]
+                            };
+                        }
+                        break;
+                        
+                    case 'inventory_query':
+                        // Format blood type inventory
+                        const inventoryList = Object.entries(bloodTypeCounts)
+                            .filter(([type]) => ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].includes(type))
+                            .sort((a, b) => b[1] - a[1])
+                            .map(([type, count]) => `• ${type}: ${count} units`)
+                            .join('\n');
+                        
+                        return {
+                            text: `Current blood inventory by type:\n\n${inventoryList || "No blood units currently in inventory."}`,
+                            suggestions: ["Which types are low?", "O- inventory", "Upcoming needs"]
+                        };
+                        
+                    case 'eligibility_question':
+                        return {
+                            text: `General requirements for blood donation include:\n\n• Age: 17 or older (16 with parental consent in some areas)\n• Weight: At least 110 pounds\n• Health: Generally good health and feeling well\n• Time since last donation: At least 8 weeks for whole blood\n\nSome factors that might disqualify someone temporarily or permanently include:\n• Recent illness or certain medications\n• Low iron levels\n• Travel to certain countries\n• Certain medical conditions`,
+                            suggestions: ["How often can someone donate?", "Donation process", "Blood types most needed"]
+                        };
+                        
+                    case 'urgent_request':
+                        const urgentText = sentiment === 'urgent' ? 
+                            "I understand this is an urgent situation. " : "";
+                        
+                        if (entities.bloodTypes.length > 0) {
+                            const bloodType = entities.bloodTypes[0];
+                            const matchingDonors = donors.filter(d => d.bloodGroup === bloodType);
+                            
+                            return {
+                                text: `${urgentText}We have ${matchingDonors.length} donors with ${bloodType} blood type. Would you like me to help you contact them or find compatible alternatives?`,
+                                suggestions: [`Contact all ${bloodType} donors`, `Compatible types for ${bloodType}`, "Emergency protocol"]
+                            };
+                        } else {
+                            return {
+                                text: `${urgentText}What specific blood type or resources do you need urgently? I can help you locate donors or suggest alternatives.`,
+                                suggestions: ["Need O- urgently", "Emergency protocol", "Contact all donors"]
+                            };
+                        }
+                        
+                    case 'greeting':
+                        return {
+                            text: `Hello! I'm your BloodLink AI Assistant. How can I help you with blood donation today?`,
+                            suggestions: ["Show blood inventory", "Donor statistics", "Urgent needs"]
+                        };
+                        
+                    case 'gratitude':
+                        return {
+                            text: `You're welcome! Is there anything else I can help you with regarding blood donation or donor management?`,
+                            suggestions: ["Blood type compatibility", "Donor statistics", "Contact donors"]
+                        };
+                        
+                    default:
+                        return {
+                            text: `I'm still learning about blood donation. Can you rephrase your question about ${entities.bloodTypes.length > 0 ? entities.bloodTypes.join(', ') + ' blood type' : 'donation management'}?`,
+                            suggestions: ["Blood type compatibility", "Donor statistics", "Donation requirements"]
+                        };
                 }
                 
                 // Fallback response
@@ -559,6 +1008,22 @@
                     text: `I'm still learning about blood donation. That's not something I have specific information about yet. How else can I help you with blood donation or donor management?`,
                     suggestions: ["Which blood types are compatible?", "Blood donation requirements", "O- donors"]
                 };
+            }
+            
+            // Helper: Get blood type compatibility information
+            function getBloodTypeCompatibility(bloodType) {
+                const compatibility = {
+                    'O-': { canDonateTo: ['O-', 'O+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+'], canReceiveFrom: ['O-'] },
+                    'O+': { canDonateTo: ['O+', 'A+', 'B+', 'AB+'], canReceiveFrom: ['O-', 'O+'] },
+                    'A-': { canDonateTo: ['A-', 'A+', 'AB-', 'AB+'], canReceiveFrom: ['O-', 'A-'] },
+                    'A+': { canDonateTo: ['A+', 'AB+'], canReceiveFrom: ['O-', 'O+', 'A-', 'A+'] },
+                    'B-': { canDonateTo: ['B-', 'B+', 'AB-', 'AB+'], canReceiveFrom: ['O-', 'B-'] },
+                    'B+': { canDonateTo: ['B+', 'AB+'], canReceiveFrom: ['O-', 'O+', 'B-', 'B+'] },
+                    'AB-': { canDonateTo: ['AB-', 'AB+'], canReceiveFrom: ['O-', 'A-', 'B-', 'AB-'] },
+                    'AB+': { canDonateTo: ['AB+'], canReceiveFrom: ['O-', 'O+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+'] }
+                };
+                
+                return compatibility[bloodType] || { canDonateTo: [], canReceiveFrom: [] };
             }
             
             // Send user message and get bot response

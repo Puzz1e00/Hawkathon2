@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hospital Search - DonorSync</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+<body class="bg-gray-50 text-gray-900">
+  <!-- Header -->
+  <header class="bg-white shadow">
+    <div class="max-w-[95%] mx-auto px-4 lg:px-8 py-6 flex items-center justify-between">
+      <!-- Logo + Brand -->
+      <div class="flex items-center gap-6">
+        <img src="DonorSyncRed.png" alt="DonorSync logo" class="w-28 h-auto object-contain" />
+        <h1 class="text-4xl font-extrabold text-blue-600 tracking-tight">DonorSync</h1>
+      </div>
+  
+      <!-- Navigation -->
+      <nav>
+        <ul class="flex gap-8 text-lg font-medium">
+          <li><a href="homepage.html" class="hover:text-blue-600">Home</a></li>
+          <li><a href="#" class="hover:text-blue-600">About Us</a></li>
+          <li><a href="register.html" class="hover:text-blue-600">Become a Donor</a></li>
+          <li><a href="hospital_login.html" class="hover:text-blue-600">Hospital Portal</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Search Section -->
+  <section class="py-12 bg-blue-100">
+    <div class="max-w-4xl mx-auto px-4 text-center">
+      <h2 class="text-3xl font-bold mb-6">Find Hospitals</h2>
+      <p class="text-lg mb-8">Search for hospitals based on location and blood availability</p>
+      
+      <div class="bg-white p-6 rounded-xl shadow-md">
+        <div class="flex flex-col md:flex-row gap-4 mb-6">
+          <!-- State Filter -->
+          <div class="flex-1">
+            <label for="state" class="block text-left text-sm font-medium text-gray-700 mb-1">State</label>
+            <select id="state" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+              <option value="">All States</option>
+              <!-- States will be populated from localStorage -->
+            </select>
+          </div>
+
+          <!-- City Filter -->
+          <div class="flex-1">
+            <label for="city" class="block text-left text-sm font-medium text-gray-700 mb-1">City</label>
+            <select id="city" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+              <option value="">All Cities</option>
+              <!-- Cities will be populated based on state selection -->
+            </select>
+          </div>
+
+          <!-- Blood Group Filter -->
+          <div class="flex-1">
+            <label for="bloodGroup" class="block text-left text-sm font-medium text-gray-700 mb-1">Blood Group</label>
+            <select id="bloodGroup" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+              <option value="">Any Blood Group</option>
+              <option value="A+">A+</option>
+              <option value="A-">A-</option>
+              <option value="B+">B+</option>
+              <option value="B-">B-</option>
+              <option value="AB+">AB+</option>
+              <option value="AB-">AB-</option>
+              <option value="O+">O+</option>
+              <option value="O-">O-</option>
+            </select>
+          </div>
+        </div>
+
+        <button id="searchBtn" class="w-full md:w-auto px-6 py-3 bg-blue-600 text-white rounded-xl shadow hover:bg-blue-700 transition">
+          <i class="fas fa-search mr-2"></i> Search Hospitals
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Results Section -->
+  <section class="py-16">
+    <div class="max-w-6xl mx-auto px-4">
+      <h3 class="text-2xl font-semibold mb-6">Search Results</h3>
+      
+      <div id="resultsCount" class="mb-4 text-gray-600">Showing all hospitals</div>
+      
+      <!-- Results Grid -->
+      <div id="hospitalResults" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Hospital cards will be populated here -->
+      </div>
+      
+      <!-- No Results Message -->
+      <div id="noResults" class="hidden text-center py-8">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <h4 class="text-xl font-medium text-gray-700 mb-2">No hospitals found</h4>
+        <p class="text-gray-600">Try adjusting your search criteria.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-white py-12">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="grid md:grid-cols-4 gap-8">
+        <!-- Logo and mission -->
+        <div class="md:col-span-2">
+          <h4 class="text-xl font-bold mb-4">DonorSync</h4>
+          <p class="text-gray-300 mb-4">Connecting donors and hospitals to save lives efficiently and effectively.</p>
+        </div>
+        
+        <!-- Quick Links -->
+        <div>
+          <h5 class="font-semibold mb-4">Quick Links</h5>
+          <ul class="space-y-2">
+            <li><a href="homepage.html" class="text-gray-300 hover:text-white">Home</a></li>
+            <li><a href="register.html" class="text-gray-300 hover:text-white">Become a Donor</a></li>
+            <li><a href="hospital_login.html" class="text-gray-300 hover:text-white">Hospital Portal</a></li>
+          </ul>
+        </div>
+        
+        <!-- Contact -->
+        <div>
+          <h5 class="font-semibold mb-4">Contact Us</h5>
+          <ul class="space-y-2 text-gray-300">
+            <li><i class="fas fa-envelope mr-2"></i> contact@donorsync.org</li>
+            <li><i class="fas fa-phone mr-2"></i> +1 (555) 123-4567</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="border-t border-gray-700 mt-8 pt-6 text-center text-gray-400">
+        <p>&copy; 2023 DonorSync. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JavaScript -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Load hospital data from localStorage
+      const hospitals = JSON.parse(localStorage.getItem('hospitals')) || [];
+      
+      if (hospitals.length === 0) {
+        document.getElementById('hospitalResults').innerHTML = `
+          <div class="col-span-full text-center py-8">
+            <p class="text-yellow-600">No hospitals found in the system. Please register hospitals first.</p>
+          </div>
+        `;
+        document.getElementById('searchBtn').disabled = true;
+      } else {
+        // Initialize the page
+        initializePage(hospitals);
+      }
+    });
+
+    function initializePage(hospitals) {
+      // Populate state dropdown with unique states
+      const states = [...new Set(hospitals.map(hospital => hospital.state))].sort();
+      const stateSelect = document.getElementById('state');
+      
+      states.forEach(state => {
+        const option = document.createElement('option');
+        option.value = state;
+        option.textContent = state;
+        stateSelect.appendChild(option);
+      });
+
+      // Update cities when state changes
+      stateSelect.addEventListener('change', function() {
+        updateCityDropdown(hospitals, this.value);
+      });
+
+      // Initial hospital display
+      displayHospitals(hospitals);
+
+      // Search button event listener
+      document.getElementById('searchBtn').addEventListener('click', function() {
+        const selectedState = document.getElementById('state').value;
+        const selectedCity = document.getElementById('city').value;
+        const selectedBloodGroup = document.getElementById('bloodGroup').value;
+        
+        searchHospitals(hospitals, selectedState, selectedCity, selectedBloodGroup);
+      });
+    }
+
+    function updateCityDropdown(hospitals, selectedState) {
+      const citySelect = document.getElementById('city');
+      
+      // Clear current options
+      citySelect.innerHTML = '<option value="">All Cities</option>';
+      
+      if (selectedState) {
+        // Get cities for the selected state
+        const cities = [...new Set(
+          hospitals
+            .filter(hospital => hospital.state === selectedState)
+            .map(hospital => hospital.city)
+        )].sort();
+        
+        // Add city options
+        cities.forEach(city => {
+          const option = document.createElement('option');
+          option.value = city;
+          option.textContent = city;
+          citySelect.appendChild(option);
+        });
+      }
+    }
+
+    function searchHospitals(hospitals, state, city, bloodGroup) {
+      // Filter hospitals based on criteria
+      let filteredHospitals = hospitals;
+      
+      if (state) {
+        filteredHospitals = filteredHospitals.filter(hospital => hospital.state === state);
+      }
+      
+      if (city) {
+        filteredHospitals = filteredHospitals.filter(hospital => hospital.city === city);
+      }
+      
+      // For blood group, we need to check if the hospital has inventory for this blood group
+      if (bloodGroup && bloodGroup !== '') {
+        filteredHospitals = filteredHospitals.filter(hospital => {
+          // Check if the hospital has blood inventory
+          if (hospital.bloodInventory && hospital.bloodInventory[bloodGroup]) {
+            return hospital.bloodInventory[bloodGroup] > 0;
+          }
+          return false;
+        });
+      }
+      
+      // Update results count
+      const resultsCount = document.getElementById('resultsCount');
+      resultsCount.textContent = `Found ${filteredHospitals.length} hospital${filteredHospitals.length !== 1 ? 's' : ''}`;
+      
+      // Display the filtered hospitals
+      displayHospitals(filteredHospitals);
+    }
+
+    function displayHospitals(hospitals) {
+      const resultsContainer = document.getElementById('hospitalResults');
+      const noResults = document.getElementById('noResults');
+      
+      // Clear current results
+      resultsContainer.innerHTML = '';
+      
+      if (hospitals.length === 0) {
+        // Show no results message
+        noResults.classList.remove('hidden');
+      } else {
+        // Hide no results message
+        noResults.classList.add('hidden');
+        
+        // Display each hospital
+        hospitals.forEach(hospital => {
+          // Create blood inventory HTML if it exists
+          let bloodInventoryHTML = '';
+          if (hospital.bloodInventory) {
+            bloodInventoryHTML = `
+              <div class="mt-4 pt-4 border-t border-gray-200">
+                <h5 class="text-sm font-semibold mb-2">Blood Inventory</h5>
+                <div class="grid grid-cols-4 gap-1">
+                  ${Object.entries(hospital.bloodInventory || {}).map(([type, units]) => `
+                    <div class="bg-${type === 'O-' ? 'red-50' : 'gray-50'} p-1 rounded text-center text-xs">
+                      <span class="font-bold ${type === 'O-' ? 'text-red-600' : ''}">${type}</span>: ${units} units
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            `;
+          }
+          
+          // Create hospital card
+          const card = document.createElement('div');
+          card.className = 'bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition';
+          card.innerHTML = `
+            <h4 class="text-xl font-semibold mb-2">${hospital.name}</h4>
+            <p class="text-gray-600 mb-3">${hospital.address}, ${hospital.city}, ${hospital.state}</p>
+            <p class="flex items-center mb-4"><i class="fas fa-phone text-blue-600 mr-2"></i> ${hospital.contact}</p>
+            
+            ${hospital.services && hospital.services.length > 0 ? `
+              <div class="mb-4">
+                <h5 class="text-sm font-semibold mb-2">Services</h5>
+                <div class="flex flex-wrap gap-2">
+                  ${hospital.services.map(service => 
+                    `<span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">${service}</span>`
+                  ).join('')}
+                </div>
+              </div>
+            ` : ''}
+            
+            ${bloodInventoryHTML}
+          `;
+          
+          resultsContainer.appendChild(card);
+        });
+      }
+    }
+  </script>
+</body>
+</html>

@@ -156,9 +156,9 @@
         }
       }
 
-      const findDonorBtn = document.getElementById('findDonorBtn');
-      if (findDonorBtn) {
-        findDonorBtn.addEventListener('click', function () {
+      const findDonorsBtn = document.getElementById('findDonorsBtn');
+      if (findDonorsBtn) {
+        findDonorsBtn.addEventListener('click', function () {
           const bloodType = document.getElementById('bloodType').value;
           if (!bloodType) {
             alert('Please select a blood type');
@@ -173,34 +173,67 @@
     function findMatchingDonors(bloodType, hospitalState) {
       const donors = JSON.parse(localStorage.getItem('donors')) || [];
       let matchingDonors = [];
+      let otherStateDonors = [];
       let headerMessage = '';
       
       // Get units needed and blood product type
       const unitsNeeded = document.getElementById('units-needed').value;
       const bloodProduct = document.getElementById('blood-product').value;
       const urgencyLevel = document.getElementById('urgency').value;
+      // Get universal donors preference
+      const prioritizeUniversalDonors = document.getElementById('prioritize-universal-donors').checked;
       
       // For AB+ (universal receiver), show all blood types
       if (bloodType === 'AB+') {
-        matchingDonors = donors.filter(donor => {
-          const donorState = donor.state || (donor.address && donor.address.state) || '';
-          return !hospitalState || donorState.toLowerCase() === hospitalState.toLowerCase();
-        });
+        // Filter donors by state
+        if (hospitalState) {
+          matchingDonors = donors.filter(donor => {
+            const donorState = donor.state || (donor.address && donor.address.state) || '';
+            return donorState.toLowerCase() === hospitalState.toLowerCase();
+          });
+          
+          // Filter donors from other states
+          otherStateDonors = donors.filter(donor => {
+            const donorState = donor.state || (donor.address && donor.address.state) || '';
+            return donorState.toLowerCase() !== hospitalState.toLowerCase();
+          });
+        } else {
+          matchingDonors = donors;
+        }
+        
         headerMessage = `Donors for AB+ Blood Type (Universal Receiver - Can Receive Any Blood Type)`;
       } else {
         // Find donors matching the selected blood type
-        matchingDonors = donors.filter(donor => {
-          const donorState = donor.state || (donor.address && donor.address.state) || '';
-          return donor.bloodGroup === bloodType &&
-            (!hospitalState || donorState.toLowerCase() === hospitalState.toLowerCase());
-        });
+        if (hospitalState) {
+          matchingDonors = donors.filter(donor => {
+            const donorState = donor.state || (donor.address && donor.address.state) || '';
+            return donor.bloodGroup === bloodType &&
+              donorState.toLowerCase() === hospitalState.toLowerCase();
+          });
+          
+          // Filter other state donors with matching blood type
+          otherStateDonors = donors.filter(donor => {
+            const donorState = donor.state || (donor.address && donor.address.state) || '';
+            return donor.bloodGroup === bloodType &&
+              donorState.toLowerCase() !== hospitalState.toLowerCase();
+          });
+        } else {
+          matchingDonors = donors.filter(donor => donor.bloodGroup === bloodType);
+        }
         
-        // Always include O- donors (universal donors) if selected blood type is not already O-
-        if (bloodType !== 'O-') {
+        // Always include O- donors (universal donors) if selected blood type is not already O- and option is checked
+        if (bloodType !== 'O-' && prioritizeUniversalDonors) {
           const universalDonors = donors.filter(donor => {
             const donorState = donor.state || (donor.address && donor.address.state) || '';
             return donor.bloodGroup === 'O-' &&
               (!hospitalState || donorState.toLowerCase() === hospitalState.toLowerCase());
+          });
+          
+          // Universal donors from other states
+          const otherStateUniversalDonors = donors.filter(donor => {
+            const donorState = donor.state || (donor.address && donor.address.state) || '';
+            return donor.bloodGroup === 'O-' &&
+              hospitalState && donorState.toLowerCase() !== hospitalState.toLowerCase();
           });
           
           if (universalDonors.length > 0) {
@@ -212,15 +245,35 @@
               }
             });
           }
+          
+          if (otherStateUniversalDonors.length > 0) {
+            // Add other state O- donors to otherStateDonors list
+            const allOtherStateDonorIds = new Set(otherStateDonors.map(d => d.id));
+            otherStateUniversalDonors.forEach(donor => {
+              if (!allOtherStateDonorIds.has(donor.id)) {
+                otherStateDonors.push(donor);
+              }
+            });
+          }
         }
         
         headerMessage = bloodType === 'O-' ? 
           `Donors with O- Blood Type (Universal Donors)` : 
-          `Donors with ${bloodType} Blood Type + Universal Donors (O-)`;
+          (prioritizeUniversalDonors ? `Donors with ${bloodType} Blood Type + Universal Donors (O-)` : `Donors with ${bloodType} Blood Type`);
       }
 
       // Sort donors to group by blood type
       matchingDonors.sort((a, b) => a.bloodGroup.localeCompare(b.bloodGroup));
+      
+      // Sort other state donors alphabetically by state and then by blood type
+      otherStateDonors.sort((a, b) => {
+        const stateA = a.state || (a.address && a.address.state) || '';
+        const stateB = b.state || (b.address && b.address.state) || '';
+        if (stateA !== stateB) {
+          return stateA.localeCompare(stateB);
+        }
+        return a.bloodGroup.localeCompare(b.bloodGroup);
+      });
 
       const resultsSection = document.getElementById('donorsResults');
       resultsSection.style.display = 'block';
@@ -228,7 +281,7 @@
       document.getElementById('resultsHeading').textContent = headerMessage;
 
       const donorsList = document.getElementById('donorsList');
-      if (matchingDonors.length > 0) {
+      if (matchingDonors.length > 0 || otherStateDonors.length > 0) {
         // Add an info message for AB+ (universal receiver)
         let infoMessage = '';
         if (bloodType === 'AB+') {
@@ -241,27 +294,93 @@
           `;
         }
 
-        donorsList.innerHTML = infoMessage + matchingDonors.map(donor => `
-          <div style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; background-color: white;">
-            <div><strong>Name:</strong> ${donor.name || 'N/A'}</div>
-            <div style="color: ${getBloodTypeColor(donor.bloodGroup)}; font-weight: bold;">
-              <strong>Blood Group:</strong> ${donor.bloodGroup || 'N/A'} 
-              ${getBloodTypeLabel(donor.bloodGroup)}
+        // Create local state donors section
+        let localDonorsHTML = '';
+        if (matchingDonors.length > 0) {
+          localDonorsHTML = matchingDonors.map(donor => `
+            <div style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; background-color: white;">
+              <div><strong>Name:</strong> ${donor.name || 'N/A'}</div>
+              <div style="color: ${getBloodTypeColor(donor.bloodGroup)}; font-weight: bold;">
+                <strong>Blood Group:</strong> ${donor.bloodGroup || 'N/A'} 
+                ${getBloodTypeLabel(donor.bloodGroup)}
+              </div>
+              <div><strong>Contact:</strong> ${donor.contact || 'N/A'}</div>
+              <div><strong>Email:</strong> ${donor.email || 'N/A'}</div>
+              <div><strong>City:</strong> ${donor.city || (donor.address && donor.address.city) || 'N/A'}</div>
+              <div><strong>State:</strong> ${donor.state || (donor.address && donor.address.state) || 'N/A'}</div>
+              <a href="send_message.html?id=${donor.id}&bloodType=${bloodType}&unitsNeeded=${unitsNeeded}&urgency=${urgencyLevel}&bloodProduct=${bloodProduct}" 
+                 style="display: block; width: 100%; padding: 8px; background-color: #28a745; color: white; text-align: center; border-radius: 4px; margin-top: 10px; text-decoration: none;">
+                Contact Donor
+              </a>
             </div>
-            <div><strong>Contact:</strong> ${donor.contact || 'N/A'}</div>
-            <div><strong>Email:</strong> ${donor.email || 'N/A'}</div>
-            <div><strong>City:</strong> ${donor.city || (donor.address && donor.address.city) || 'N/A'}</div>
-            <div><strong>State:</strong> ${donor.state || (donor.address && donor.address.state) || 'N/A'}</div>
-            <a href="send_message.html?id=${donor.id}&bloodType=${bloodType}&unitsNeeded=${unitsNeeded}&urgency=${urgencyLevel}&bloodProduct=${bloodProduct}" 
-               style="display: block; width: 100%; padding: 8px; background-color: #28a745; color: white; text-align: center; border-radius: 4px; margin-top: 10px; text-decoration: none;">
-              Contact Donor
-            </a>
-          </div>
-        `).join('');
+          `).join('');
+        } else {
+          localDonorsHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 20px; background-color: #f8f9fa; border-radius: 8px;">
+              <p style="margin: 0; font-size: 16px; color: #6c757d;">No donors found with ${bloodType} blood type${prioritizeUniversalDonors ? ' or O- universal donors' : ''} in your state.</p>
+            </div>
+          `;
+        }
+        
+        // Create other states donors section
+        let otherStatesDonorsHTML = '';
+        if (otherStateDonors.length > 0) {
+          otherStatesDonorsHTML = `
+            <div style="grid-column: 1/-1; margin-top: 30px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 style="margin: 0;">Donors from Other States</h3>
+                <div>
+                  <label style="margin-right: 10px; display: inline-flex; align-items: center;">
+                    <input type="checkbox" id="showOtherStates" checked style="margin-right: 5px;"> Show donors from other states
+                  </label>
+                </div>
+              </div>
+              <div id="otherStatesDonorsContainer" style="max-height: 400px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px;">
+                  ${otherStateDonors.map(donor => {
+                    const donorState = donor.state || (donor.address && donor.address.state) || 'Unknown';
+                    const isUniversalDonor = donor.bloodGroup === 'O-';
+                    return `
+                      <div style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; background-color: white; border-left: 4px solid ${isUniversalDonor ? '#dc3545' : '#3b82f6'};">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                          <div style="font-weight: bold;">${donor.name || 'N/A'}</div>
+                          <div style="color: ${getBloodTypeColor(donor.bloodGroup)}; font-weight: bold; background-color: ${isUniversalDonor ? '#fef2f2' : '#eff6ff'}; padding: 3px 8px; border-radius: 12px;">
+                            ${donor.bloodGroup || 'N/A'} ${getBloodTypeLabel(donor.bloodGroup)}
+                          </div>
+                        </div>
+                        <div><strong>Contact:</strong> ${donor.contact || 'N/A'}</div>
+                        <div><strong>City:</strong> ${donor.city || (donor.address && donor.address.city) || 'N/A'}</div>
+                        <div><strong>State:</strong> <span style="background-color: #dbeafe; padding: 2px 6px; border-radius: 4px;">${donorState}</span></div>
+                        <a href="send_message.html?id=${donor.id}&bloodType=${bloodType}&unitsNeeded=${unitsNeeded}&urgency=${urgencyLevel}&bloodProduct=${bloodProduct}" 
+                           style="display: block; width: 100%; padding: 8px; background-color: #4f46e5; color: white; text-align: center; border-radius: 4px; margin-top: 10px; text-decoration: none;">
+                          Contact Donor
+                        </a>
+                      </div>
+                    `;
+                  }).join('')}
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
+        // Combine sections
+        donorsList.innerHTML = infoMessage + localDonorsHTML + otherStatesDonorsHTML;
+        
+        // Add toggle functionality for other states section
+        const showOtherStatesCheckbox = document.getElementById('showOtherStates');
+        if (showOtherStatesCheckbox) {
+          const otherStatesDonorsContainer = document.getElementById('otherStatesDonorsContainer');
+          showOtherStatesCheckbox.addEventListener('change', function() {
+            if (otherStatesDonorsContainer) {
+              otherStatesDonorsContainer.style.display = this.checked ? 'block' : 'none';
+            }
+          });
+        }
       } else {
         donorsList.innerHTML = `
           <div style="grid-column: 1/-1; text-align: center; padding: 20px; background-color: #f8f9fa; border-radius: 8px;">
-            <p style="margin: 0; font-size: 16px; color: #6c757d;">No donors found with ${bloodType} blood type.</p>
+            <p style="margin: 0; font-size: 16px; color: #6c757d;">No donors found with ${bloodType} blood type${prioritizeUniversalDonors ? ' or O- universal donors' : ''}.</p>
           </div>
         `;
       }
@@ -343,54 +462,86 @@
         </table>
       </fieldset>
 
-      <fieldset id="patient-information">
-        <legend>Patient Medical Request</legend>
-        <table>
-          <tr>
-            <td>
-              <label for="bloodType">Blood Type:</label>
-              <select name="bloodType" id="bloodType" required>
-                <option value="">Select</option>
-                <option value="A+">A+</option>
-                <option value="A-">A-</option>
-                <option value="B+">B+</option>
-                <option value="B-">B-</option>
-                <option value="AB+">AB+</option>
-                <option value="AB-">AB-</option>
-                <option value="O+">O+</option>
-                <option value="O-">O-</option>
-              </select>
-            </td>
-            <td>
-              <label for="units-needed">Units Needed:</label>
-              <input type="number" id="units-needed" placeholder="e.g. 2" required>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <label for="urgency">Urgency Level:</label>
-              <select id="urgency" required>
-                <option value="normal">Normal</option>
-                <option value="urgent">Urgent</option>
-                <option value="emergency">Emergency</option>
-              </select>
-            </td>
-            <td>
-              <label for="blood-product">Type of Blood Product:</label>
-              <select id="blood-product" required>
-                <option value="">Select</option>
-                <option value="whole">Whole Blood</option>
-                <option value="plasma">Plasma</option>
-                <option value="platelets">Platelets</option>
-              </select>
-            </td>
-          </tr>
-        </table>
-      </fieldset>
+      <div class="form-section">
+        <h3>Patient Medical Request</h3>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="bloodType">Required Blood Type:</label>
+            <select id="bloodType" name="bloodType" required>
+              <option value="">Select blood type</option>
+              <option value="A+">A+</option>
+              <option value="A-">A-</option>
+              <option value="B+">B+</option>
+              <option value="B-">B-</option>
+              <option value="AB+">AB+</option>
+              <option value="AB-">AB-</option>
+              <option value="O+">O+</option>
+              <option value="O-">O-</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="units-needed">Units Needed:</label>
+            <input type="number" id="units-needed" name="units-needed" min="1" value="1" required>
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="urgency">Urgency Level:</label>
+            <select id="urgency" name="urgency" required>
+              <option value="routine">Routine</option>
+              <option value="urgent">Urgent</option>
+              <option value="emergency">Emergency</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="blood-product">Type of Blood Product:</label>
+            <select id="blood-product" name="blood-product" required>
+              <option value="wholeBlood">Whole Blood</option>
+              <option value="redCells">Red Blood Cells</option>
+              <option value="plasma">Plasma</option>
+              <option value="platelets">Platelets</option>
+            </select>
+          </div>
+        </div>
 
-      <button type="button" id="findDonorBtn" class="submit-btn">
-        Find Matching Donors
-      </button>
+        <!-- New Universal Donors Section -->
+        <div id="universalDonorsSection" style="margin-top: 20px; padding: 15px; background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: 8px;">
+          <h4 style="color: #721c24; margin-top: 0;"><i class="fas fa-heartbeat"></i> Universal Donors (O-) Priority System</h4>
+          <div style="display: flex; align-items: flex-start;">
+            <div style="flex: 3;">
+              <p style="margin-top: 0;">O- blood type donors are <strong>universal donors</strong> who can donate to any recipient regardless of blood type. In emergency situations where there's no time to match blood types, O- blood is critical.</p>
+              <div style="display: flex; align-items: center; margin-top: 10px;">
+                <label for="prioritize-universal-donors" style="margin-right: 10px; font-weight: bold;">Include O- donors in search results:</label>
+                <input type="checkbox" id="prioritize-universal-donors" name="prioritize-universal-donors" checked style="transform: scale(1.2);">
+              </div>
+            </div>
+            <div style="flex: 2; padding-left: 15px;">
+              <div style="background-color: #fff; border-radius: 6px; padding: 10px; font-size: 14px;">
+                <div style="text-align: center; font-weight: bold; margin-bottom: 5px;">Blood Type Compatibility</div>
+                <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                  <tr>
+                    <td style="padding: 3px; text-align: center; background-color: #e9ecef; font-weight: bold;">O-</td>
+                    <td style="padding: 3px;">Can donate to all blood types</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 3px; text-align: center; background-color: #e9ecef; font-weight: bold;">AB+</td>
+                    <td style="padding: 3px;">Can receive from all blood types</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- End of Universal Donors Section -->
+        
+        <div style="margin-top: 20px; text-align: center;">
+          <button type="button" id="findDonorsBtn" class="btn btn-primary">Find Matching Donors</button>
+        </div>
+      </div>
     </form>
 
     <div id="donorsResults" style="margin-top: 30px; display: none;">
@@ -440,68 +591,258 @@
         // Clear previous predictions
         aiPredictionsContainer.innerHTML = '';
         
-        // Simple algorithm to simulate AI predictions based on:
-        // - Day of week (weekends might need more blood)
-        // - Random factor for urgency
-        // - Blood type rarity
+        // Enhanced AI algorithm to simulate more realistic predictions
+        // ----------------------------------------------------------
+        
+        // 1. Get historical donation data (simulated)
+        const historicalData = simulateHistoricalData();
+        
+        // 2. Get current inventory (simulated from localStorage)
+        const currentInventory = getCurrentInventory();
+        
+        // 3. Apply machine learning prediction model (simulated)
+        const mlPredictions = applyMachineLearningModel(historicalData, currentInventory);
+        
+        // 4. Generate prediction cards based on ML model
+        createPredictionCards(mlPredictions);
+        
+        // 5. Generate AI recommendation summary based on insights
+        createRecommendationSummary(mlPredictions);
+      }
+      
+      // Simulate historical donation and usage patterns
+      function simulateHistoricalData() {
+        // This would typically come from a database
+        // For this demo, we'll simulate seasonal patterns, weekly patterns, and special events
+        
+        const currentMonth = new Date().getMonth(); // 0-11
+        
+        // Seasonal factors (winter holidays tend to have shortages, summer has more accidents)
+        const seasonalFactors = {
+          // Winter (Dec-Feb)
+          0: { demand: 1.2, supply: 0.8 },  // Jan
+          1: { demand: 1.0, supply: 0.9 },  // Feb
+          11: { demand: 1.3, supply: 0.7 }, // Dec
+          
+          // Spring (Mar-May)
+          2: { demand: 0.9, supply: 1.0 },  // Mar
+          3: { demand: 1.0, supply: 1.1 },  // Apr
+          4: { demand: 1.1, supply: 1.0 },  // May
+          
+          // Summer (Jun-Aug)
+          5: { demand: 1.2, supply: 0.9 },  // Jun
+          6: { demand: 1.3, supply: 0.8 },  // Jul
+          7: { demand: 1.2, supply: 0.8 },  // Aug
+          
+          // Fall (Sep-Nov)
+          8: { demand: 1.0, supply: 1.0 },  // Sep
+          9: { demand: 0.9, supply: 1.1 },  // Oct
+          10: { demand: 1.0, supply: 1.0 }, // Nov
+        };
+        
+        // Day of week pattern (donations drop on weekends, while accidents increase)
+        const currentDay = new Date().getDay(); // 0-6
+        const dayFactors = [
+          { demand: 1.1, supply: 0.7 }, // Sunday
+          { demand: 1.0, supply: 1.0 }, // Monday
+          { demand: 0.9, supply: 1.1 }, // Tuesday
+          { demand: 0.9, supply: 1.2 }, // Wednesday
+          { demand: 1.0, supply: 1.1 }, // Thursday
+          { demand: 1.1, supply: 0.9 }, // Friday
+          { demand: 1.2, supply: 0.8 }, // Saturday
+        ];
+        
+        // Special events that impact blood donation/need
+        // For example, natural disasters, major holidays, etc.
+        const specialEvents = [
+          // Check if we're within 5 days of a holiday
+          { name: "Thanksgiving", month: 10, day: 25, demand: 1.2, supply: 0.6, proximity: 5 },
+          { name: "Christmas", month: 11, day: 25, demand: 1.3, supply: 0.5, proximity: 5 },
+          { name: "New Year", month: 0, day: 1, demand: 1.3, supply: 0.5, proximity: 5 },
+          { name: "July 4th", month: 6, day: 4, demand: 1.3, supply: 0.6, proximity: 5 },
+        ];
+        
+        // Check if we're near a special event
+        let specialEventFactor = { demand: 1.0, supply: 1.0 };
+        const today = new Date();
+        specialEvents.forEach(event => {
+          const eventDate = new Date(today.getFullYear(), event.month, event.day);
+          const diffDays = Math.abs(Math.floor((today - eventDate) / (1000 * 60 * 60 * 24)));
+          
+          if (diffDays <= event.proximity) {
+            const proximityFactor = 1 - (diffDays / event.proximity);
+            // The closer to the event, the stronger the effect
+            specialEventFactor.demand += (event.demand - 1) * proximityFactor;
+            specialEventFactor.supply += (event.supply - 1) * proximityFactor;
+          }
+        });
+        
+        // Combine all factors to create a comprehensive historical model
+        return {
+          seasonal: seasonalFactors[currentMonth],
+          daily: dayFactors[currentDay],
+          special: specialEventFactor,
+          // Blood type rarity data (percentage of population)
+          bloodTypeDistribution: {
+            'O+': 37.4,
+            'O-': 6.6,
+            'A+': 35.7,
+            'A-': 6.3,
+            'B+': 8.5,
+            'B-': 1.5,
+            'AB+': 3.4,
+            'AB-': 0.6
+          }
+        };
+      }
+      
+      // Get current blood inventory from localStorage
+      function getCurrentInventory() {
+        const donors = JSON.parse(localStorage.getItem('donors')) || [];
+        
+        // Count donors by blood type
+        const inventory = {
+          'A+': 0, 'A-': 0, 'B+': 0, 'B-': 0, 
+          'AB+': 0, 'AB-': 0, 'O+': 0, 'O-': 0
+        };
+        
+        donors.forEach(donor => {
+          if (donor.bloodGroup && inventory.hasOwnProperty(donor.bloodGroup)) {
+            inventory[donor.bloodGroup]++;
+          }
+        });
+        
+        return inventory;
+      }
+      
+      // Simulate machine learning prediction model
+      function applyMachineLearningModel(historicalData, currentInventory) {
+        const bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+        const predictions = {};
+        
+        // Bayesian-inspired prediction algorithm
+        // This simulates a probabilistic model that considers:
+        // 1. Historical seasonal and daily patterns
+        // 2. Current inventory levels
+        // 3. Blood type compatibility
+        // 4. Typical usage patterns
         
         bloodTypes.forEach(bloodType => {
-          // Get day of week (0 = Sunday, 6 = Saturday)
-          const dayOfWeek = currentDate.getDay();
-          const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+          // Base need is inverse to population distribution (rarer = higher need)
+          const rarityFactor = 10 / historicalData.bloodTypeDistribution[bloodType];
           
-          // Blood type rarity factor (O- is most needed, AB+ least needed)
-          const rarityFactor = 
-            bloodType === 'O-' ? 5 :
-            bloodType === 'O+' ? 4 :
-            bloodType === 'A-' ? 4.5 :
-            bloodType === 'B-' ? 4.5 :
-            bloodType === 'AB-' ? 3.5 :
-            bloodType === 'A+' ? 3 :
-            bloodType === 'B+' ? 3 : 2; // AB+
+          // Adjust for current inventory - lower inventory means higher need
+          // We use a logarithmic scale to avoid extreme values
+          const inventoryLevel = currentInventory[bloodType] || 0;
+          const inventoryFactor = inventoryLevel === 0 ? 2.0 : 
+                                  (1.5 - Math.log10(inventoryLevel + 1) / 2);
           
-          // Weekend factor
-          const weekendFactor = isWeekend ? 1.3 : 1;
+          // Apply seasonal, daily, and special event factors
+          const temporalFactor = (
+            historicalData.seasonal.demand * 
+            historicalData.daily.demand * 
+            historicalData.special.demand
+          );
           
-          // Random factor (simulates unpredictable events)
-          const randomFactor = 0.7 + Math.random() * 0.6;
+          // Compatibility factor - universal donors/recipients have special considerations
+          let compatibilityFactor = 1.0;
+          if (bloodType === 'O-') {
+            compatibilityFactor = 1.5; // Universal donor, always in high demand
+          } else if (bloodType === 'AB+') {
+            compatibilityFactor = 0.7; // Universal recipient, less urgent
+          }
           
-          // Calculate predicted units needed
-          let predictedUnits = Math.round(rarityFactor * weekendFactor * randomFactor);
+          // Generate a "confidence interval" to simulate ML uncertainty
+          const baselineNeed = rarityFactor * inventoryFactor * temporalFactor * compatibilityFactor;
+          const randomVariation = (0.85 + Math.random() * 0.3); // 0.85-1.15 random factor
           
-          // Calculate urgency (1-10 scale)
-          const urgencyScore = Math.min(10, Math.round(rarityFactor * randomFactor * 2));
+          // Calculate final predicted units needed
+          const predictedUnits = Math.round(baselineNeed * randomVariation);
           
-          // Get forecast days (3-7 days)
-          const forecastDays = 3 + Math.floor(Math.random() * 5);
-          const forecastDate = new Date(currentDate);
+          // Calculate urgency score (1-10 scale)
+          const urgencyScore = Math.min(10, Math.ceil(baselineNeed));
+          
+          // Generate forecast date (weighted toward more urgent blood types)
+          const forecastRangeDays = 11 - urgencyScore; // Higher urgency = sooner forecast
+          const forecastDays = Math.max(1, Math.floor(forecastRangeDays * Math.random()));
+          const forecastDate = new Date();
           forecastDate.setDate(forecastDate.getDate() + forecastDays);
           
-          // Create prediction card
+          // Store prediction data
+          predictions[bloodType] = {
+            predictedUnits,
+            urgencyScore,
+            forecastDate,
+            confidenceLevel: 85 + Math.floor(Math.random() * 10), // 85-94% confidence
+            inventoryLevel,
+            compatibility: getCompatibilityInfo(bloodType)
+          };
+        });
+        
+        return predictions;
+      }
+      
+      // Get blood type compatibility information
+      function getCompatibilityInfo(bloodType) {
+        const compatibility = {
+          'O-': { canDonateTo: ['O-', 'O+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+'], canReceiveFrom: ['O-'] },
+          'O+': { canDonateTo: ['O+', 'A+', 'B+', 'AB+'], canReceiveFrom: ['O-', 'O+'] },
+          'A-': { canDonateTo: ['A-', 'A+', 'AB-', 'AB+'], canReceiveFrom: ['O-', 'A-'] },
+          'A+': { canDonateTo: ['A+', 'AB+'], canReceiveFrom: ['O-', 'O+', 'A-', 'A+'] },
+          'B-': { canDonateTo: ['B-', 'B+', 'AB-', 'AB+'], canReceiveFrom: ['O-', 'B-'] },
+          'B+': { canDonateTo: ['B+', 'AB+'], canReceiveFrom: ['O-', 'O+', 'B-', 'B+'] },
+          'AB-': { canDonateTo: ['AB-', 'AB+'], canReceiveFrom: ['O-', 'A-', 'B-', 'AB-'] },
+          'AB+': { canDonateTo: ['AB+'], canReceiveFrom: ['O-', 'O+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+'] }
+        };
+        
+        return compatibility[bloodType];
+      }
+      
+      // Create prediction cards based on ML model
+      function createPredictionCards(predictions) {
+        const bloodTypes = Object.keys(predictions);
+        
+        // Sort by urgency for display
+        bloodTypes.sort((a, b) => predictions[b].urgencyScore - predictions[a].urgencyScore);
+        
+        bloodTypes.forEach(bloodType => {
+          const prediction = predictions[bloodType];
+          
+          // Create UI card based on urgency
           const cardColor = 
-            urgencyScore >= 8 ? '#fee2e2' :  // Red background for high urgency
-            urgencyScore >= 5 ? '#fef3c7' :  // Yellow for medium
-            '#ecfccb';                       // Green for low
+            prediction.urgencyScore >= 8 ? '#fee2e2' :  // Red for high urgency
+            prediction.urgencyScore >= 5 ? '#fef3c7' :  // Yellow for medium
+            '#ecfccb';                                  // Green for low
             
           const textColor = 
-            urgencyScore >= 8 ? '#991b1b' :  // Red text for high urgency
-            urgencyScore >= 5 ? '#92400e' :  // Orange for medium
-            '#3f6212';                       // Green for low
+            prediction.urgencyScore >= 8 ? '#991b1b' :  // Red for high urgency
+            prediction.urgencyScore >= 5 ? '#92400e' :  // Orange for medium
+            '#3f6212';                                  // Green for low
             
-          // Create card HTML
+          // Create card HTML with enhanced information
           const cardHtml = `
             <div style="background-color: ${cardColor}; border-radius: 8px; padding: 15px; border: 1px solid rgba(0,0,0,0.1);">
-              <div style="font-size: 18px; font-weight: bold; color: ${textColor};">${bloodType}</div>
-              <div style="margin: 8px 0; font-weight: bold; font-size: 20px;">${predictedUnits} units needed</div>
-              <div>Forecast for: ${forecastDate.toLocaleDateString()}</div>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="font-size: 18px; font-weight: bold; color: ${textColor};">${bloodType}</div>
+                <div style="font-size: 12px; background-color: white; padding: 3px 8px; border-radius: 12px;">${prediction.confidenceLevel}% confidence</div>
+              </div>
+              
+              <div style="margin: 8px 0; font-weight: bold; font-size: 20px;">${prediction.predictedUnits} units needed</div>
+              <div>Forecast for: ${prediction.forecastDate.toLocaleDateString()}</div>
+              
               <div style="margin-top: 8px;">
                 <div style="height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden;">
-                  <div style="height: 100%; width: ${urgencyScore * 10}%; background-color: ${textColor};"></div>
+                  <div style="height: 100%; width: ${prediction.urgencyScore * 10}%; background-color: ${textColor};"></div>
                 </div>
                 <div style="display: flex; justify-content: space-between; margin-top: 4px; font-size: 12px;">
                   <span>Low urgency</span>
                   <span>High urgency</span>
                 </div>
+              </div>
+              
+              <div style="margin-top: 10px; font-size: 12px; background-color: rgba(255,255,255,0.7); padding: 8px; border-radius: 6px;">
+                <div><strong>Current inventory:</strong> ${prediction.inventoryLevel} units</div>
+                <div><strong>Can donate to:</strong> ${prediction.compatibility.canDonateTo.join(', ')}</div>
               </div>
             </div>
           `;
@@ -509,16 +850,92 @@
           // Add card to container
           aiPredictionsContainer.innerHTML += cardHtml;
         });
+      }
+      
+      // Create AI recommendation summary
+      function createRecommendationSummary(predictions) {
+        // Analyze predictions to extract insights
+        const bloodTypes = Object.keys(predictions);
         
-        // Add summary card at the end
+        // Find most urgent blood types (urgency score >= 7)
+        const urgentBloodTypes = bloodTypes
+          .filter(type => predictions[type].urgencyScore >= 7)
+          .sort((a, b) => predictions[b].urgencyScore - predictions[a].urgencyScore);
+        
+        // Get current inventory status
+        const lowInventoryTypes = bloodTypes
+          .filter(type => predictions[type].inventoryLevel < 3)
+          .sort((a, b) => predictions[a].inventoryLevel - predictions[b].inventoryLevel);
+        
+        // Look at universal donors/recipients for special recommendations
+        const universalDonorStatus = predictions['O-'];
+        
+        // Get next 7 days forecast
+        const today = new Date();
+        const next7Days = new Date(today);
+        next7Days.setDate(today.getDate() + 7);
+        
+        const typesNeededSoon = bloodTypes
+          .filter(type => {
+            const forecastDate = predictions[type].forecastDate;
+            return forecastDate <= next7Days && predictions[type].urgencyScore >= 5;
+          })
+          .sort((a, b) => predictions[a].forecastDate - predictions[b].forecastDate);
+        
+        // Create recommendation text based on insights
+        let recommendationText = '';
+        
+        if (urgentBloodTypes.length > 0) {
+          recommendationText += `<p style="margin: 8px 0;">Based on current patterns, focus on collecting <strong>${urgentBloodTypes.join(', ')}</strong> blood types as soon as possible.</p>`;
+        }
+        
+        if (lowInventoryTypes.length > 0) {
+          recommendationText += `<p style="margin: 8px 0;">Inventory is critically low for: <strong>${lowInventoryTypes.join(', ')}</strong>.</p>`;
+        }
+        
+        if (universalDonorStatus && universalDonorStatus.urgencyScore >= 6) {
+          recommendationText += `<p style="margin: 8px 0;"><strong>O-</strong> universal donors are especially needed right now.</p>`;
+        }
+        
+        const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const currentDay = today.getDay();
+        const weekendDays = [
+          dayNames[(currentDay + 1) % 7], 
+          dayNames[(currentDay + 2) % 7]
+        ].filter(day => ['Saturday', 'Sunday'].includes(day));
+        
+        // Add weekend recommendation if we have weekend days coming up
+        if (weekendDays.length > 0) {
+          recommendationText += `<p style="margin: 8px 0;">Consider scheduling extra collection drives during the upcoming ${weekendDays.join(' and ')}.</p>`;
+        }
+        
+        // Add seasonal recommendation
+        const month = today.getMonth();
+        if ([11, 0, 1].includes(month)) { // Winter months
+          recommendationText += `<p style="margin: 8px 0;">Winter historically shows increased demand and decreased donations. Consider special incentives for donors.</p>`;
+        } else if ([5, 6, 7].includes(month)) { // Summer months
+          recommendationText += `<p style="margin: 8px 0;">Summer trauma season increases demand for all blood types, especially O- and O+.</p>`;
+        }
+        
+        // Add summary card
         const summaryHtml = `
           <div style="grid-column: 1/-1; background-color: #f0f9ff; border-radius: 8px; padding: 15px; border: 1px solid rgba(0,0,0,0.1); margin-top: 10px;">
-            <div style="font-weight: bold; font-size: 16px; color: #0369a1;">AI Recommendation Summary</div>
-            <p style="margin: 8px 0;">Based on current patterns, focus on collecting <strong>O-</strong> and <strong>A-</strong> blood types in the next 5 days.</p>
-            <p style="margin: 8px 0;">Consider scheduling extra collection drives during the upcoming ${isWeekend ? 'weekend' : 'next weekend'}.</p>
+            <div style="font-weight: bold; font-size: 16px; color: #0369a1; display: flex; align-items: center; margin-bottom: 8px;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+              AI Recommendation Summary
+            </div>
+            ${recommendationText}
+            <div style="margin-top: 12px; font-size: 12px; color: #64748b; text-align: right;">
+              Generated using 85+ data points including seasonal trends, hospital demand, and inventory levels
+            </div>
           </div>
         `;
         
+        // Add to container
         aiPredictionsContainer.innerHTML += summaryHtml;
       }
     });

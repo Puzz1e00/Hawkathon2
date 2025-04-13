@@ -1,4 +1,47 @@
 <!DOCTYPE html>
+<!--
+  EMAILJS CONFIGURATION INSTRUCTIONS
+  =================================
+  
+  This page uses EmailJS to send both SMS and email notifications to donors.
+  To set up EmailJS for this page:
+  
+  1. Create an account at https://www.emailjs.com/ (they offer a free tier)
+  
+  2. Add an Email Service:
+     - Go to "Email Services" in your EmailJS dashboard
+     - Add a new service (Gmail, Outlook, custom SMTP, etc.)
+     - Follow their instructions to connect your email provider
+     - Note the Service ID (e.g., 'service_ue2qd91')
+  
+  3. Create two Email Templates:
+     - Go to "Email Templates" in your EmailJS dashboard
+     - Create one template for SMS messages:
+       - Set a simple subject like "Blood Donation Request"
+       - In the content, use variables: {{message}}
+       - Save and note the Template ID (e.g., 'template_b9pjy1s')
+     
+     - Create another template for email messages:
+       - Set subject to use variables: {{subject}}
+       - In the content, include: 
+         Dear {{donor_name}},
+         
+         {{message}}
+         
+         From: {{hospital_name}}
+       - Save and note the Template ID
+  
+  4. Get your User ID:
+     - Go to "Account" → "API Keys" in your EmailJS dashboard
+     - Copy your Public Key
+  
+  5. Update this file:
+     - Replace the initialization value with your User ID
+     - Update the service_ID and template_ID in the sendBtn event listener
+  
+  Note: SMS sending uses carrier email-to-SMS gateways which may not work for all carriers.
+  The code includes fallbacks to open the native SMS app when EmailJS fails.
+-->
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -218,9 +261,9 @@
       
       <div class="notify-panel">
         <h3>Send Notification</h3>
-        <p>Send an SMS to this donor</p>
+        <p>Send a message to this donor</p>
         
-        <textarea id="messageInput" placeholder="Enter your urgent message here...">Urgent: We need your blood type at our hospital immediately. Please respond if you can donate.</textarea>
+        <textarea id="messageInput" placeholder="Enter your message here...">Urgent: We need your blood type at our hospital immediately. Please respond if you can donate.</textarea>
         
         <!-- AI Message Recommendations -->
         <div id="messageRecommendations" style="margin-top: 15px; margin-bottom: 15px; background-color: #f0f9ff; border-radius: 8px; padding: 12px; border: 1px solid #bfdbfe;">
@@ -239,7 +282,28 @@
           <div id="recommendationsList" style="display: flex; flex-direction: column; gap: 8px;"></div>
         </div>
         
-        <button id="sendSMSBtn" class="send-btn">Send Urgent SMS</button>
+        <div id="emailJSStatus" style="display: flex; align-items: center; margin-bottom: 10px; font-size: 12px;">
+          <div id="emailJSStatusDot" style="width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; background-color: #ccc;"></div>
+          <span id="emailJSStatusText">Checking EmailJS configuration...</span>
+        </div>
+        
+        <button id="sendSMSBtn" class="send-btn">Send Message</button>
+      </div>
+    </div>
+    
+    <!-- New section to display other donors with the same blood type -->
+    <div id="otherDonorsSection" class="other-donors-section" style="margin-top: 30px;">
+      <h2>Other Compatible Donors</h2>
+      <div class="filter-controls" style="margin-bottom: 15px;">
+        <label style="margin-right: 10px;">
+          <input type="checkbox" id="sameBloodTypeOnly" checked> Show only same blood type
+        </label>
+        <label>
+          <input type="checkbox" id="showAllStates" checked> Include donors from all states
+        </label>
+      </div>
+      <div id="otherDonorsList" style="max-height: 400px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px;">
+        <!-- Other donors will be listed here -->
       </div>
     </div>
     
@@ -254,9 +318,19 @@
   
   <script>
     // Initialize EmailJS
-    (function() {
+    // To use EmailJS:
+    // 1. Create an account at https://www.emailjs.com/
+    // 2. Set up an Email Service (Gmail, Outlook, etc.) in your EmailJS dashboard
+    // 3. Create two templates - one for SMS and one for email
+    // 4. Replace the service_ID, template_ID, and user_ID below with your own
+    let emailJSInitialized = false;
+    try {
       emailjs.init('yCWU4AkltHj8zi78b'); // Replace with your actual User ID
-    })();
+      emailJSInitialized = true;
+      console.log('EmailJS initialized successfully');
+    } catch (error) {
+      console.error('Failed to initialize EmailJS:', error);
+    }
 
     document.addEventListener('DOMContentLoaded', function() {
       const urlParams = new URLSearchParams(window.location.search);
@@ -264,6 +338,20 @@
       const debugInfo = document.getElementById('debug-info');
       const statusDiv = document.getElementById('status');
       const sendBtn = document.getElementById('sendSMSBtn');
+      
+      // Update EmailJS status indicator
+      const emailJSStatusDot = document.getElementById('emailJSStatusDot');
+      const emailJSStatusText = document.getElementById('emailJSStatusText');
+      
+      if (emailJSInitialized) {
+        emailJSStatusDot.style.backgroundColor = '#22c55e'; // Green
+        emailJSStatusText.textContent = 'EmailJS configured properly';
+        emailJSStatusText.style.color = '#16a34a';
+      } else {
+        emailJSStatusDot.style.backgroundColor = '#ef4444'; // Red
+        emailJSStatusText.textContent = 'EmailJS not configured - will use fallback methods';
+        emailJSStatusText.style.color = '#dc2626';
+      }
       
       // Get patient details from URL
       const patientBloodType = urlParams.get('bloodType') || '';
@@ -346,6 +434,144 @@
         }
         
         messageInput.value = messageText;
+        
+        // Load other donors
+        displayOtherDonors(donor);
+      }
+
+      // New function to display other donors
+      function displayOtherDonors(currentDonor) {
+        const donorsList = document.getElementById('otherDonorsList');
+        const sameBloodTypeCheckbox = document.getElementById('sameBloodTypeOnly');
+        const showAllStatesCheckbox = document.getElementById('showAllStates');
+        
+        const currentDonorState = currentDonor.state || (currentDonor.address && currentDonor.address.state) || '';
+        const currentDonorBloodType = currentDonor.bloodGroup || '';
+        
+        function filterAndDisplayDonors() {
+          // Get filter values
+          const showOnlySameBloodType = sameBloodTypeCheckbox.checked;
+          const showAllStates = showAllStatesCheckbox.checked;
+          
+          // Filter donors
+          const filteredDonors = donors.filter(d => {
+            // Skip current donor
+            if (String(d.id) === String(currentDonor.id)) return false;
+            
+            // Check blood type
+            if (showOnlySameBloodType && d.bloodGroup !== currentDonorBloodType) return false;
+            
+            // Check state
+            const donorState = d.state || (d.address && d.address.state) || '';
+            if (!showAllStates && donorState !== currentDonorState) return false;
+            
+            return true;
+          });
+          
+          // Sort donors: first by blood type match, then by same state
+          filteredDonors.sort((a, b) => {
+            // First sort by blood type match
+            const aBloodTypeMatch = a.bloodGroup === currentDonorBloodType;
+            const bBloodTypeMatch = b.bloodGroup === currentDonorBloodType;
+            
+            if (aBloodTypeMatch && !bBloodTypeMatch) return -1;
+            if (!aBloodTypeMatch && bBloodTypeMatch) return 1;
+            
+            // Then by state match
+            const aState = a.state || (a.address && a.address.state) || '';
+            const bState = b.state || (b.address && b.address.state) || '';
+            
+            const aStateMatch = aState === currentDonorState;
+            const bStateMatch = bState === currentDonorState;
+            
+            if (aStateMatch && !bStateMatch) return -1;
+            if (!aStateMatch && bStateMatch) return 1;
+            
+            // Finally by state name alphabetically
+            return aState.localeCompare(bState);
+          });
+          
+          // Display donors
+          donorsList.innerHTML = '';
+          
+          if (filteredDonors.length === 0) {
+            donorsList.innerHTML = '<p>No other donors found matching your criteria.</p>';
+            return;
+          }
+          
+          // Create a grid layout for donors
+          const donorsGrid = document.createElement('div');
+          donorsGrid.style.display = 'grid';
+          donorsGrid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(280px, 1fr))';
+          donorsGrid.style.gap = '15px';
+          
+          filteredDonors.forEach(donor => {
+            const donorState = donor.state || (donor.address && donor.address.state) || 'Unknown';
+            const isONegative = donor.bloodGroup === 'O-';
+            
+            const donorCard = document.createElement('div');
+            donorCard.className = 'donor-card';
+            donorCard.style.border = '1px solid #ddd';
+            donorCard.style.borderRadius = '8px';
+            donorCard.style.padding = '15px';
+            donorCard.style.backgroundColor = '#f8f9fa';
+            donorCard.style.borderLeft = isONegative ? '4px solid #dc3545' : '4px solid #3b82f6';
+            
+            donorCard.innerHTML = `
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div>
+                  <span style="font-weight: bold;">${donor.name || 'Unknown'}</span>
+                </div>
+                <span style="background-color: ${isONegative ? '#fecaca' : '#dbeafe'}; color: ${isONegative ? '#dc2626' : '#2563eb'}; 
+                  padding: 3px 8px; border-radius: 12px; font-weight: bold; font-size: 14px;">
+                  ${donor.bloodGroup || 'Unknown'}
+                </span>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                <span style="color: #666;">Contact:</span>
+                <span>${donor.contact || 'Unknown'}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                <span style="color: #666;">City:</span>
+                <span>${donor.city || (donor.address && donor.address.city) || 'Unknown'}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                <span style="color: #666;">State:</span>
+                <span style="background-color: ${donorState === currentDonorState ? '#dcfce7' : '#dbeafe'}; 
+                  padding: 2px 6px; border-radius: 4px;">
+                  ${donorState}
+                </span>
+              </div>
+              <button class="contact-btn" data-id="${donor.id}" style="width: 100%; margin-top: 10px; padding: 8px; 
+                background-color: #4f46e5; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                Contact This Donor
+              </button>
+            `;
+            
+            donorsGrid.appendChild(donorCard);
+          });
+          
+          donorsList.appendChild(donorsGrid);
+          
+          // Add event listeners to contact buttons
+          const contactButtons = donorsList.querySelectorAll('.contact-btn');
+          contactButtons.forEach(button => {
+            button.addEventListener('click', function() {
+              const donorId = this.getAttribute('data-id');
+              // Preserve existing URL parameters
+              const params = new URLSearchParams(window.location.search);
+              params.set('id', donorId);
+              window.location.href = `send_message.html?${params.toString()}`;
+            });
+          });
+        }
+        
+        // Initial display
+        filterAndDisplayDonors();
+        
+        // Add event listeners to checkboxes
+        sameBloodTypeCheckbox.addEventListener('change', filterAndDisplayDonors);
+        showAllStatesCheckbox.addEventListener('change', filterAndDisplayDonors);
       }
 
       // SMS Notification Handler
@@ -366,44 +592,107 @@
           `\n\n— ${hospital.name}\n${hospital.contact}` : '\n\n— LifeLink System';
         
         const fullMessage = message + hospitalSignature;
+
+        // Check if EmailJS is initialized
+        if (!emailJSInitialized) {
+          showStatus('EmailJS is not properly configured. Check console for details.', 'error');
+          console.error('EmailJS is not initialized. Please check your account and internet connection.');
+          
+          // Try native SMS as fallback
+          try {
+            const encodedMessage = encodeURIComponent(fullMessage);
+            window.open(`sms:${donor.contact}?body=${encodedMessage}`, '_blank');
+            showStatus('Opened native SMS app instead', 'success');
+          } catch (fallbackError) {
+            console.error('Native SMS fallback failed:', fallbackError);
+            showStatus('Failed to send message. EmailJS not configured and native SMS failed.', 'error');
+          }
+          return;
+        }
         
         try {
           // Show sending status
           sendBtn.disabled = true;
-          showStatus('Sending urgent notification...', 'sending');
+          showStatus('Sending notification...', 'sending');
           
-          // Send via EmailJS
-          const response = await emailjs.send(
-            'service_ue2qd91', // Replace with your Service ID
-            'template_b9pjy1s', // Replace with your Template ID
-            {
-              to_email: donor.contact + '@txt.att.net', // Using AT&T SMS gateway
-              message: fullMessage
+          let successCount = 0;
+          let errorMessages = [];
+          
+          // Send SMS via EmailJS
+          try {
+            const smsResponse = await emailjs.send(
+              'service_ue2qd91', // Replace with your Service ID
+              'template_b9pjy1s', // Replace with your Template ID
+              {
+                to_email: '3187374810@tmomail.net', // Using AT&T SMS gateway
+                message: fullMessage,
+                donor_name: donor.name,
+                hospital_name: hospital.name || 'Hospital',
+                blood_type: donor.bloodGroup
+              }
+            );
+            console.log('Message sent successfully:', smsResponse);
+            successCount++;
+          } catch (smsError) {
+            console.error('SMS via EmailJS failed:', smsError);
+            errorMessages.push('SMS gateway: ' + (smsError.text || smsError.message || 'Unknown error'));
+            
+            // Fallback to native SMS
+            try {
+              const encodedMessage = encodeURIComponent(fullMessage);
+              window.open(`sms:${donor.contact}?body=${encodedMessage}`, '_blank');
+            } catch (fallbackError) {
+              console.error('Fallback SMS failed:', fallbackError);
+              errorMessages.push('SMS fallback: Failed to open SMS app');
             }
-          );
+          }
           
-          // Show success
-          showStatus('Urgent notification sent!', 'success');
-          console.log('SMS sent successfully:', response);
+          // If donor has email, send email via EmailJS
+          if (donor.email && donor.email.includes('@')) {
+            try {
+              const emailResponse = await emailjs.send(
+                'service_ue2qd91', // Replace with your Service ID
+                'template_b9pjy1s', // Replace with your Template ID (use a different template if needed for email)
+                {
+                  to_email: donor.email,
+                  message: fullMessage,
+                  donor_name: donor.name,
+                  hospital_name: hospital.name || 'Hospital',
+                  blood_type: donor.bloodGroup,
+                  subject: `URGENT: ${hospital.name || 'Hospital'} needs your ${donor.bloodGroup} blood donation`
+                }
+              );
+              console.log('Email sent successfully:', emailResponse);
+              successCount++;
+            } catch (emailError) {
+              console.error('Email via EmailJS failed:', emailError);
+              errorMessages.push('Email: ' + (emailError.text || emailError.message || 'Unknown error'));
+            }
+          }
+          
+          // Show appropriate status message
+          if (successCount > 0) {
+            if (errorMessages.length > 0) {
+              // Some succeeded, some failed
+              showStatus(`Message sent via ${successCount} method(s). Some errors occurred.`, 'success');
+            } else {
+              // All succeeded
+              showStatus('Messages sent successfully!', 'success');
+            }
+          } else if (errorMessages.length > 0) {
+            // All failed
+            showStatus('Failed to send messages: ' + errorMessages[0], 'error');
+          }
           
         } catch (error) {
-          // Show error
-          showStatus('Failed to send via SMS gateway', 'error');
-          console.error('EmailJS error:', error);
-          
-          // Fallback to native SMS
-          try {
-            const encodedMessage = encodeURIComponent(fullMessage);
-            window.location.href = `sms:${donor.contact}?body=${encodedMessage}`;
-          } catch (fallbackError) {
-            console.error('Fallback SMS failed:', fallbackError);
-            showStatus('Failed to open SMS app', 'error');
-          }
+          // Show general error
+          showStatus('Failed to send messages', 'error');
+          console.error('General error:', error);
         } finally {
           sendBtn.disabled = false;
           setTimeout(() => {
             statusDiv.style.display = 'none';
-          }, 3000);
+          }, 5000); // Show status for 5 seconds
         }
       });
       

@@ -352,6 +352,87 @@
                 </div>
             </div>
 
+            <!-- ID Verification Section -->
+            <div class="form-group bg-blue-50 p-6 rounded-lg border border-blue-200 animate-fade-in">
+                <div class="flex items-center mb-4">
+                    <span class="bg-blue-600 text-white p-2 rounded-full mr-3">
+                        <i class="fas fa-id-card"></i>
+                    </span>
+                    <h3 class="text-lg font-semibold text-blue-800">ID Verification</h3>
+                    <span class="ml-auto bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full flex items-center">
+                        <i class="fas fa-shield-alt mr-1"></i> Required for Verification
+                    </span>
+                </div>
+                
+                <p class="text-gray-600 mb-4 text-sm">
+                    Please provide your government-issued ID information. This helps hospitals verify your identity 
+                    and ensures the safety and integrity of the donation process. Your information is kept confidential.
+                </p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="floating-label form-group">
+                        <select name="idType" required class="w-full p-3 border rounded-md">
+                            <option value=""> </option>
+                            <option value="driversLicense">Driver's License</option>
+                            <option value="stateID">State ID</option>
+                            <option value="passport">Passport</option>
+                            <option value="militaryID">Military ID</option>
+                        </select>
+                        <label>ID Type</label>
+                        <i class="fas fa-id-card absolute right-3 top-3 text-gray-400"></i>
+                    </div>
+                    
+                    <div class="floating-label form-group">
+                        <input type="text" name="idNumber" required placeholder=" " 
+                               class="w-full p-3 border rounded-md" 
+                               pattern="[A-Za-z0-9-]*"
+                               title="ID Number (letters, numbers, and hyphens only)" />
+                        <label>ID Number</label>
+                        <i class="fas fa-fingerprint absolute right-3 top-3 text-gray-400"></i>
+                    </div>
+                    
+                    <div class="floating-label form-group">
+                        <input type="text" name="issuingState" required placeholder=" " class="w-full p-3 border rounded-md" />
+                        <label>Issuing State/Authority</label>
+                        <i class="fas fa-building absolute right-3 top-3 text-gray-400"></i>
+                    </div>
+                    
+                    <div class="floating-label form-group">
+                        <input type="date" name="expirationDate" required placeholder=" " class="w-full p-3 border rounded-md" />
+                        <label>Expiration Date</label>
+                        <i class="fas fa-calendar absolute right-3 top-3 text-gray-400"></i>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <label class="block font-medium mb-2 text-gray-700">Upload ID Image (Optional)</label>
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:bg-gray-50 transition cursor-pointer relative">
+                        <input type="file" name="idImage" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                        <i class="fas fa-upload text-3xl text-gray-400 mb-2"></i>
+                        <p class="text-sm text-gray-500">Drag and drop your ID image here, or click to browse</p>
+                        <p class="text-xs text-gray-400 mt-1">Supported formats: JPG, PNG, PDF (Max 5MB)</p>
+                    </div>
+                    <div id="imagePreview" class="mt-3 hidden">
+                        <div class="flex items-center">
+                            <img id="previewImg" class="h-16 border rounded" />
+                            <button type="button" id="removeImage" class="ml-2 text-red-500 hover:text-red-700">
+                                <i class="fas fa-times"></i> Remove
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                    <label class="flex items-start cursor-pointer">
+                        <input type="checkbox" name="idConsent" required class="form-checkbox mt-1 h-5 w-5 text-blue-600 transition duration-150 ease-in-out" />
+                        <span class="ml-3 text-gray-700 text-sm">
+                            I certify that the ID information provided is accurate and belongs to me. I authorize hospitals to verify this information
+                            for the purpose of blood donation. I understand that falsifying identification may result in legal consequences.
+                        </span>
+                    </label>
+                </div>
+            </div>
+
             <div class="form-group">
                 <label class="block font-medium mb-2 text-gray-700">Additional Notes</label>
                 <textarea name="notes" rows="3" class="w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"></textarea>
@@ -369,6 +450,56 @@
             const progressBar = document.querySelector('.progress-bar-fill');
             const zipInput = document.querySelector('input[name="zipcode"]');
             const contactInputs = document.querySelectorAll('.contact-input');
+            const idImageInput = document.querySelector('input[name="idImage"]');
+            const imagePreview = document.getElementById('imagePreview');
+            const previewImg = document.getElementById('previewImg');
+            const removeImageBtn = document.getElementById('removeImage');
+            
+            // Handle ID image upload and preview
+            if (idImageInput) {
+                idImageInput.addEventListener('change', function(event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        // Check file size (max 5MB)
+                        if (file.size > 5 * 1024 * 1024) {
+                            alert('File size exceeds 5MB limit. Please choose a smaller file.');
+                            this.value = ''; // Clear the input
+                            return;
+                        }
+                        
+                        // Check file type
+                        const validTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+                        if (!validTypes.includes(file.type)) {
+                            alert('Invalid file type. Please upload JPG, PNG, or PDF.');
+                            this.value = ''; // Clear the input
+                            return;
+                        }
+                        
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            // Show preview for images only
+                            if (file.type.startsWith('image/')) {
+                                previewImg.src = e.target.result;
+                                imagePreview.classList.remove('hidden');
+                            } else {
+                                // For PDFs just show an icon
+                                previewImg.src = 'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/svgs/regular/file-pdf.svg';
+                                imagePreview.classList.remove('hidden');
+                            }
+                        }
+                        reader.readAsDataURL(file);
+                    }
+                });
+                
+                // Remove image preview
+                if (removeImageBtn) {
+                    removeImageBtn.addEventListener('click', function() {
+                        idImageInput.value = '';
+                        imagePreview.classList.add('hidden');
+                        previewImg.src = '';
+                    });
+                }
+            }
             
             // Zip code validation
             zipInput.addEventListener('input', (e) => {
@@ -417,7 +548,7 @@
                 let totalCount = 0;
                 
                 for (let element of formElements) {
-                    if (element.type !== 'submit' && element.type !== 'button') {
+                    if (element.type !== 'submit' && element.type !== 'button' && element.type !== 'file' && element.type !== 'checkbox') {
                         totalCount++;
                         if (element.value.trim() !== '') {
                             filledCount++;
@@ -455,41 +586,82 @@
                     return; // Don't submit if validation fails
                 }
                 
+                // Validate ID consent checkbox
+                const idConsent = document.querySelector('input[name="idConsent"]');
+                if (!idConsent.checked) {
+                    alert('You must agree to the ID verification consent to proceed.');
+                    return;
+                }
+                
                 const formData = new FormData(donorForm);
                 const donationTypes = Array.from(document.querySelectorAll('input[name="donationTypes"]:checked'))
                     .map(checkbox => checkbox.value);
                 
-                const donor = {
-                    id: Date.now(),
-                    name: formData.get('fullName'),
-                    age: formData.get('age'),
-                    bloodGroup: formData.get('bloodType'),
-                    contact: formData.get('contact'),
-                    email: formData.get('email'),
-                    emergencyContact: formData.get('emergencyContact'),
-                    address: {
-                        street: formData.get('street'),
-                        city: formData.get('city'),
-                        state: formData.get('state'),
-                        zipcode: formData.get('zipcode')
-                    },
-                    healthConditions: formData.get('healthConditions'),
-                    donationTypes: donationTypes,
-                    notes: formData.get('notes'),
-                    registrationDate: new Date().toISOString()
+                // Convert ID image to base64 if provided
+                let idImageData = null;
+                const idImageFile = document.querySelector('input[name="idImage"]').files[0];
+                
+                const prepareFormSubmission = () => {
+                    const donor = {
+                        id: Date.now(),
+                        name: formData.get('fullName'),
+                        age: formData.get('age'),
+                        bloodGroup: formData.get('bloodType'),
+                        contact: formData.get('contact'),
+                        email: formData.get('email'),
+                        emergencyContact: formData.get('emergencyContact'),
+                        address: {
+                            street: formData.get('street'),
+                            city: formData.get('city'),
+                            state: formData.get('state'),
+                            zipcode: formData.get('zipcode')
+                        },
+                        healthConditions: formData.get('healthConditions'),
+                        donationTypes: donationTypes,
+                        notes: formData.get('notes'),
+                        registrationDate: new Date().toISOString(),
+                        idVerification: {
+                            idType: formData.get('idType'),
+                            idNumber: formData.get('idNumber'),
+                            issuingState: formData.get('issuingState'),
+                            expirationDate: formData.get('expirationDate'),
+                            hasImage: idImageData !== null,
+                            verificationStatus: 'pending', // Initial status: pending, verified, rejected
+                            verifiedBy: null,
+                            verifiedDate: null
+                        }
+                    };
+                    
+                    // Only add the image data if it exists (to prevent large localStorage objects)
+                    if (idImageData) {
+                        donor.idVerification.imageData = idImageData;
+                    }
+                    
+                    const donors = JSON.parse(localStorage.getItem('donors')) || [];
+                    donors.push(donor);
+                    localStorage.setItem('donors', JSON.stringify(donors));
+                    
+                    const submitBtn = document.querySelector('button[type="submit"]');
+                    submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Registration Successful!';
+                    submitBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+                    
+                    setTimeout(() => {
+                        window.location.href = 'confirmation.html';
+                    }, 1500);
                 };
                 
-                const donors = JSON.parse(localStorage.getItem('donors')) || [];
-                donors.push(donor);
-                localStorage.setItem('donors', JSON.stringify(donors));
-                
-                const submitBtn = document.querySelector('button[type="submit"]');
-                submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Registration Successful!';
-                submitBtn.classList.add('bg-green-600', 'hover:bg-green-700');
-                
-                setTimeout(() => {
-                    window.location.href = 'confirmation.html';
-                }, 1500);
+                // If we have an ID image, convert it to base64 before submitting
+                if (idImageFile) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        idImageData = e.target.result;
+                        prepareFormSubmission();
+                    };
+                    reader.readAsDataURL(idImageFile);
+                } else {
+                    // No image, just submit the form
+                    prepareFormSubmission();
+                }
             });
         });
     </script>

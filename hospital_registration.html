@@ -156,6 +156,48 @@
                         <label for="services">Services (comma-separated):</label>
                         <input type="text" id="services" required>
                     </div>
+                    
+                    <!-- Blood Inventory Section -->
+                    <div class="form-group">
+                        <h3 style="margin-bottom: 15px; color: var(--primary-700); border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">Blood Inventory</h3>
+                        <p style="margin-bottom: 15px; font-size: 14px; color: #666;">Specify the current number of units for each blood type:</p>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                            <div style="display: flex; align-items: center;">
+                                <label for="blood_Apos" style="width: 60px; font-weight: bold;">A+:</label>
+                                <input type="number" id="blood_Apos" min="0" value="0" style="width: 80px;">
+                            </div>
+                            <div style="display: flex; align-items: center;">
+                                <label for="blood_Aneg" style="width: 60px; font-weight: bold;">A-:</label>
+                                <input type="number" id="blood_Aneg" min="0" value="0" style="width: 80px;">
+                            </div>
+                            <div style="display: flex; align-items: center;">
+                                <label for="blood_Bpos" style="width: 60px; font-weight: bold;">B+:</label>
+                                <input type="number" id="blood_Bpos" min="0" value="0" style="width: 80px;">
+                            </div>
+                            <div style="display: flex; align-items: center;">
+                                <label for="blood_Bneg" style="width: 60px; font-weight: bold;">B-:</label>
+                                <input type="number" id="blood_Bneg" min="0" value="0" style="width: 80px;">
+                            </div>
+                            <div style="display: flex; align-items: center;">
+                                <label for="blood_ABpos" style="width: 60px; font-weight: bold;">AB+:</label>
+                                <input type="number" id="blood_ABpos" min="0" value="0" style="width: 80px;">
+                            </div>
+                            <div style="display: flex; align-items: center;">
+                                <label for="blood_ABneg" style="width: 60px; font-weight: bold;">AB-:</label>
+                                <input type="number" id="blood_ABneg" min="0" value="0" style="width: 80px;">
+                            </div>
+                            <div style="display: flex; align-items: center;">
+                                <label for="blood_Opos" style="width: 60px; font-weight: bold;">O+:</label>
+                                <input type="number" id="blood_Opos" min="0" value="0" style="width: 80px;">
+                            </div>
+                            <div style="display: flex; align-items: center;">
+                                <label for="blood_Oneg" style="width: 60px; font-weight: bold; color: #dc2626;">O-:</label>
+                                <input type="number" id="blood_Oneg" min="0" value="0" style="width: 80px; border-color: #dc2626;">
+                            </div>
+                        </div>
+                    </div>
+                    
                     <button type="submit">Add Hospital</button>
                 </form>
             </div>
