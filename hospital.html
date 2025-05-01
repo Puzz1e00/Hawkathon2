@@ -4,1062 +4,560 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hospital Dashboard</title>
-    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <style>
-        :root {
-            --primary-500: #22c55e;
-            --primary-600: #16a34a;
-            --primary-700: #15803d;
-            --primary-light: #dcfce7;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #f0fdf4 0%, var(--primary-light) 100%);
+        /* Sidebar styles - Green Theme */
+        .sidebar {
+            width: 250px;
             min-height: 100vh;
-        }
-        .dashboard-container {
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .hospital-details {
-            margin-bottom: 30px;
-        }
-        .detail-group {
-            margin-bottom: 15px;
-        }
-        .detail-group label {
-            font-weight: bold;
-            color: #333;
-            display: block;
-            margin-bottom: 5px;
-        }
-        .detail-group p {
-            margin: 0;
-            padding: 8px;
-            background-color: #f8f9fa;
-            border-radius: 4px;
-        }
-        .services-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .service-tag {
-            background-color: #e9ecef;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        .logout-btn {
-            background-color: #dc3545;
+            background: linear-gradient(to bottom, #16a34a, #15803d);
             color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-        }
-        .logout-btn:hover {
-            background-color: #c82333;
+            position: fixed;
+            top: 0;
+            left: 0;
+            transition: all 0.3s;
+            z-index: 100;
         }
         
-        /* Chatbot Styles */
-        .chatbot-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 350px;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-            overflow: hidden;
-            transition: height 0.3s ease;
-            display: flex;
-            flex-direction: column;
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .chatbot-collapsed {
-            height: 60px;
+        
+        .sidebar-menu {
+            padding: 20px 0;
         }
-        .chatbot-expanded {
-            height: 500px;
-        }
-        .chatbot-header {
-            background-color: var(--primary-600);
+        
+        .sidebar-menu a {
+            display: block;
+            padding: 12px 20px;
             color: white;
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
         }
-        .chatbot-header h3 {
-            margin: 0;
+        
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid white;
+        }
+        
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid white;
+        }
+        
+        .sidebar-menu i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+        }
+        
+        .dashboard-card {
+            transition: all 0.3s ease;
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .bg-hospital-primary {
+            background-color: #16a34a;
+        }
+        
+        .badge-green {
+            background: linear-gradient(to right, #16a34a, #15803d);
+            color: white;
+        }
+        
+        .donor-row:hover {
+            background-color: #f3f4f6;
+        }
+        
+        /* Blood Type Input Styles */
+        .blood-type-input-container {
             display: flex;
             align-items: center;
+            margin-bottom: 10px;
         }
-        .chatbot-header svg {
+        .blood-type-select {
+            flex: 1;
             margin-right: 10px;
         }
-        .chatbot-messages {
-            flex-grow: 1;
-            padding: 15px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+        .blood-type-units {
+            width: 80px;
         }
-        .chatbot-input-container {
-            display: flex;
-            border-top: 1px solid #eee;
-            padding: 10px;
-        }
-        .chatbot-input {
-            flex-grow: 1;
-            border: 1px solid #ddd;
-            border-radius: 20px;
-            padding: 8px 15px;
-            font-size: 14px;
-            outline: none;
-        }
-        .chatbot-send-btn {
-            background-color: var(--primary-500);
+        .add-blood-btn {
+            background-color: #16a34a;
             color: white;
             border: none;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            margin-left: 10px;
+            padding: 8px 16px;
+            border-radius: 4px;
             cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+        .add-blood-btn:hover {
+            background-color: #15803d;
+        }
+        
+        /* Message Block Styles */
+        .message-block {
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        .message-header {
+            background-color: #f7fafc;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            font-weight: 600;
+        }
+        .message-item {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+        }
+        .message-item:last-child {
+            border-bottom: none;
+        }
+        .message-item:hover {
+            background-color: #f8fafc;
+        }
+        .donor-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #bee3f8;
             display: flex;
             align-items: center;
             justify-content: center;
+            margin-right: 0.75rem;
+            color: #2b6cb0;
+            font-weight: bold;
         }
-        .bot-message {
-            align-self: flex-start;
-            background-color: #f1f1f1;
-            padding: 10px 15px;
-            border-radius: 18px;
-            border-bottom-left-radius: 5px;
-            max-width: 80%;
-            animation: fadeIn 0.3s;
+        .message-content {
+            flex: 1;
         }
-        .user-message {
-            align-self: flex-end;
-            background-color: var(--primary-500);
-            color: white;
-            padding: 10px 15px;
-            border-radius: 18px;
-            border-bottom-right-radius: 5px;
-            max-width: 80%;
-            animation: fadeIn 0.3s;
+        .message-time {
+            font-size: 0.75rem;
+            color: #718096;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .typing-indicator {
-            display: flex;
-            align-items: center;
-            gap: 3px;
-            padding: 10px 15px;
-            background-color: #f1f1f1;
-            border-radius: 18px;
-            width: fit-content;
-        }
-        .typing-dot {
-            width: 8px;
-            height: 8px;
-            background-color: #888;
-            border-radius: 50%;
-            animation: typingBounce 1.3s infinite;
-        }
-        .typing-dot:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-        .typing-dot:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-        @keyframes typingBounce {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-5px); }
-        }
-        .suggestion-chips {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 10px;
-        }
-        .suggestion-chip {
-            background-color: #e9ecef;
-            padding: 6px 12px;
-            border-radius: 16px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        .suggestion-chip:hover {
-            background-color: #dee2e6;
+        .no-messages {
+            padding: 1.5rem;
+            text-align: center;
+            color: #718096;
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="dashboard-container">
-            <h1 style="text-align: center;">Hospital Dashboard</h1>
-            <div id="hospitalDetails" class="hospital-details">
-                <!-- Hospital details will be loaded here -->
-            </div>
+<body class="bg-gray-50">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <a href="homepage.html" class="text-2xl font-bold text-white">DonorSync</a>
+        </div>
+        
+        <div class="sidebar-menu">
+            <a href="homepage.html">
+                <i class="fas fa-home"></i> Home
+            </a>
+            <a href="hospital.html" class="active">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+            <a href="patientsForm.html">
+                <i class="fas fa-user-injured"></i> Make a Request
+            </a>
+            <a href="#" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </div>
 
-            <!-- Blood Inventory Management Section -->
-            <div class="blood-inventory-section" style="margin-bottom: 30px; padding: 20px; background-color: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef;">
-                <h2 style="margin-top: 0; color: #333; font-size: 1.4rem; display: flex; align-items: center;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 10px;">
-                        <path d="M18 21a6 6 0 0 0 0-12h-5c-.47 0-.94-.06-1.4-.17a6 6 0 0 1-5.24-5.95 6 6 0 0 1 11.28-2.88"></path>
-                        <path d="m15.54 10.5-4.54-2 2 4.5-2 4.5 4.54-2"></path>
-                    </svg>
-                    Blood Inventory Management
-                </h2>
-                <p style="margin-bottom: 15px; color: #6c757d;">Update your hospital's current blood inventory levels:</p>
-                
-                <div id="bloodInventoryForm" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
-                    <!-- Blood type inputs will be generated here -->
-                </div>
-                
-                <div style="display: flex; justify-content: flex-end; margin-top: 15px;">
-                    <button id="updateInventoryBtn" style="background-color: #28a745; color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
-                        Update Inventory
-                    </button>
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">Hospital Dashboard</h1>
+            <div class="flex items-center space-x-4">
+                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+                    <i class="fas fa-hospital mr-1"></i> <span id="hospitalName"></span>
+                </span>
+                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                    <i class="fas fa-map-marker-alt mr-1"></i> <span id="hospitalLocation"></span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="dashboard-card p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+                        <i class="fas fa-tint text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-sm">Total Blood Units</p>
+                        <h3 class="text-2xl font-bold"><span id="totalBloodUnits">0</span></h3>
+                    </div>
                 </div>
             </div>
-
-            <button class="add-patient-btn" style="background-color: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin: 20px 0; transition: background-color 0.3s;">
-                <a href="patientsform.html" style="color: white; text-decoration: none;">Request Donor</a>
-            </button>
             
-            <button id="logoutBtn" class="logout-btn"><a href="hospital_login.html">Logout</a></button>
+            <div class="dashboard-card p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
+                        <i class="fas fa-user-injured text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-sm">Active Patients</p>
+                        <h3 class="text-2xl font-bold"><span id="activePatients">0</span></h3>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="dashboard-card p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
+                        <i class="fas fa-bell text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-sm">Urgent Needs</p>
+                        <h3 class="text-2xl font-bold"><span id="urgentNeeds">0</span></h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Three Column Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Blood Inventory Section -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden lg:col-span-2">
+                <div class="bg-hospital-primary text-white px-6 py-4">
+                    <h2 class="text-xl font-semibold flex items-center">
+                        <i class="fas fa-tint mr-2"></i> Blood Inventory
+                    </h2>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="bloodInventory">
+                        <!-- Blood type inventory will be loaded here -->
+                    </div>
+                    
+                    <!-- Add Blood Type Form -->
+                    <div class="mt-6 border-t pt-4">
+                        <h3 class="text-lg font-medium mb-3">Add Blood Type</h3>
+                        <div id="bloodTypeInputs">
+                            <div class="blood-type-input-container">
+                                <select class="blood-type-select border rounded p-2">
+                                    <option value="">Select Blood Type</option>
+                                    <option value="A+">A+</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B+">B+</option>
+                                    <option value="B-">B-</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="AB-">AB-</option>
+                                    <option value="O+">O+</option>
+                                    <option value="O-">O-</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                                <input type="number" min="0" class="blood-type-units border rounded p-2" placeholder="Units">
+                            </div>
+                        </div>
+                        <button id="addMoreBloodType" class="add-blood-btn">
+                            <i class="fas fa-plus mr-1"></i> Add Another Type
+                        </button>
+                        <button id="saveBloodInventory" class="add-blood-btn ml-2">
+                            <i class="fas fa-save mr-1"></i> Save Inventory
+                        </button>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <a href="patientsForm.html" class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                            <i class="fas fa-plus mr-2"></i> Request Blood
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Messages Section -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                <div class="bg-hospital-primary text-white px-6 py-4">
+                    <h2 class="text-xl font-semibold flex items-center">
+                        <i class="fas fa-comments mr-2"></i> Recent Messages
+                    </h2>
+                </div>
+                <div class="p-0">
+                    <div class="message-block">
+                        <div class="message-header">
+                            Contacted Donors
+                        </div>
+                        <div id="donorMessages">
+                            <!-- Messages will be loaded here -->
+                            <div class="no-messages">
+                                <i class="fas fa-comment-slash text-2xl mb-2"></i>
+                                <p>No donor messages yet</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Requests Section -->
+        <div class="mt-8 bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="bg-hospital-primary text-white px-6 py-4">
+                <h2 class="text-xl font-semibold flex items-center">
+                    <i class="fas fa-list mr-2"></i> Recent Blood Requests
+                </h2>
+            </div>
+            <div class="p-6">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Blood Type</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Units</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200" id="requestsTable">
+                            <tr>
+                                <td colspan="5" class="px-6 py-4 text-center text-gray-500">No recent requests found</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="mt-8 bg-gradient-to-r from-green-500 to-green-600 rounded-xl shadow-lg overflow-hidden">
+            <div class="p-6 flex flex-col md:flex-row items-center justify-between">
+                <div class="text-white mb-4 md:mb-0">
+                    <h2 class="text-xl font-bold mb-1">Quick Actions</h2>
+                    <p class="opacity-90">Manage your hospital's blood supply and patient needs</p>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="patientsForm.html" class="bg-white text-green-600 hover:bg-gray-100 px-6 py-3 rounded-lg font-semibold shadow-md transform transition-all duration-300 hover:scale-105">
+                        <i class="fas fa-user-injured mr-2"></i> New Request
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
-    
-    <!-- AI-Powered Chatbot -->
-    <div id="chatbot" class="chatbot-container chatbot-collapsed">
-        <div id="chatbotHeader" class="chatbot-header">
-            <h3>
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"></path>
-                    <path d="M12 16h.01"></path>
-                    <path d="M8 12a4 4 0 0 1 8 0"></path>
-                </svg>
-                BloodLink AI Assistant
-            </h3>
-            <span id="chatbotToggle">▲</span>
-        </div>
-        <div id="chatbotMessages" class="chatbot-messages">
-            <!-- Messages will appear here -->
-        </div>
-        <div id="chatbotInputContainer" class="chatbot-input-container">
-            <input type="text" id="chatbotInput" class="chatbot-input" placeholder="Ask about blood donation..." />
-            <button id="chatbotSendBtn" class="chatbot-send-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="22" y1="2" x2="11" y2="13"></line>
-                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                </svg>
-            </button>
-        </div>
-    </div>
-    
+
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Check if user is logged in
+        document.addEventListener('DOMContentLoaded', function() {
             const hospitalId = sessionStorage.getItem('loggedInHospitalId');
             if (!hospitalId) {
-                window.location.href = 'hospital_login.html';
+                window.location.href = "hospital_login.html";
                 return;
             }
 
-            // Get hospital details
+            // Get hospital data
             const hospitals = JSON.parse(localStorage.getItem('hospitals')) || [];
             const hospital = hospitals.find(h => h.id === parseInt(hospitalId));
-
+            
             if (hospital) {
-                // Display hospital information
-                const hospitalDetails = document.getElementById('hospitalDetails');
-                hospitalDetails.innerHTML = `
-                    <div class="detail-group">
-                        <label>Hospital Name:</label>
-                        <p>${hospital.name}</p>
-                    </div>
-                    <div class="detail-group">
-                        <label>Address:</label>
-                        <p>${hospital.address}, ${hospital.city}, ${hospital.state}</p>
-                    </div>
-                    <div class="detail-group">
-                        <label>Contact Number:</label>
-                        <p>${hospital.contact}</p>
-                    </div>
-                    <div class="detail-group">
-                        <label>Services:</label>
-                        <div class="services-list">
-                            ${hospital.services.map(service => 
-                                `<span class="service-tag">${service}</span>`
-                            ).join('')}
-                        </div>
+                // Set hospital info
+                document.getElementById("hospitalName").textContent = hospital.name || "Hospital";
+                document.getElementById("hospitalLocation").textContent = `${hospital.city || ""}, ${hospital.state || ""}`;
+                
+                // Initialize blood inventory if not exists
+                if (!hospital.bloodInventory) {
+                    hospital.bloodInventory = {};
+                }
+                
+                // Calculate total blood units
+                const totalUnits = Object.values(hospital.bloodInventory).reduce((sum, val) => sum + (parseInt(val) || 0), 0);
+                document.getElementById("totalBloodUnits").textContent = totalUnits;
+                
+                // Display blood inventory
+                displayBloodInventory(hospital.bloodInventory);
+                
+                // Load donor messages
+                loadDonorMessages(hospitalId);
+            }
+            
+            // Logout functionality
+            document.getElementById("logoutBtn").addEventListener("click", function(e) {
+                e.preventDefault();
+                sessionStorage.removeItem('loggedInHospitalId');
+                window.location.href = "hospital_login.html";
+            });
+
+            // Add more blood type inputs
+            document.getElementById("addMoreBloodType").addEventListener("click", function(e) {
+                e.preventDefault();
+                const newInput = document.createElement('div');
+                newInput.className = 'blood-type-input-container mt-2';
+                newInput.innerHTML = `
+                    <select class="blood-type-select border rounded p-2">
+                        <option value="">Select Blood Type</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <input type="number" min="0" class="blood-type-units border rounded p-2" placeholder="Units">
+                    <button class="remove-blood-type bg-red-500 text-white p-2 rounded ml-2">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                document.getElementById("bloodTypeInputs").appendChild(newInput);
+                
+                // Add event listener to remove button
+                newInput.querySelector('.remove-blood-type').addEventListener('click', function() {
+                    newInput.remove();
+                });
+            });
+
+            // Save blood inventory
+            document.getElementById("saveBloodInventory").addEventListener("click", function(e) {
+                e.preventDefault();
+                const inputs = document.querySelectorAll('.blood-type-input-container');
+                const hospitalId = sessionStorage.getItem('loggedInHospitalId');
+                const hospitals = JSON.parse(localStorage.getItem('hospitals')) || [];
+                const hospital = hospitals.find(h => h.id === parseInt(hospitalId));
+                
+                if (!hospital) return;
+                
+                inputs.forEach(input => {
+                    const typeSelect = input.querySelector('.blood-type-select');
+                    const unitsInput = input.querySelector('.blood-type-units');
+                    
+                    if (typeSelect.value && unitsInput.value) {
+                        const bloodType = typeSelect.value;
+                        const units = parseInt(unitsInput.value) || 0;
+                        
+                        // Add to inventory
+                        if (hospital.bloodInventory[bloodType]) {
+                            hospital.bloodInventory[bloodType] += units;
+                        } else {
+                            hospital.bloodInventory[bloodType] = units;
+                        }
+                    }
+                });
+                
+                // Save to localStorage
+                localStorage.setItem('hospitals', JSON.stringify(hospitals));
+                
+                // Update display
+                displayBloodInventory(hospital.bloodInventory);
+                
+                // Clear inputs
+                document.getElementById("bloodTypeInputs").innerHTML = `
+                    <div class="blood-type-input-container">
+                        <select class="blood-type-select border rounded p-2">
+                            <option value="">Select Blood Type</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <input type="number" min="0" class="blood-type-units border rounded p-2" placeholder="Units">
                     </div>
                 `;
-
-                // Initialize Blood Inventory Form
-                initializeBloodInventory(hospital);
                 
-                // Function to display donors from the same state
-                function displayStateDonors() {
-                    // Get all registered donors
-                    const donors = JSON.parse(localStorage.getItem('donors')) || [];
-                    console.log('All donors:', donors);
-                    console.log('Hospital state:', hospital.state);
-                    
-                    // Get hospital state, handling different possible structures
-                    const hospitalState = hospital.state || (hospital.address && hospital.address.state);
-                    
-                    if (!hospitalState) {
-                        console.error('Hospital state information not found');
-                        return;
-                    }
-                    
-                    // Filter donors to show only those from the same state as the hospital
-                    const stateDonors = donors.filter(donor => {
-                        const donorState = donor.state || (donor.address && donor.address.state);
-                        return donorState === hospitalState;
-                    });
-                    
-                    // Filter donors from other states
-                    const otherStateDonors = donors.filter(donor => {
-                        const donorState = donor.state || (donor.address && donor.address.state);
-                        return donorState !== hospitalState;
-                    });
-                    
-                    // Sort other state donors alphabetically by state
-                    otherStateDonors.sort((a, b) => {
-                        const stateA = a.state || (a.address && a.address.state) || '';
-                        const stateB = b.state || (b.address && b.address.state) || '';
-                        return stateA.localeCompare(stateB);
-                    });
-                    
-                    console.log('Filtered donors from same state:', stateDonors);
-                    console.log('Filtered donors from other states:', otherStateDonors);
-
-                    // Get or create donors display section
-                    let donorsSection = document.getElementById('donorsSection');
-                    if (!donorsSection) {
-                        donorsSection = document.createElement('div');
-                        donorsSection.id = 'donorsSection';
-                        donorsSection.className = 'dashboard-container';
-                        document.querySelector('.container').appendChild(donorsSection);
-                    }
-
-                    // Create donors list HTML for same state
-                    donorsSection.innerHTML = `
-                        <h2>Blood Donors in ${hospitalState}</h2>
-                        <div class="donors-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px;">
-                            ${stateDonors.length > 0 ? 
-                                stateDonors.map(donor =>
-                                    `<div class="donor-card" style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; background-color: #f8f9fa;">
-                                        <div class="donor-detail">
-                                            <label style="font-weight: bold;">Name:</label>
-                                            <span>${donor.name || 'N/A'}</span>
-                                        </div>
-                                        <div class="donor-detail">
-                                            <label style="font-weight: bold;">Blood Group:</label>
-                                            <span>${donor.bloodGroup || 'N/A'}</span>
-                                        </div>
-                                        <div class="donor-detail">
-                                            <label style="font-weight: bold;">Contact:</label>
-                                            <span>${donor.contact || 'N/A'}</span>
-                                        </div>
-                                        <div class="donor-detail">
-                                            <label style="font-weight: bold;">Street:</label>
-                                            <span>${donor.street || (donor.address && donor.address.street) || 'N/A'}</span>
-                                        </div>
-                                        <div class="donor-detail">
-                                            <label style="font-weight: bold;">City:</label>
-                                            <span>${donor.city || (donor.address && donor.address.city) || 'N/A'}</span>
-                                        </div>
-                                        <div class="donor-detail">
-                                            <label style="font-weight: bold;">State:</label>
-                                            <span>${(donor.state || (donor.address && donor.address.state) || 'N/A')}</span>
-                                        </div>
-                                    </div>`
-                                ).join('') 
-                                : `<p>No donors found.</p>`
-                            }
-                        </div>
-
-                        <h2 style="margin-top: 30px;">Blood Donors in Other States</h2>
-                        <div class="other-states-container" style="max-height: 400px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px;">
-                            <div class="donors-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px;">
-                                ${otherStateDonors.length > 0 ? 
-                                    otherStateDonors.map(donor => {
-                                        const donorState = donor.state || (donor.address && donor.address.state) || 'N/A';
-                                        return `<div class="donor-card" style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; background-color: #f8f9fa; border-left: 4px solid #3b82f6;">
-                                            <div class="donor-detail">
-                                                <label style="font-weight: bold;">State:</label>
-                                                <span style="background-color: #dbeafe; padding: 2px 6px; border-radius: 4px;">${donorState}</span>
-                                            </div>
-                                            <div class="donor-detail">
-                                                <label style="font-weight: bold;">Name:</label>
-                                                <span>${donor.name || 'N/A'}</span>
-                                            </div>
-                                            <div class="donor-detail">
-                                                <label style="font-weight: bold;">Blood Group:</label>
-                                                <span style="color: ${donor.bloodGroup === 'O-' ? '#dc2626' : '#2563eb'}; font-weight: bold;">${donor.bloodGroup || 'N/A'}</span>
-                                            </div>
-                                            <div class="donor-detail">
-                                                <label style="font-weight: bold;">Contact:</label>
-                                                <span>${donor.contact || 'N/A'}</span>
-                                            </div>
-                                            <div class="donor-detail">
-                                                <label style="font-weight: bold;">City:</label>
-                                                <span>${donor.city || (donor.address && donor.address.city) || 'N/A'}</span>
-                                            </div>
-                                        </div>`;
-                                    }).join('') 
-                                    : `<p>No donors found in other states.</p>`
-                                }
-                            </div>
-                        </div>
-                    `;
-                }
+                // Update total units
+                const totalUnits = Object.values(hospital.bloodInventory).reduce((sum, val) => sum + (parseInt(val) || 0), 0);
+                document.getElementById("totalBloodUnits").textContent = totalUnits;
                 
-                // Call the function to display donors
-                displayStateDonors();
-            }
+                alert('Blood inventory updated successfully!');
+            });
 
-            // Add logout functionality
-            const logoutBtn = document.getElementById('logoutBtn');
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', () => {
-                    sessionStorage.removeItem('loggedInHospitalId');
-                    window.location.href = 'hospital_login.html';
-                });
-            }
-            
-            // Initialize Blood Inventory Form
-            function initializeBloodInventory(hospital) {
-                const bloodInventoryForm = document.getElementById('bloodInventoryForm');
-                if (!bloodInventoryForm) return;
+            function displayBloodInventory(inventory) {
+                const inventoryContainer = document.getElementById("bloodInventory");
+                inventoryContainer.innerHTML = '';
                 
-                // Define all blood types
-                const bloodTypes = [
-                    { type: 'A+', id: 'inv_Apos', color: '#78c2ad' },
-                    { type: 'A-', id: 'inv_Aneg', color: '#78c2ad' },
-                    { type: 'B+', id: 'inv_Bpos', color: '#6cc3d5' },
-                    { type: 'B-', id: 'inv_Bneg', color: '#6cc3d5' },
-                    { type: 'AB+', id: 'inv_ABpos', color: '#81c995' },
-                    { type: 'AB-', id: 'inv_ABneg', color: '#81c995' },
-                    { type: 'O+', id: 'inv_Opos', color: '#ffce67' },
-                    { type: 'O-', id: 'inv_Oneg', color: '#ff7851' },  // Universal donor
-                ];
+                // Get all blood types (standard + any custom ones in inventory)
+                const standardTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+                const customTypes = Object.keys(inventory).filter(type => !standardTypes.includes(type));
+                const allTypes = [...standardTypes, ...customTypes];
                 
-                // Initialize the inventory object if not already present
-                if (!hospital.bloodInventory) {
-                    hospital.bloodInventory = {
-                        'A+': 0, 'A-': 0, 'B+': 0, 'B-': 0, 
-                        'AB+': 0, 'AB-': 0, 'O+': 0, 'O-': 0
-                    };
-                }
-                
-                // Generate inputs for each blood type
-                bloodTypes.forEach(bloodType => {
-                    const currentUnits = hospital.bloodInventory[bloodType.type] || 0;
-                    const isUniversalDonor = bloodType.type === 'O-';
-                    const isUniversalRecipient = bloodType.type === 'AB+';
+                allTypes.forEach(type => {
+                    const units = inventory[type] || 0;
+                    const isCritical = (type === 'O-' && units < 2) || units < 3;
                     
-                    const inputHtml = `
-                        <div style="background-color: ${isUniversalDonor ? '#fff5f5' : '#f8f9fa'}; border: 1px solid ${isUniversalDonor ? '#dc2626' : '#dee2e6'}; border-radius: 8px; padding: 10px; display: flex; flex-direction: column;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                <span style="font-weight: bold; color: ${isUniversalDonor ? '#dc2626' : '#333'}; font-size: 16px;">${bloodType.type}</span>
-                                ${isUniversalDonor ? '<span style="font-size: 12px; background-color: #dc2626; color: white; padding: 2px 6px; border-radius: 10px;">Universal Donor</span>' : ''}
-                                ${isUniversalRecipient ? '<span style="font-size: 12px; background-color: #3b82f6; color: white; padding: 2px 6px; border-radius: 10px;">Universal Recipient</span>' : ''}
-                            </div>
-                            <div style="display: flex; align-items: center;">
-                                <input 
-                                    type="number" 
-                                    id="${bloodType.id}" 
-                                    min="0" 
-                                    value="${currentUnits}" 
-                                    style="width: 100%; padding: 8px; border: 1px solid ${isUniversalDonor ? '#dc2626' : '#dee2e6'}; border-radius: 4px;"
-                                >
-                                <span style="margin-left: 5px; color: #6c757d;">units</span>
-                            </div>
-                        </div>
+                    const inventoryItem = document.createElement('div');
+                    inventoryItem.className = 'bg-white p-4 rounded-lg shadow text-center border';
+                    inventoryItem.innerHTML = `
+                        <div class="text-lg font-bold ${isCritical ? 'text-red-600' : 'text-gray-800'}">${type}</div>
+                        <div class="text-2xl font-bold mt-2">${units}</div>
+                        <div class="text-xs ${isCritical ? 'text-red-500' : 'text-gray-500'}">${isCritical ? 'Low Stock' : 'Available'}</div>
                     `;
                     
-                    // Append to the form
-                    const div = document.createElement('div');
-                    div.innerHTML = inputHtml;
-                    bloodInventoryForm.appendChild(div);
-                });
-                
-                // Add update button event listener
-                const updateInventoryBtn = document.getElementById('updateInventoryBtn');
-                if (updateInventoryBtn) {
-                    updateInventoryBtn.addEventListener('click', () => {
-                        // Update hospital blood inventory
-                        bloodTypes.forEach(bloodType => {
-                            const inputValue = parseInt(document.getElementById(bloodType.id).value) || 0;
-                            hospital.bloodInventory[bloodType.type] = inputValue;
-                        });
-                        
-                        // Save to localStorage
-                        const hospitals = JSON.parse(localStorage.getItem('hospitals')) || [];
-                        const hospitalIndex = hospitals.findIndex(h => h.id === parseInt(hospitalId));
-                        
-                        if (hospitalIndex !== -1) {
-                            hospitals[hospitalIndex] = hospital;
-                            localStorage.setItem('hospitals', JSON.stringify(hospitals));
-                            
-                            // Show success message
-                            alert('Blood inventory updated successfully!');
-                        }
-                    });
-                }
-            }
-            
-            // Chatbot Functionality
-            const chatbot = document.getElementById('chatbot');
-            const chatbotHeader = document.getElementById('chatbotHeader');
-            const chatbotToggle = document.getElementById('chatbotToggle');
-            const chatbotMessages = document.getElementById('chatbotMessages');
-            const chatbotInput = document.getElementById('chatbotInput');
-            const chatbotSendBtn = document.getElementById('chatbotSendBtn');
-            
-            // Toggle chatbot expand/collapse
-            chatbotHeader.addEventListener('click', () => {
-                chatbot.classList.toggle('chatbot-expanded');
-                chatbot.classList.toggle('chatbot-collapsed');
-                chatbotToggle.textContent = chatbot.classList.contains('chatbot-expanded') ? '▼' : '▲';
-                
-                // If expanding and no messages, show welcome message
-                if (chatbot.classList.contains('chatbot-expanded') && chatbotMessages.children.length === 0) {
-                    showWelcomeMessage();
-                }
-            });
-            
-            // Send message when button is clicked
-            chatbotSendBtn.addEventListener('click', sendMessage);
-            
-            // Send message when Enter key is pressed
-            chatbotInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    sendMessage();
-                }
-            });
-            
-            // Show welcome message with suggestions
-            function showWelcomeMessage() {
-                const welcomeMessage = "Hello! I'm your BloodLink AI Assistant. How can I help you with blood donation today?";
-                addBotMessage(welcomeMessage);
-                
-                // Add suggestion chips
-                const suggestions = [
-                    "Which blood types are compatible?",
-                    "How many donors with O- do we have?",
-                    "What is a universal donor?",
-                    "Blood donation requirements"
-                ];
-                
-                addSuggestions(suggestions);
-            }
-            
-            // Add a bot message to the chat
-            function addBotMessage(message) {
-                const messageElement = document.createElement('div');
-                messageElement.className = 'bot-message';
-                messageElement.textContent = message;
-                chatbotMessages.appendChild(messageElement);
-                chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
-            }
-            
-            // Add a user message to the chat
-            function addUserMessage(message) {
-                const messageElement = document.createElement('div');
-                messageElement.className = 'user-message';
-                messageElement.textContent = message;
-                chatbotMessages.appendChild(messageElement);
-                chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
-            }
-            
-            // Add suggestion chips
-            function addSuggestions(suggestions) {
-                const suggestionsContainer = document.createElement('div');
-                suggestionsContainer.className = 'suggestion-chips';
-                
-                suggestions.forEach(suggestion => {
-                    const chip = document.createElement('div');
-                    chip.className = 'suggestion-chip';
-                    chip.textContent = suggestion;
-                    chip.addEventListener('click', () => {
-                        chatbotInput.value = suggestion;
-                        sendMessage();
-                    });
-                    suggestionsContainer.appendChild(chip);
-                });
-                
-                chatbotMessages.appendChild(suggestionsContainer);
-                chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
-            }
-            
-            // Show typing indicator
-            function showTypingIndicator() {
-                const indicator = document.createElement('div');
-                indicator.className = 'typing-indicator';
-                indicator.id = 'typingIndicator';
-                
-                for (let i = 0; i < 3; i++) {
-                    const dot = document.createElement('div');
-                    dot.className = 'typing-dot';
-                    indicator.appendChild(dot);
-                }
-                
-                chatbotMessages.appendChild(indicator);
-                chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
-            }
-            
-            // Hide typing indicator
-            function hideTypingIndicator() {
-                const indicator = document.getElementById('typingIndicator');
-                if (indicator) {
-                    indicator.remove();
-                }
-            }
-            
-            // Process user message and generate a response
-            function processMessage(message) {
-                // In a real implementation, this would call an AI API like OpenAI
-                // For this demo, we'll use enhanced NLP simulation
- 
-                // NLP Pipeline:
-                // 1. Preprocess the message (lowercase, remove extra spaces)
-                // 2. Extract entities (blood types, dates, locations, numbers)
-                // 3. Classify intent (question, request, information)
-                // 4. Determine sentiment (urgent, neutral, positive)
-                // 5. Generate appropriate response
-                
-                // Step 1: Preprocess
-                const preprocessedMessage = message.toLowerCase().trim();
-                
-                // Step 2: Entity extraction
-                const entities = extractEntities(preprocessedMessage);
-                
-                // Step 3: Intent classification
-                const intent = classifyIntent(preprocessedMessage, entities);
-                
-                // Step 4: Sentiment analysis
-                const sentiment = analyzeSentiment(preprocessedMessage);
-                
-                // Step 5: Generate response based on intent and entities
-                const response = generateResponse(intent, entities, sentiment);
-                
-                // For debugging
-                console.log({
-                  message: preprocessedMessage,
-                  entities,
-                  intent,
-                  sentiment,
-                  response
-                });
-                
-                return response;
-            }
-            
-            // Entity extraction (blood types, locations, numbers, dates)
-            function extractEntities(text) {
-                const entities = {
-                    bloodTypes: [],
-                    locations: [],
-                    numbers: [],
-                    dates: [],
-                    people: []
-                };
-                
-                // Extract blood types
-                const bloodTypePatterns = [
-                    /\b(a|b|ab|o)(\s*|\-)(positive|negative|\+|\-)\b/g,
-                    /\b(a|b|ab|o)(\s*)(type)\b/gi,
-                    /\bo\s*neg(ative)?\b/gi,
-                    /\bo\s*pos(itive)?\b/gi
-                ];
-                
-                bloodTypePatterns.forEach(pattern => {
-                    const matches = text.match(pattern);
-                    if (matches) {
-                        matches.forEach(match => {
-                            // Normalize blood type format
-                            let normalizedType = match.toUpperCase()
-                                .replace(/\s+/g, '')
-                                .replace('POSITIVE', '+')
-                                .replace('NEGATIVE', '-')
-                                .replace('TYPE', '');
-                            
-                            // Fix common patterns
-                            if (normalizedType === 'ONEG') normalizedType = 'O-';
-                            if (normalizedType === 'OPOS') normalizedType = 'O+';
-                            
-                            if (!entities.bloodTypes.includes(normalizedType) && 
-                                ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].includes(normalizedType)) {
-                                entities.bloodTypes.push(normalizedType);
-                            }
-                        });
+                    if (isCritical) {
+                        inventoryItem.classList.add('border-red-200', 'bg-red-50');
+                    } else {
+                        inventoryItem.classList.add('border-gray-200');
                     }
-                });
-                
-                // Extract numbers
-                const numberMatches = text.match(/\b\d+\b/g);
-                if (numberMatches) {
-                    entities.numbers = numberMatches.map(n => parseInt(n));
-                }
-                
-                // Extract locations (simplified - would use a gazetteer in a real NLP system)
-                const commonLocations = [
-                    'hospital', 'clinic', 'center', 'ward', 'emergency', 'er', 'icu', 
-                    'department', 'lab', 'laboratory', 'blood bank', 'donation center'
-                ];
-                
-                commonLocations.forEach(location => {
-                    if (text.includes(location)) {
-                        entities.locations.push(location);
-                    }
-                });
-                
-                // Extract date-related terms
-                const dateTerms = [
-                    'today', 'tomorrow', 'yesterday', 'next week', 'last week',
-                    'this week', 'this month', 'weekend', 'monday', 'tuesday',
-                    'wednesday', 'thursday', 'friday', 'saturday', 'sunday'
-                ];
-                
-                dateTerms.forEach(term => {
-                    if (text.includes(term)) {
-                        entities.dates.push(term);
-                    }
-                });
-                
-                return entities;
-            }
-            
-            // Intent classification
-            function classifyIntent(text, entities) {
-                // Define intent patterns
-                const intentPatterns = {
-                    compatibility_question: [
-                        /compatible|compatibility|match|matching|can.*donate to|who can.*receive/i,
-                    ],
-                    count_query: [
-                        /how many|count|total|number of|do we have/i,
-                    ],
-                    urgent_request: [
-                        /urgent|emergency|critical|immediately|asap|right away/i,
-                    ],
-                    inventory_query: [
-                        /inventory|supply|stock|available|have enough/i,
-                    ],
-                    educational_question: [
-                        /what is|why is|how does|explain|tell me about/i,
-                    ],
-                    recommendation_request: [
-                        /recommend|suggest|advice|advise|should we|what should/i,
-                    ],
-                    donation_process: [
-                        /process|procedure|steps|how to donate|donation procedure/i,
-                    ],
-                    eligibility_question: [
-                        /eligible|eligibility|can donate|requirements|qualify|allowed to/i,
-                    ],
-                    greeting: [
-                        /^(hi|hello|hey|greetings|good morning|good afternoon|good evening)( there)?$/i,
-                    ],
-                    gratitude: [
-                        /thank|thanks|appreciate|grateful/i,
-                    ]
-                };
-                
-                // Check each intent pattern
-                for (const [intent, patterns] of Object.entries(intentPatterns)) {
-                    for (const pattern of patterns) {
-                        if (pattern.test(text)) {
-                            return intent;
-                        }
-                    }
-                }
-                
-                // Default intents based on entities
-                if (entities.bloodTypes.length > 0) {
-                    return 'blood_type_query';
-                }
-                
-                // Fallback intent
-                return 'general_query';
-            }
-            
-            // Sentiment analysis
-            function analyzeSentiment(text) {
-                // Define sentiment markers
-                const sentimentMarkers = {
-                    urgent: [
-                        'urgent', 'emergency', 'critical', 'immediately', 'asap', 'crisis', 
-                        'severe', 'serious', 'life-threatening', 'dying', 'death', 'fatal', 
-                        'quickly', 'fast', 'hurry'
-                    ],
-                    negative: [
-                        'bad', 'worried', 'concerned', 'problem', 'issue', 'trouble', 'difficult',
-                        'challenge', 'shortage', 'lack', 'insufficient', 'not enough', 'running out',
-                        'depleted', 'low'
-                    ],
-                    positive: [
-                        'good', 'great', 'excellent', 'perfect', 'wonderful', 'amazing', 'fantastic',
-                        'helpful', 'useful', 'beneficial', 'appreciate', 'thanks', 'thank you',
-                        'grateful', 'happy', 'satisfied'
-                    ]
-                };
-                
-                // Count occurrences of each sentiment marker
-                let urgentCount = 0;
-                let negativeCount = 0;
-                let positiveCount = 0;
-                
-                sentimentMarkers.urgent.forEach(marker => {
-                    if (text.includes(marker)) urgentCount++;
-                });
-                
-                sentimentMarkers.negative.forEach(marker => {
-                    if (text.includes(marker)) negativeCount++;
-                });
-                
-                sentimentMarkers.positive.forEach(marker => {
-                    if (text.includes(marker)) positiveCount++;
-                });
-                
-                // Determine overall sentiment
-                if (urgentCount > 0) return 'urgent';
-                if (positiveCount > negativeCount) return 'positive';
-                if (negativeCount > positiveCount) return 'negative';
-                return 'neutral';
-            }
-            
-            // Generate response based on intent, entities, and sentiment
-            function generateResponse(intent, entities, sentiment) {
-                // Get hospital state
-                const hospitalState = hospital.state || (hospital.address && hospital.address.state) || '';
-                
-                // Get all donors data
-                const donors = JSON.parse(localStorage.getItem('donors')) || [];
-                
-                // Count blood types
-                const bloodTypeCounts = {};
-                donors.forEach(donor => {
-                    const bloodType = donor.bloodGroup || 'Unknown';
-                    bloodTypeCounts[bloodType] = (bloodTypeCounts[bloodType] || 0) + 1;
-                });
-                
-                // Create response based on intent
-                switch (intent) {
-                    case 'compatibility_question':
-                        return {
-                            text: `Here's a quick guide to blood type compatibility:\n\n• O- is the universal donor (can donate to all types)\n• AB+ is the universal recipient (can receive from all types)\n• Type A can donate to A and AB\n• Type B can donate to B and AB\n• Type AB can donate only to AB\n• Type O can donate to all types\n\nNegative types can donate to both negative and positive of the same letter, but positive types can only donate to positive.`,
-                            suggestions: ["How many O- donors do we have?", "What is a universal donor?", "Rarest blood types"]
-                        };
-                        
-                    case 'count_query':
-                        // If specific blood type is mentioned
-                        if (entities.bloodTypes.length > 0) {
-                            const bloodType = entities.bloodTypes[0];
-                            const count = bloodTypeCounts[bloodType] || 0;
-                            const stateCount = donors.filter(d => 
-                                d.bloodGroup === bloodType && 
-                                (d.state || (d.address && d.address.state)) === hospitalState
-                            ).length;
-                            
-                            let responseText = `We currently have ${count} donors with ${bloodType} blood type`;
-                            if (hospitalState) {
-                                responseText += `, with ${stateCount} of them in ${hospitalState}`;
-                            }
-                            responseText += '.';
-                            
-                            // Add urgency info for O-
-                            if (bloodType === 'O-') {
-                                responseText += `\n\nO- is the universal donor blood type and in high demand, especially in emergency situations.`;
-                            }
-                            
-                            return {
-                                text: responseText,
-                                suggestions: ["Blood type compatibility", "Donation requirements", "List all blood types"]
-                            };
-                        } else {
-                            // Total donor count
-                            return {
-                                text: `We currently have ${donors.length} total registered donors across all blood types.${hospitalState ? ` ${donors.filter(d => (d.state || (d.address && d.address.state)) === hospitalState).length} of them are in ${hospitalState}.` : ''}`,
-                                suggestions: ["Show donors by blood type", "O- donors", "Most needed blood types"]
-                            };
-                        }
-                        
-                    case 'blood_type_query':
-                        if (entities.bloodTypes.length > 0) {
-                            const bloodType = entities.bloodTypes[0];
-                            let responseText = '';
-                            
-                            switch (bloodType) {
-                                case 'O-':
-                                    responseText = `O- (O negative) is the universal donor blood type. It can be given to anyone regardless of their blood type, making it extremely valuable, especially in emergency situations when there's no time to determine a patient's blood type.\n\nOnly about 7% of the population has O- blood, making it relatively rare but in high demand.`;
-                                    break;
-                                case 'AB+':
-                                    responseText = `AB+ (AB positive) is the universal recipient blood type. People with AB+ can receive blood from any donor type, which makes their treatment options much more flexible.\n\nHowever, AB+ donors can only donate to other AB+ recipients. It's the rarest blood type, occurring in only about 3% of the population.`;
-                                    break;
-                                default:
-                                    const compatibilityInfo = getBloodTypeCompatibility(bloodType);
-                                    responseText = `${bloodType} blood type:\n• Can donate to: ${compatibilityInfo.canDonateTo.join(', ')}\n• Can receive from: ${compatibilityInfo.canReceiveFrom.join(', ')}\n\nWe currently have ${bloodTypeCounts[bloodType] || 0} registered donors with this blood type.`;
-                            }
-                            
-                            return {
-                                text: responseText,
-                                suggestions: ["Blood type compatibility", `How many ${bloodType} donors?`, "Rare blood types"]
-                            };
-                        }
-                        break;
-                        
-                    case 'educational_question':
-                        // Generic educational response
-                        if (text.includes('universal donor')) {
-                            return {
-                                text: `O- (O negative) is the universal donor blood type. It can be given to anyone regardless of their blood type, making it extremely valuable, especially in emergency situations when there's no time to determine a patient's blood type.\n\nOnly about 7% of the population has O- blood, making it relatively rare but in high demand.`,
-                                suggestions: ["How many O- donors do we have?", "Universal recipient", "Blood shortages"]
-                            };
-                        } else if (text.includes('universal recipient')) {
-                            return {
-                                text: `AB+ (AB positive) is the universal recipient blood type. People with AB+ can receive blood from any donor type, which makes their treatment options much more flexible.\n\nHowever, AB+ donors can only donate to other AB+ recipients. It's the rarest blood type, occurring in only about 3% of the population.`,
-                                suggestions: ["How many AB+ patients?", "Universal donor", "Blood type compatibility"]
-                            };
-                        }
-                        break;
-                        
-                    case 'inventory_query':
-                        // Format blood type inventory
-                        const inventoryList = Object.entries(bloodTypeCounts)
-                            .filter(([type]) => ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].includes(type))
-                            .sort((a, b) => b[1] - a[1])
-                            .map(([type, count]) => `• ${type}: ${count} units`)
-                            .join('\n');
-                        
-                        return {
-                            text: `Current blood inventory by type:\n\n${inventoryList || "No blood units currently in inventory."}`,
-                            suggestions: ["Which types are low?", "O- inventory", "Upcoming needs"]
-                        };
-                        
-                    case 'eligibility_question':
-                        return {
-                            text: `General requirements for blood donation include:\n\n• Age: 17 or older (16 with parental consent in some areas)\n• Weight: At least 110 pounds\n• Health: Generally good health and feeling well\n• Time since last donation: At least 8 weeks for whole blood\n\nSome factors that might disqualify someone temporarily or permanently include:\n• Recent illness or certain medications\n• Low iron levels\n• Travel to certain countries\n• Certain medical conditions`,
-                            suggestions: ["How often can someone donate?", "Donation process", "Blood types most needed"]
-                        };
-                        
-                    case 'urgent_request':
-                        const urgentText = sentiment === 'urgent' ? 
-                            "I understand this is an urgent situation. " : "";
-                        
-                        if (entities.bloodTypes.length > 0) {
-                            const bloodType = entities.bloodTypes[0];
-                            const matchingDonors = donors.filter(d => d.bloodGroup === bloodType);
-                            
-                            return {
-                                text: `${urgentText}We have ${matchingDonors.length} donors with ${bloodType} blood type. Would you like me to help you contact them or find compatible alternatives?`,
-                                suggestions: [`Contact all ${bloodType} donors`, `Compatible types for ${bloodType}`, "Emergency protocol"]
-                            };
-                        } else {
-                            return {
-                                text: `${urgentText}What specific blood type or resources do you need urgently? I can help you locate donors or suggest alternatives.`,
-                                suggestions: ["Need O- urgently", "Emergency protocol", "Contact all donors"]
-                            };
-                        }
-                        
-                    case 'greeting':
-                        return {
-                            text: `Hello! I'm your BloodLink AI Assistant. How can I help you with blood donation today?`,
-                            suggestions: ["Show blood inventory", "Donor statistics", "Urgent needs"]
-                        };
-                        
-                    case 'gratitude':
-                        return {
-                            text: `You're welcome! Is there anything else I can help you with regarding blood donation or donor management?`,
-                            suggestions: ["Blood type compatibility", "Donor statistics", "Contact donors"]
-                        };
-                        
-                    default:
-                        return {
-                            text: `I'm still learning about blood donation. Can you rephrase your question about ${entities.bloodTypes.length > 0 ? entities.bloodTypes.join(', ') + ' blood type' : 'donation management'}?`,
-                            suggestions: ["Blood type compatibility", "Donor statistics", "Donation requirements"]
-                        };
-                }
-                
-                // Fallback response
-                return {
-                    text: `I'm still learning about blood donation. That's not something I have specific information about yet. How else can I help you with blood donation or donor management?`,
-                    suggestions: ["Which blood types are compatible?", "Blood donation requirements", "O- donors"]
-                };
-            }
-            
-            // Helper: Get blood type compatibility information
-            function getBloodTypeCompatibility(bloodType) {
-                const compatibility = {
-                    'O-': { canDonateTo: ['O-', 'O+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+'], canReceiveFrom: ['O-'] },
-                    'O+': { canDonateTo: ['O+', 'A+', 'B+', 'AB+'], canReceiveFrom: ['O-', 'O+'] },
-                    'A-': { canDonateTo: ['A-', 'A+', 'AB-', 'AB+'], canReceiveFrom: ['O-', 'A-'] },
-                    'A+': { canDonateTo: ['A+', 'AB+'], canReceiveFrom: ['O-', 'O+', 'A-', 'A+'] },
-                    'B-': { canDonateTo: ['B-', 'B+', 'AB-', 'AB+'], canReceiveFrom: ['O-', 'B-'] },
-                    'B+': { canDonateTo: ['B+', 'AB+'], canReceiveFrom: ['O-', 'O+', 'B-', 'B+'] },
-                    'AB-': { canDonateTo: ['AB-', 'AB+'], canReceiveFrom: ['O-', 'A-', 'B-', 'AB-'] },
-                    'AB+': { canDonateTo: ['AB+'], canReceiveFrom: ['O-', 'O+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+'] }
-                };
-                
-                return compatibility[bloodType] || { canDonateTo: [], canReceiveFrom: [] };
-            }
-            
-            // Send user message and get bot response
-            function sendMessage() {
-                const message = chatbotInput.value.trim();
-                if (!message) return;
-                
-                // Add user message to chat
-                addUserMessage(message);
-                chatbotInput.value = '';
-                
-                // Show typing indicator
-                showTypingIndicator();
-                
-                // Simulate AI processing time (500-1200ms)
-                setTimeout(() => {
-                    hideTypingIndicator();
                     
-                    // Process the message and get response
-                    const response = processMessage(message);
-                    
-                    // Add bot response
-                    addBotMessage(response.text);
-                    
-                    // Add suggestions if available
-                    if (response.suggestions && response.suggestions.length > 0) {
-                        addSuggestions(response.suggestions);
-                    }
-                }, 500 + Math.random() * 700);
+                    inventoryContainer.appendChild(inventoryItem);
+                });
             }
             
-            // Expand chatbot initially on large screens
-            if (window.innerWidth > 768) {
-                setTimeout(() => {
-                    chatbotHeader.click();
-                }, 1000);
+            function loadDonorMessages(hospitalId) {
+                const hospitals = JSON.parse(localStorage.getItem('hospitals')) || [];
+                const hospital = hospitals.find(h => h.id === parseInt(hospitalId));
+                
+                if (!hospital || !hospital.messages || hospital.messages.length === 0) {
+                    const messagesContainer = document.getElementById("donorMessages");
+                    messagesContainer.innerHTML = `
+                        <div class="no-messages">
+                            <i class="fas fa-comment-slash text-2xl mb-2"></i>
+                            <p>No donor messages yet</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const messagesContainer = document.getElementById("donorMessages");
+                messagesContainer.innerHTML = '';
+                
+                // Sort messages by date (newest first)
+                hospital.messages.sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                // Show only the last 5 messages
+                const recentMessages = hospital.messages.slice(0, 5);
+                
+                recentMessages.forEach(msg => {
+                    const initials = msg.donorName.split(' ').map(n => n[0]).join('');
+                    const formattedDate = new Date(msg.date).toLocaleString();
+                    
+                    const messageElement = document.createElement('div');
+                    messageElement.className = 'message-item';
+                    messageElement.innerHTML = `
+                        <div class="donor-avatar">${initials}</div>
+                        <div class="message-content">
+                            <div class="font-medium">${msg.donorName} (${msg.bloodType})</div>
+                            <div class="text-sm text-gray-600">${msg.message}</div>
+                        </div>
+                        <div class="message-time">${formattedDate}</div>
+                    `;
+                    
+                    messagesContainer.appendChild(messageElement);
+                });
             }
         });
     </script>

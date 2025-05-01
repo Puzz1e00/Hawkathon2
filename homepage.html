@@ -9,376 +9,366 @@
   <!-- Font Awesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
   <style>
-    /* AI Assistant Chat Styles */
-    #ai-assistant-container {
+    /* Sidebar styles */
+    .sidebar {
+      width: 250px;
+      min-height: 100vh;
+      background: linear-gradient(to bottom, #1e40af, #1e3a8a);
+      color: white;
       position: fixed;
-      bottom: 30px;
-      right: 30px;
+      top: 0;
+      left: 0;
+      transition: all 0.3s;
+      z-index: 100;
+    }
+    
+    .sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .sidebar-menu {
+      padding: 20px 0;
+    }
+    
+    .sidebar-menu a {
+      display: block;
+      padding: 12px 20px;
+      color: white;
+      text-decoration: none;
+      transition: all 0.3s;
+      border-left: 4px solid transparent;
+    }
+    
+    .sidebar-menu a:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-left: 4px solid white;
+    }
+    
+    .sidebar-menu a.active {
+      background: rgba(255, 255, 255, 0.1);
+      border-left: 4px solid white;
+    }
+    
+    .sidebar-menu i {
+      margin-right: 10px;
+      width: 20px;
+      text-align: center;
+    }
+    
+    .main-content {
+      margin-left: 250px;
+      padding: 1rem 2rem;
+    }
+    
+    /* Cookie Consent */
+    .cookie-consent {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 350px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      padding: 20px;
       z-index: 1000;
+      transform: translateY(20px);
+      opacity: 0;
       transition: all 0.3s ease;
     }
-    #ai-chat-window {
-      display: none;
-      width: 350px;
-      max-height: 500px;
-      background-color: white;
-      border-radius: 10px;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-      overflow: hidden;
-      margin-bottom: 20px;
+    
+    .cookie-consent.show {
+      transform: translateY(0);
+      opacity: 1;
     }
-    #chat-messages {
-      height: 350px;
-      overflow-y: auto;
-      padding: 16px;
+    
+    /* Footer links */
+    footer a {
+      color: #2563eb;
+      text-decoration: none;
+      transition: color 0.2s;
     }
-    .ai-message {
-      background-color: #EFF6FF;
-      border-radius: 18px 18px 18px 4px;
-      padding: 10px 16px;
-      margin-bottom: 10px;
-      max-width: 80%;
-      animation: fadeIn 0.3s;
-    }
-    .user-message {
-      background-color: #2563EB;
-      color: white;
-      border-radius: 18px 18px 4px 18px;
-      padding: 10px 16px;
-      margin-bottom: 10px;
-      margin-left: auto;
-      max-width: 80%;
-      animation: fadeIn 0.3s;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .typing-indicator {
-      display: flex;
-      padding: 10px 16px;
-      background-color: #EFF6FF;
-      border-radius: 18px 18px 18px 4px;
-      margin-bottom: 10px;
-      max-width: 80%;
-    }
-    .typing-dot {
-      width: 8px;
-      height: 8px;
-      background-color: #93C5FD;
-      border-radius: 50%;
-      margin: 0 2px;
-      animation: typingAnimation 1.4s infinite ease-in-out;
-    }
-    .typing-dot:nth-child(1) { animation-delay: 0s; }
-    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
-    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes typingAnimation {
-      0%, 60%, 100% { transform: translateY(0); }
-      30% { transform: translateY(-5px); }
+    
+    footer a:hover {
+      color: #1e40af;
+      text-decoration: underline;
     }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-900">
-  <!-- Header -->
-  <header class="bg-white shadow">
-    <div class="max-w-[95%] mx-auto px-4 lg:px-8 py-6 flex items-center justify-between">
-      <!-- Logo + Brand -->
-      <div class="flex items-center gap-6">
-        <img src="DonorSyncRed.png" alt="DonorSync logo" class="w-28 h-auto object-contain" />
-        <h1 class="text-4xl font-extrabold text-blue-600 tracking-tight">DonorSync</h1>
-      </div>
-  
-      <!-- Navigation -->
-      <nav>
-        <ul class="flex gap-8 text-lg font-medium">
-          <li><a href="#" class="hover:text-blue-600">Home</a></li>
-          <li><a href="#" class="hover:text-blue-600">About Us</a></li>
-          <li><a href="register.html" class="hover:text-blue-600">Become a Donor</a></li>
-          <li><a href="hospital_login.html" class="hover:text-blue-600">Hospital Portal</a></li>
-          <li><a href="search_hospital.html" class="hover:text-blue-600">Associated Hospitals</a></li>
-        </ul>
-      </nav>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <a href="homepage.html" class="text-2xl font-bold text-white">DonorSync</a>
     </div>
-  </header>
-
-  <!-- Hero Section -->
-  <section class="bg-blue-100 py-20">
-    <div class="max-w-4xl mx-auto px-4 text-center">
-      <h2 class="text-4xl font-bold mb-4">Connecting Lives. One Match at a Time.</h2>
-      <p class="text-lg mb-8">Our platform bridges the gap between generous donors and patients in need through hospital partnerships.</p>
-      <div class="flex justify-center gap-4">
-        <a href="register.html" class="bg-white text-blue-600 border border-blue-600 px-6 py-3 rounded-xl shadow hover:bg-blue-50 transition">
-          Become a Donor
-        </a>
-        <a href="hospital_login.html" class="bg-blue-400 text-white px-6 py-3 rounded-xl shadow hover:bg-blue-700 transition">
-          Hospital Portal
-        </a>
-        <a href="hospital_registration.html" class="bg-blue-600 text-white px-6 py-3 rounded-xl shadow hover:bg-blue-700 transition">
-          Register Hospital
-        </a>
-      </div>
+    
+    <div class="sidebar-menu">
+      <a href="#" class="active">
+        <i class="fas fa-home"></i> Home
+      </a>
+      <a href="register.html">
+        <i class="fas fa-heartbeat"></i> Donor Portal
+      </a>
+      <a href="hospital_registration.html">
+        <i class="fas fa-hospital"></i> Hospital Portal
+      </a>
+      <a href="about.html">
+        <i class="fas fa-info-circle"></i> About
+      </a>
     </div>
-  </section>
+  </div>
 
-  <!-- Impact Stats -->
-  <section class="py-16 bg-white">
-    <div class="max-w-6xl mx-auto px-4 text-center">
-      <h4 class="text-3xl font-semibold mb-12"><i>Every Second Counts. Every Drop Matters.</i><h4>
-      <div class="grid md:grid-cols-3 gap-8">
-        <div class="p-6">
-          <p class="text-5xl font-bold text-blue-600 mb-2">1,250+</p>
-          <p class="text-gray-600">Lives Saved</p>
-        </div>
-        <div class="p-6">
-          <p class="text-5xl font-bold text-blue-600 mb-2">85+</p>
-          <p class="text-gray-600">Partner Hospitals</p>
-        </div>
-        <div class="p-6">
-          <p class="text-5xl font-bold text-blue-600 mb-2">5,000+</p>
-          <p class="text-gray-600">Registered Donors</p>
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Hero Section -->
+    <section class="bg-blue-100 py-20">
+      <div class="max-w-4xl mx-auto px-4 text-center">
+        <h2 class="text-4xl font-bold mb-4">Connecting Lives. One Match at a Time.</h2>
+        <p class="text-lg mb-8">Our platform bridges the gap between generous donors and patients in need through hospital partnerships.</p>
+        <div class="flex justify-center gap-4">
+          <a href="register.html" class="bg-white text-blue-600 border border-blue-600 px-6 py-3 rounded-xl shadow hover:bg-blue-50 transition">
+            Donor Portal
+          </a>
+          <a href="hospital_registration.html" class="bg-blue-600 text-white px-6 py-3 rounded-xl shadow hover:bg-blue-700 transition">
+            Hospital Portal
+          </a>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- AI-Powered Blood Supply Dashboard -->
-  <section class="py-16 bg-gray-50" id="ai-dashboard">
-    <div class="max-w-6xl mx-auto px-4">
-      <div class="flex items-center justify-center gap-2 mb-12">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="14.31" y1="8" x2="20.05" y2="17.94"></line>
-          <line x1="9.69" y1="8" x2="21.17" y2="8"></line>
-          <line x1="7.38" y1="12" x2="13.12" y2="2.06"></line>
-          <line x1="9.69" y1="16" x2="3.95" y2="6.06"></line>
-          <line x1="14.31" y1="16" x2="2.83" y2="16"></line>
-          <line x1="16.62" y1="12" x2="10.88" y2="21.94"></line>
-        </svg>
-        <h3 class="text-3xl font-semibold text-center">AI-Powered Blood Supply Intelligence</h3>
-      </div>
-
-      <div class="grid md:grid-cols-2 gap-8">
-        <!-- Blood Type Demand Chart -->
-        <div class="bg-white rounded-xl shadow-lg p-6">
-          <h4 class="text-xl font-semibold mb-4">Current Blood Type Demand</h4>
-          <div class="h-64">
-            <canvas id="bloodDemandChart"></canvas>
+    <!-- Impact Stats -->
+    <section class="py-16 bg-white">
+      <div class="max-w-6xl mx-auto px-4 text-center">
+        <h4 class="text-3xl font-semibold mb-12"><i>Every Second Counts. Every Drop Matters.</i><h4>
+        <div class="grid md:grid-cols-3 gap-8">
+          <div class="p-6">
+            <p class="text-5xl font-bold text-blue-600 mb-2">1,250+</p>
+            <p class="text-gray-600">Lives Saved</p>
           </div>
-          <p class="text-sm text-gray-500 mt-4">
-            Our AI analyzes hospital requests, seasonal trends, and historical data to predict current demand.
-          </p>
-        </div>
-
-        <!-- Regional Needs Map -->
-        <div class="bg-white rounded-xl shadow-lg p-6">
-          <h4 class="text-xl font-semibold mb-4">Critical Need Areas</h4>
-          <div class="space-y-3 mb-4">
-            <div class="flex items-center justify-between">
-              <span>NYC Metropolitan Area</span>
-              <div class="w-64 bg-gray-200 rounded-full h-2.5">
-                <div class="bg-red-600 h-2.5 rounded-full" style="width: 85%"></div>
-              </div>
-              <span class="font-bold text-red-600">High</span>
-            </div>
-            <div class="flex items-center justify-between">
-              <span>Chicago Region</span>
-              <div class="w-64 bg-gray-200 rounded-full h-2.5">
-                <div class="bg-yellow-500 h-2.5 rounded-full" style="width: 65%"></div>
-              </div>
-              <span class="font-bold text-yellow-600">Medium</span>
-            </div>
-            <div class="flex items-center justify-between">
-              <span>LA County</span>
-              <div class="w-64 bg-gray-200 rounded-full h-2.5">
-                <div class="bg-yellow-500 h-2.5 rounded-full" style="width: 60%"></div>
-              </div>
-              <span class="font-bold text-yellow-600">Medium</span>
-            </div>
-            <div class="flex items-center justify-between">
-              <span>Dallas-Fort Worth</span>
-              <div class="w-64 bg-gray-200 rounded-full h-2.5">
-                <div class="bg-green-500 h-2.5 rounded-full" style="width: 40%"></div>
-              </div>
-              <span class="font-bold text-green-600">Low</span>
-            </div>
-            <div class="flex items-center justify-between">
-              <span>Miami-Dade</span>
-              <div class="w-64 bg-gray-200 rounded-full h-2.5">
-                <div class="bg-red-600 h-2.5 rounded-full" style="width: 78%"></div>
-              </div>
-              <span class="font-bold text-red-600">High</span>
-            </div>
+          <div class="p-6">
+            <p class="text-5xl font-bold text-blue-600 mb-2">85+</p>
+            <p class="text-gray-600">Partner Hospitals</p>
           </div>
-          <p class="text-sm text-gray-500">
-            AI predicts regional needs based on population, hospital density, and recent emergencies.
-          </p>
+          <div class="p-6">
+            <p class="text-5xl font-bold text-blue-600 mb-2">5,000+</p>
+            <p class="text-gray-600">Registered Donors</p>
+          </div>
         </div>
       </div>
+    </section>
 
-      <!-- AI-Generated Insights -->
-      <div class="mt-8 bg-blue-50 border border-blue-100 rounded-xl p-6">
-        <h4 class="text-xl font-semibold mb-3 flex items-center">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600 mr-2">
+    <!-- AI-Powered Blood Supply Dashboard -->
+    <section class="py-16 bg-gray-50" id="ai-dashboard">
+      <div class="max-w-6xl mx-auto px-4">
+        <div class="flex items-center justify-center gap-2 mb-12">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600">
             <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="16" x2="12" y2="12"></line>
-            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            <line x1="14.31" y1="8" x2="20.05" y2="17.94"></line>
+            <line x1="9.69" y1="8" x2="21.17" y2="8"></line>
+            <line x1="7.38" y1="12" x2="13.12" y2="2.06"></line>
+            <line x1="9.69" y1="16" x2="3.95" y2="6.06"></line>
+            <line x1="14.31" y1="16" x2="2.83" y2="16"></line>
+            <line x1="16.62" y1="12" x2="10.88" y2="21.94"></line>
           </svg>
-          AI-Generated Insights
-        </h4>
-        <ul class="space-y-2 text-gray-700">
-          <li class="flex items-start">
-            <span class="text-red-600 mr-2">●</span>
-            <span>Critical shortage of O- blood detected nationwide - donation urgently needed</span>
-          </li>
-          <li class="flex items-start">
-            <span class="text-yellow-500 mr-2">●</span>
-            <span>Platelet donations show seasonal decline - expect 15% reduction in available supply</span>
-          </li>
-          <li class="flex items-start">
-            <span class="text-green-500 mr-2">●</span>
-            <span>AB+ supply levels stable across most regions</span>
-          </li>
-          <li class="flex items-start">
-            <span class="text-blue-500 mr-2">●</span>
-            <span>AI predicts increased demand for all blood types during upcoming holiday season</span>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </section>
+          <h3 class="text-3xl font-semibold text-center">AI-Powered Blood Supply Intelligence</h3>
+        </div>
 
-  <!-- AI-Powered Personalized Recommendations -->
-  <section class="py-16 bg-white">
-    <div class="max-w-6xl mx-auto px-4">
-      <div class="text-center mb-12">
-        <h3 class="text-3xl font-semibold">Personalized AI Recommendations</h3>
-        <p class="text-gray-600 mt-2">Our AI analyzes your profile to provide tailored donation suggestions</p>
-      </div>
-
-      <div class="grid md:grid-cols-3 gap-6">
-        <!-- Recommendation Card 1 -->
-        <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow p-6 border border-blue-100">
-          <div class="flex justify-between items-start mb-4">
-            <div class="flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600 mr-2">
-                <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
-              </svg>
-              <h4 class="text-lg font-semibold">Ideal Donation Type</h4>
+        <div class="grid md:grid-cols-2 gap-8">
+          <!-- Blood Type Demand Chart -->
+          <div class="bg-white rounded-xl shadow-lg p-6">
+            <h4 class="text-xl font-semibold mb-4">Current Blood Type Demand</h4>
+            <div class="h-64">
+              <canvas id="bloodDemandChart"></canvas>
             </div>
-            <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">AI Suggested</span>
+            <p class="text-sm text-gray-500 mt-4">
+              Our AI analyzes hospital requests, seasonal trends, and historical data to predict current demand.
+            </p>
           </div>
-          <p class="mb-4">Based on your blood type and local hospital needs, the most impactful donation you could make right now would be:</p>
-          <div class="bg-white rounded-lg p-4 text-center mb-4">
-            <span class="text-2xl font-bold text-red-600">Whole Blood</span>
-          </div>
-          <p class="text-sm text-gray-600">AI has identified that your donation could help up to 3 patients within your community.</p>
-        </div>
 
-        <!-- Recommendation Card 2 -->
-        <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow p-6 border border-blue-100">
-          <div class="flex justify-between items-start mb-4">
-            <div class="flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600 mr-2">
-                <circle cx="12" cy="12" r="10"></circle>
-                <polyline points="12 6 12 12 16 14"></polyline>
-              </svg>
-              <h4 class="text-lg font-semibold">Optimal Timing</h4>
+          <!-- Regional Needs Map -->
+          <div class="bg-white rounded-xl shadow-lg p-6">
+            <h4 class="text-xl font-semibold mb-4">Critical Need Areas</h4>
+            <div class="space-y-3 mb-4">
+              <div class="flex items-center justify-between">
+                <span>NYC Metropolitan Area</span>
+                <div class="w-64 bg-gray-200 rounded-full h-2.5">
+                  <div class="bg-red-600 h-2.5 rounded-full" style="width: 85%"></div>
+                </div>
+                <span class="font-bold text-red-600">High</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span>Chicago Region</span>
+                <div class="w-64 bg-gray-200 rounded-full h-2.5">
+                  <div class="bg-yellow-500 h-2.5 rounded-full" style="width: 65%"></div>
+                </div>
+                <span class="font-bold text-yellow-600">Medium</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span>LA County</span>
+                <div class="w-64 bg-gray-200 rounded-full h-2.5">
+                  <div class="bg-yellow-500 h-2.5 rounded-full" style="width: 60%"></div>
+                </div>
+                <span class="font-bold text-yellow-600">Medium</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span>Dallas-Fort Worth</span>
+                <div class="w-64 bg-gray-200 rounded-full h-2.5">
+                  <div class="bg-green-500 h-2.5 rounded-full" style="width: 40%"></div>
+                </div>
+                <span class="font-bold text-green-600">Low</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span>Miami-Dade</span>
+                <div class="w-64 bg-gray-200 rounded-full h-2.5">
+                  <div class="bg-red-600 h-2.5 rounded-full" style="width: 78%"></div>
+                </div>
+                <span class="font-bold text-red-600">High</span>
+              </div>
             </div>
-            <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">AI Suggested</span>
+            <p class="text-sm text-gray-500">
+              AI predicts regional needs based on population, hospital density, and recent emergencies.
+            </p>
           </div>
-          <p class="mb-4">Our AI has analyzed hospital schedules and donation patterns to recommend the best time for your next donation:</p>
-          <div class="bg-white rounded-lg p-4 text-center mb-4">
-            <span class="text-2xl font-bold text-blue-600">This Weekend</span>
-            <p class="text-sm text-gray-500">Saturday, 10AM - 2PM</p>
-          </div>
-          <p class="text-sm text-gray-600">Weekend donations are critical as they help maintain supply for Monday emergency procedures.</p>
         </div>
 
-        <!-- Recommendation Card 3 -->
-        <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow p-6 border border-blue-100">
-          <div class="flex justify-between items-start mb-4">
-            <div class="flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600 mr-2">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                <circle cx="12" cy="10" r="3"></circle>
-              </svg>
-              <h4 class="text-lg font-semibold">Nearest Center</h4>
+        <!-- AI-Generated Insights -->
+        <div class="mt-8 bg-blue-50 border border-blue-100 rounded-xl p-6">
+          <h4 class="text-xl font-semibold mb-3 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600 mr-2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            AI-Generated Insights
+          </h4>
+          <ul class="space-y-2 text-gray-700">
+            <li class="flex items-start">
+              <span class="text-red-600 mr-2">●</span>
+              <span>Critical shortage of O- blood detected nationwide - donation urgently needed</span>
+            </li>
+            <li class="flex items-start">
+              <span class="text-yellow-500 mr-2">●</span>
+              <span>Platelet donations show seasonal decline - expect 15% reduction in available supply</span>
+            </li>
+            <li class="flex items-start">
+              <span class="text-green-500 mr-2">●</span>
+              <span>AB+ supply levels stable across most regions</span>
+            </li>
+            <li class="flex items-start">
+              <span class="text-blue-500 mr-2">●</span>
+              <span>AI predicts increased demand for all blood types during upcoming holiday season</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- AI-Powered Personalized Recommendations -->
+    <section class="py-16 bg-white">
+      <div class="max-w-6xl mx-auto px-4">
+        <div class="text-center mb-12">
+          <h3 class="text-3xl font-semibold">Personalized AI Recommendations</h3>
+          <p class="text-gray-600 mt-2">Our AI analyzes your profile to provide tailored donation suggestions</p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6">
+          <!-- Recommendation Card 1 -->
+          <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow p-6 border border-blue-100">
+            <div class="flex justify-between items-start mb-4">
+              <div class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600 mr-2">
+                  <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                </svg>
+                <h4 class="text-lg font-semibold">Ideal Donation Type</h4>
+              </div>
+              <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">AI Suggested</span>
             </div>
-            <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">AI Suggested</span>
+            <p class="mb-4">Based on your blood type and local hospital needs, the most impactful donation you could make right now would be:</p>
+            <div class="bg-white rounded-lg p-4 text-center mb-4">
+              <span class="text-2xl font-bold text-red-600">Whole Blood</span>
+            </div>
+            <p class="text-sm text-gray-600">AI has identified that your donation could help up to 3 patients within your community.</p>
           </div>
-          <p class="mb-4">Based on your location, our AI recommends the following donation center that's currently understaffed:</p>
-          <div class="bg-white rounded-lg p-4 text-center mb-4">
-            <span class="text-xl font-bold text-blue-600">Memorial Blood Center</span>
-            <p class="text-sm text-gray-500">2.3 miles away • Wait time: 15 min</p>
+
+          <!-- Recommendation Card 2 -->
+          <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow p-6 border border-blue-100">
+            <div class="flex justify-between items-start mb-4">
+              <div class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600 mr-2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <h4 class="text-lg font-semibold">Optimal Timing</h4>
+              </div>
+              <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">AI Suggested</span>
+            </div>
+            <p class="mb-4">Our AI has analyzed hospital schedules and donation patterns to recommend the best time for your next donation:</p>
+            <div class="bg-white rounded-lg p-4 text-center mb-4">
+              <span class="text-2xl font-bold text-blue-600">This Weekend</span>
+              <p class="text-sm text-gray-500">Saturday, 10AM - 2PM</p>
+            </div>
+            <p class="text-sm text-gray-600">Weekend donations are critical as they help maintain supply for Monday emergency procedures.</p>
           </div>
-          <p class="text-sm text-gray-600">This center is experiencing 25% higher demand than usual this week.</p>
-        </div>
-      </div>
 
-      <div class="mt-12 text-center">
-        <button id="personalizeBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg text-md px-6 py-3 inline-flex items-center transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
-            <circle cx="12" cy="12" r="3"></circle>
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-          </svg>
-          Get Personalized AI Recommendations
-        </button>
-      </div>
-    </div>
-  </section>
-
-  <!-- AI Assistant Floating Button and Chat Window -->
-  <div id="ai-assistant-container">
-    <div id="ai-chat-window">
-      <div class="bg-blue-600 text-white p-4 flex justify-between items-center">
-        <div class="flex items-center">
-          <i class="fas fa-robot mr-2"></i>
-          <h3 class="font-semibold">BloodLink Assistant</h3>
+          <!-- Recommendation Card 3 -->
+          <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow p-6 border border-blue-100">
+            <div class="flex justify-between items-start mb-4">
+              <div class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600 mr-2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                <h4 class="text-lg font-semibold">Nearest Center</h4>
+              </div>
+              <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">AI Suggested</span>
+            </div>
+            <p class="mb-4">Based on your location, our AI recommends the following donation center that's currently understaffed:</p>
+            <div class="bg-white rounded-lg p-4 text-center mb-4">
+              <span class="text-xl font-bold text-blue-600">Memorial Blood Center</span>
+              <p class="text-sm text-gray-500">2.3 miles away • Wait time: 15 min</p>
+            </div>
+            <p class="text-sm text-gray-600">This center is experiencing 25% higher demand than usual this week.</p>
+          </div>
         </div>
-        <button id="close-chat" class="text-white hover:text-blue-200 transition">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <div id="chat-messages" class="space-y-3">
-        <!-- Messages will be added here -->
-      </div>
-      <div class="p-4 border-t">
-        <div class="flex items-center">
-          <input
-            type="text"
-            id="user-input"
-            placeholder="Ask about blood donation..."
-            class="flex-1 p-3 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <button
-            id="send-message"
-            class="bg-blue-600 text-white p-3 rounded-r-lg hover:bg-blue-700 transition"
-          >
-            <i class="fas fa-paper-plane"></i>
+
+        <div class="mt-12 text-center">
+          <button id="personalizeBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg text-md px-6 py-3 inline-flex items-center transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+            Get Personalized AI Recommendations
           </button>
         </div>
       </div>
-    </div>
-    <button
-      id="open-chat"
-      class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-full p-4 flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
-    >
-      <i class="fas fa-robot text-2xl"></i>
-    </button>
-  </div>
+    </section>
 
-  <!-- Footer -->
-  <footer class="bg-white border-t py-6 mt-10">
-    <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-sm">
-      <p>&copy; 2025 DonorSync. All rights reserved.</p>
-      <div class="flex gap-4 mt-2 md:mt-0">
-        <a href="#" class="hover:underline">Privacy</a>
-        <a href="#" class="hover:underline">Terms</a>
-        <a href="#" class="hover:underline">Contact</a>
+    <!-- Footer -->
+    <footer class="bg-white border-t py-6 mt-10 relative z-10">
+      <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-sm">
+        <p>&copy; 2025 DonorSync. All rights reserved.</p>
+        <div class="flex gap-4 mt-2 md:mt-0">
+          <a href="privacy.html" class="hover:underline">Privacy</a>
+          <a href="terms.html" class="hover:underline">Terms</a>
+          <a href="contact.html" class="hover:underline">Contact</a>
+        </div>
       </div>
+    </footer>
+
+  <!-- Cookie Consent Popup -->
+  <div class="cookie-consent">
+    <div class="flex items-start mb-4">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <h3 class="text-lg font-semibold text-blue-600">We value your privacy</h3>
     </div>
-  </footer>
+    <p class="text-gray-600 mb-4">We use cookies to enhance your browsing experience and analyze our traffic. By clicking "Accept", you consent to our use of cookies.</p>
+    <div class="flex justify-end gap-2">
+      <button id="cookie-decline" class="px-4 py-2 text-blue-600 hover:text-blue-800">Decline</button>
+      <button id="cookie-accept" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Accept</button>
+    </div>
+  </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -455,6 +445,28 @@
         });
       }
       
+      // Cookie Consent
+      const cookieConsent = document.querySelector('.cookie-consent');
+      const cookieAccept = document.getElementById('cookie-accept');
+      const cookieDecline = document.getElementById('cookie-decline');
+      
+      // Check if consent was already given
+      if (!localStorage.getItem('cookieConsent')) {
+        setTimeout(() => {
+          cookieConsent.classList.add('show');
+        }, 1000);
+      }
+      
+      cookieAccept.addEventListener('click', () => {
+        localStorage.setItem('cookieConsent', 'accepted');
+        cookieConsent.classList.remove('show');
+      });
+      
+      cookieDecline.addEventListener('click', () => {
+        localStorage.setItem('cookieConsent', 'declined');
+        cookieConsent.classList.remove('show');
+      });
+      
       // Simulate dynamic data updates for a more realistic AI behavior
       setInterval(() => {
         // Update demand chart with slight variations
@@ -465,591 +477,6 @@
         });
         bloodDemandChart.update();
       }, 5000); // Update every 5 seconds
-    });
-
-    // AI Assistant Chat Functionality
-    document.addEventListener('DOMContentLoaded', function() {
-      const openChatBtn = document.getElementById('open-chat');
-      const closeChatBtn = document.getElementById('close-chat');
-      const chatWindow = document.getElementById('ai-chat-window');
-      const chatMessages = document.getElementById('chat-messages');
-      const userInput = document.getElementById('user-input');
-      const sendMessageBtn = document.getElementById('send-message');
-      
-      // Enhanced sample responses for the AI assistant with more topics
-      const aiResponses = {
-        greetings: [
-          "Hello! I'm your BloodLink Assistant. How can I help you today?",
-          "Welcome to BloodLink! I'm here to assist with any questions about blood donation.",
-          "Hi there! I'm your AI donation assistant. I can help with information about blood types, eligibility, or finding donation centers."
-        ],
-        bloodTypes: "There are 8 main blood types: O+, O-, A+, A-, B+, B-, AB+, and AB-. O- is considered the universal donor as it can be given to any blood type in emergency situations. AB+ is the universal recipient. Blood type compatibility is critical for transfusions - would you like to know more about specific compatibility?",
-        donationProcess: "The blood donation process is simple and takes about 10-15 minutes for the actual donation. The entire visit takes about an hour including registration, a mini health check (temperature, blood pressure, pulse, and hemoglobin test), the donation itself, and a short rest with refreshments afterward.",
-        eligibility: "Most healthy adults are eligible to donate blood. Basic requirements include being at least 17 years old (16 with parental consent in some states), weighing at least 110 pounds, and being in good health. Some factors that might temporarily defer donation include recent illness, low iron levels, certain medications, and travel to specific regions.",
-        benefits: "Donating blood has several benefits: it helps save lives, you get a free mini health check-up, and your body replaces the blood volume within 24 hours. Regular donation may also reduce the risk of certain health problems like hemochromatosis and may help maintain healthy iron levels.",
-        universal: "Type O- blood is known as the universal donor type because it can be transfused to almost any patient in need, regardless of their blood type. This makes it extremely valuable in emergency situations when there's no time to determine a patient's blood type. Only about 7% of the population has O- blood, making these donors particularly important.",
-        locations: "You can find the nearest donation center by clicking on 'Become a Donor' in the navigation menu. We have permanent donation centers in most major cities and regular mobile blood drives at community centers, workplaces, and schools. Would you like me to help you locate the nearest center?",
-        frequency: "Most people can donate whole blood every 56 days (8 weeks). If you donate platelets, you can donate more frequently - as often as every 7 days, up to 24 times a year. Plasma donors can donate every 28 days, and double red cell donors can donate every 112 days.",
-        preparation: "Before donating, make sure to: drink plenty of water, eat a healthy meal, avoid fatty foods, get a good night's sleep, and bring a photo ID. Wearing a short-sleeved shirt or one with sleeves that roll up easily is also helpful.",
-        aftercare: "After donating: drink extra fluids for the next 48 hours, avoid strenuous physical activity for 24 hours, don't smoke for 2 hours, keep the bandage on for at least 4 hours, and eat iron-rich foods like spinach, beans, and red meat to help replenish your iron stores.",
-        myths: "Common myths about blood donation include that it's painful (most people feel just a quick pinch), that it takes too long (the actual donation takes only 8-10 minutes), and that it's not safe (all equipment is sterile and used only once). Donating blood is very safe and truly saves lives!",
-        impact: "Your blood donation can save up to three lives! Blood is used for accident and burn victims, heart surgery patients, organ transplant recipients, and those battling cancer, among others. Every two seconds, someone in the U.S. needs blood, and a single car accident victim can require as many as 100 units of blood.",
-        compatibility: {
-          "O-": "As an O- donor, you're a universal donor! Your blood can be given to any patient regardless of their blood type, making it vital for emergency situations.",
-          "O+": "O+ blood can be given to anyone with a positive blood type (O+, A+, B+, and AB+). That's about 84% of the population!",
-          "A-": "A- blood can be given to A-, A+, AB-, and AB+ recipients. As a negative blood type, you're always in demand.",
-          "A+": "A+ blood can be given to A+ and AB+ recipients. This is one of the most common blood types.",
-          "B-": "B- blood can be given to B-, B+, AB-, and AB+ recipients. B- is quite rare, making your donations extremely valuable.",
-          "B+": "B+ blood can be given to B+ and AB+ recipients. Your donations are especially important for certain ethnic populations.",
-          "AB-": "AB- is very rare and can be given to AB- and AB+ recipients. Though limited in who can receive it, your donations are still crucial.",
-          "AB+": "As an AB+ donor, you're a universal recipient! While your blood is only used for other AB+ patients, you can receive blood from any donor."
-        },
-        appointment: "You can schedule a blood donation appointment directly through our website. Click on 'Become a Donor' in the navigation menu, or I can guide you through the process. Would you prefer to schedule for a specific day or location?",
-        urgency: "Blood donation is especially critical right now. Our current inventory shows shortages in several blood types, particularly O- and B-. One donation can save up to three lives, and the need is constant - every two seconds, someone in the US needs blood.",
-        safety: "Your safety is our top priority. All donation equipment is sterile and used only once. Our staff are highly trained professionals, and the FDA strictly regulates all blood collection facilities. The donation process itself is very safe with minimal risks like temporary dizziness or bruising.",
-        plasmaDonation: "Plasma donation differs from whole blood donation. The process takes longer (about 1-2 hours) as your blood is drawn, the plasma separated, and the red cells returned to your body. Plasma donors can donate more frequently - as often as twice per week, because your body replaces plasma quickly (within 24-48 hours).",
-        plateletDonation: "Platelet donation is a specialized type of donation that takes about 2-3 hours. Your blood is drawn, platelets are collected, and the rest is returned to your body. Platelets are vital for cancer patients, burn victims, and those undergoing major surgeries. You can donate platelets up to 24 times per year!",
-        ironLevels: "Blood donation temporarily reduces your iron levels. While your body replaces the liquid portion of blood within 24 hours, it takes 4-6 weeks to fully restore iron levels. We recommend eating iron-rich foods like red meat, spinach, beans, and iron-fortified cereals before and after donating.",
-        firstTime: "For first-time donors, the process is straightforward but might feel intimidating. You'll complete a registration form, have a mini-health check, and then donate. Our staff will guide you through every step, and most donors report the process is much easier than they expected. Would you like specific tips for your first donation?",
-        covidProtocols: "We've implemented comprehensive COVID-19 safety protocols at all donation centers. These include enhanced cleaning, mandatory masks for staff, physical distancing measures, temperature checks, and screening questions. All these precautions ensure both donors and staff remain safe throughout the donation process.",
-        fallback: "I don't have that specific information, but I'd be happy to help you find it. You can also check our website resources or contact our support team at support@bloodlink.org for more detailed assistance."
-      };
-      
-      // Enhanced conversation context tracking
-      let conversationContext = {
-        bloodTypeDiscussed: false,
-        eligibilityDiscussed: false,
-        donationProcessDiscussed: false, 
-        appointmentInterest: false,
-        userName: null,
-        userBloodType: null,
-        messageCount: 0,
-        lastQuestion: null,
-        suggestedTopics: []
-      };
-
-      // Add message to the chat with enhanced styling
-      function addMessage(message, sender) {
-        const messageDiv = document.createElement('div');
-        messageDiv.classList.add(sender === 'user' ? 'user-message' : 'ai-message');
-        
-        // Add fancy entrance animation for AI messages
-        if (sender === 'ai') {
-          messageDiv.style.opacity = '0';
-          messageDiv.style.transform = 'translateY(10px)';
-          setTimeout(() => {
-            messageDiv.style.opacity = '1';
-            messageDiv.style.transform = 'translateY(0)';
-            messageDiv.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-          }, 100);
-        }
-        
-        // Format links, numbers, and blood types in messages
-        const formattedMessage = message
-          .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" class="text-blue-500 underline">$1</a>')
-          .replace(/(\d{3}-\d{3}-\d{4})/g, '<span class="font-medium">$1</span>')
-          .replace(/\b(O-|O\+|A-|A\+|B-|B\+|AB-|AB\+)\b/g, '<span class="font-semibold text-red-600">$1</span>');
-          
-        // Replace bullet points and line breaks for better formatting
-        const formattedHtml = formattedMessage
-          .replace(/\n/g, '<br>')
-          .replace(/• /g, '• ');
-          
-        messageDiv.innerHTML = formattedHtml;
-        chatMessages.appendChild(messageDiv);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-        
-        // Update context
-        conversationContext.messageCount++;
-      }
-
-      // Show typing indicator with improved animation
-      function showTypingIndicator() {
-        const indicator = document.createElement('div');
-        indicator.classList.add('typing-indicator');
-        indicator.id = 'typing-indicator';
-        
-        for (let i = 0; i < 3; i++) {
-          const dot = document.createElement('div');
-          dot.classList.add('typing-dot');
-          indicator.appendChild(dot);
-        }
-        
-        chatMessages.appendChild(indicator);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-      }
-
-      // Remove typing indicator
-      function removeTypingIndicator() {
-        const indicator = document.getElementById('typing-indicator');
-        if (indicator) {
-          indicator.remove();
-        }
-      }
-
-      // Generate AI response based on user input with improved context awareness
-      function generateResponse(input) {
-        const lowercaseInput = input.toLowerCase();
-        
-        // Extract potential name for personalization
-        const nameMatch = lowercaseInput.match(/my name is (\w+)/i);
-        if (nameMatch && nameMatch[1]) {
-          conversationContext.userName = nameMatch[1];
-        }
-        
-        // Extract blood type if mentioned
-        const bloodTypeMatch = lowercaseInput.match(/\b(a\+|a\-|b\+|b\-|ab\+|ab\-|o\+|o\-)\b/i);
-        if (bloodTypeMatch) {
-          conversationContext.userBloodType = bloodTypeMatch[0].toUpperCase();
-        }
-        
-        // Save the current input as last question for follow-ups
-        conversationContext.lastQuestion = lowercaseInput;
-        
-        // Check for blood type specific compatibility information
-        if (bloodTypeMatch && lowercaseInput.includes("compatibility")) {
-          const bloodType = bloodTypeMatch[0].toUpperCase();
-          conversationContext.bloodTypeDiscussed = true;
-          conversationContext.suggestedTopics = ["donation process", "eligibility", "universal donors"];
-          return aiResponses.compatibility[bloodType] || aiResponses.bloodTypes;
-        }
-        
-        // Check for specific topics with expanded detection
-        if (lowercaseInput.match(/\b(hello|hi|hey|howdy|greetings)\b/) || lowercaseInput.includes("good") && lowercaseInput.match(/\b(morning|afternoon|evening)\b/)) {
-          const greeting = aiResponses.greetings[Math.floor(Math.random() * aiResponses.greetings.length)];
-          
-          // Personalize if we know the name
-          if (conversationContext.userName) {
-            return `Hello ${conversationContext.userName}! ${greeting.split('!')[1]}`;
-          }
-          
-          conversationContext.suggestedTopics = ["blood types", "eligibility", "donation process"];
-          return greeting;
-        } 
-        else if (lowercaseInput.match(/\b(blood type|types of blood|blood groups|rh factor)\b/)) {
-          conversationContext.bloodTypeDiscussed = true;
-          conversationContext.suggestedTopics = ["compatibility", "universal donors", "donation process"];
-          return aiResponses.bloodTypes;
-        } 
-        else if (lowercaseInput.match(/\b(process|how to donate|what happens|steps|procedure)\b/)) {
-          conversationContext.donationProcessDiscussed = true;
-          conversationContext.suggestedTopics = ["preparation", "aftercare", "eligibility"];
-          return aiResponses.donationProcess;
-        } 
-        else if (lowercaseInput.match(/\b(eligible|can i donate|requirements|qualify|allowed to)\b/)) {
-          conversationContext.eligibilityDiscussed = true;
-          conversationContext.suggestedTopics = ["blood types", "first time", "safety"];
-          
-          // Personalize with blood type if we know it
-          if (conversationContext.userBloodType) {
-            return `${aiResponses.eligibility}\n\nWith your blood type ${conversationContext.userBloodType}, your donation would be particularly valuable. All blood types are needed, but each has unique uses in medical settings.`;
-          }
-          
-          return aiResponses.eligibility;
-        }
-        else if (lowercaseInput.match(/\b(benefit|why donate|what do i get|why should i|healthy)\b/)) {
-          conversationContext.suggestedTopics = ["impact", "frequency", "iron levels"];
-          return aiResponses.benefits;
-        } 
-        else if (lowercaseInput.match(/\b(universal|o-|o neg|type o negative)\b/)) {
-          conversationContext.bloodTypeDiscussed = true;
-          conversationContext.suggestedTopics = ["compatibility", "urgency", "blood types"];
-          return aiResponses.universal;
-        } 
-        else if (lowercaseInput.match(/\b(where|location|center|near me|close|find)\b/)) {
-          conversationContext.suggestedTopics = ["appointment", "preparation", "first time"];
-          return aiResponses.locations;
-        } 
-        else if (lowercaseInput.match(/\b(how often|frequency|when again|next donation|wait between)\b/)) {
-          conversationContext.suggestedTopics = ["donation process", "different types", "plasma donation"];
-          return aiResponses.frequency;
-        } 
-        else if (lowercaseInput.match(/\b(before|prepare|ready|getting ready|eat|drink)\b/)) {
-          conversationContext.suggestedTopics = ["aftercare", "iron levels", "eligibility"];
-          return aiResponses.preparation;
-        } 
-        else if (lowercaseInput.match(/\b(after|care|recovery|afterwards|post donation)\b/)) {
-          conversationContext.suggestedTopics = ["preparation", "frequency", "iron levels"];
-          return aiResponses.aftercare;
-        } 
-        else if (lowercaseInput.match(/\b(myth|afraid|scared|pain|hurt|safe|risk|faint|weak)\b/)) {
-          conversationContext.suggestedTopics = ["safety", "first time", "benefits"];
-          return aiResponses.myths;
-        } 
-        else if (lowercaseInput.match(/\b(impact|save|help|difference|patient|recipient)\b/)) {
-          conversationContext.suggestedTopics = ["urgency", "benefits", "universal donors"];
-          return aiResponses.impact;
-        } 
-        else if (lowercaseInput.match(/\b(compatibility|compatible|match|transfusion)\b/)) {
-          conversationContext.bloodTypeDiscussed = true;
-          conversationContext.suggestedTopics = ["blood types", "universal donors", "impact"];
-          return "Blood type compatibility is essential for safe transfusions. Type O- is the universal donor, while AB+ is the universal recipient. Would you like to know about compatibility for a specific blood type?";
-        }
-        else if (lowercaseInput.match(/\b(appointment|schedule|book|reserve|sign up|when can i)\b/)) {
-          conversationContext.appointmentInterest = true;
-          conversationContext.suggestedTopics = ["locations", "preparation", "eligibility"];
-          return aiResponses.appointment;
-        }
-        else if (lowercaseInput.match(/\b(urgent|urgency|need|emergency|critical|shortage)\b/)) {
-          conversationContext.suggestedTopics = ["impact", "universal donors", "appointment"];
-          return aiResponses.urgency;
-        }
-        else if (lowercaseInput.match(/\b(safe|safety|risk|danger|covid|coronavirus|infection|disease)\b/)) {
-          conversationContext.suggestedTopics = ["covid protocols", "myths", "donation process"];
-          return lowercaseInput.includes("covid") ? aiResponses.covidProtocols : aiResponses.safety;
-        }
-        else if (lowercaseInput.match(/\b(plasma|plasmapheresis)\b/)) {
-          conversationContext.suggestedTopics = ["platelet donation", "frequency", "impact"];
-          return aiResponses.plasmaDonation;
-        }
-        else if (lowercaseInput.match(/\b(platelet|platelets|thrombocytes)\b/)) {
-          conversationContext.suggestedTopics = ["plasma donation", "frequency", "impact"];
-          return aiResponses.plateletDonation;
-        }
-        else if (lowercaseInput.match(/\b(iron|ferritin|anemia|hemoglobin)\b/)) {
-          conversationContext.suggestedTopics = ["preparation", "aftercare", "eligibility"];
-          return aiResponses.ironLevels;
-        }
-        else if (lowercaseInput.match(/\b(first time|never donated|new donor|beginner)\b/)) {
-          conversationContext.suggestedTopics = ["preparation", "myths", "safety"];
-          return aiResponses.firstTime;
-        }
-        else if (lowercaseInput.match(/\b(covid|coronavirus|pandemic|virus protection|safety measure)\b/)) {
-          conversationContext.suggestedTopics = ["safety", "appointment", "impact"];
-          return aiResponses.covidProtocols;
-        }
-        else if (lowercaseInput.match(/\b(thank you|thanks|appreciate|helpful)\b/)) {
-          return "You're welcome! I'm happy to help with any other questions. Is there anything else you'd like to know about blood donation?";
-        }
-        
-        // If no specific topic was detected
-        if (conversationContext.messageCount > 1) {
-          // Offer contextual suggestions based on conversation history
-          if (!conversationContext.bloodTypeDiscussed) {
-            conversationContext.suggestedTopics = ["blood types", "compatibility", "universal donors"];
-            return "I'm not sure I understand. Would you like to learn about blood types and compatibility? This information is important for both donors and recipients.";
-          } else if (!conversationContext.eligibilityDiscussed) {
-            conversationContext.suggestedTopics = ["eligibility", "requirements", "first time"];
-            return "I'm not sure about that. Perhaps you're interested in blood donation eligibility requirements? Most healthy adults can donate, but there are some important criteria to check.";
-          } else if (!conversationContext.donationProcessDiscussed) {
-            conversationContext.suggestedTopics = ["donation process", "preparation", "aftercare"];
-            return "I'm not sure how to answer that. Would you like to learn about the blood donation process? I can explain what happens during your visit.";
-          } else if (!conversationContext.appointmentInterest) {
-            conversationContext.suggestedTopics = ["appointment", "locations", "urgency"];
-            return "I'm not sure about that. Would you like to schedule a donation appointment? Our community is always in need of donors.";
-          }
-        }
-        
-        conversationContext.suggestedTopics = ["blood types", "eligibility", "donation process"];
-        return aiResponses.fallback;
-      }
-
-      // Add suggestion chips after AI responses
-      function addSuggestionChips() {
-        if (conversationContext.suggestedTopics && conversationContext.suggestedTopics.length > 0) {
-          // Create suggestion chips container
-          const suggestionsDiv = document.createElement('div');
-          suggestionsDiv.classList.add('suggestion-chips');
-          suggestionsDiv.style.display = 'flex';
-          suggestionsDiv.style.flexWrap = 'wrap';
-          suggestionsDiv.style.gap = '8px';
-          suggestionsDiv.style.marginTop = '10px';
-          
-          // Add suggestion chips based on context
-          conversationContext.suggestedTopics.forEach(topic => {
-            const displayText = {
-              "blood types": "Blood Types?",
-              "compatibility": "Blood Compatibility?",
-              "donation process": "Donation Process?",
-              "eligibility": "Am I Eligible?",
-              "benefits": "Benefits of Donating?",
-              "universal donors": "About Universal Donors",
-              "locations": "Donation Locations",
-              "frequency": "How Often Can I Donate?",
-              "preparation": "How to Prepare",
-              "aftercare": "After Donation Care",
-              "myths": "Common Myths",
-              "impact": "Lives Saved Impact",
-              "appointment": "Schedule Appointment",
-              "urgency": "Current Blood Needs",
-              "safety": "Is Donation Safe?",
-              "plasma donation": "Plasma Donation",
-              "platelet donation": "Platelet Donation",
-              "iron levels": "Iron & Donation",
-              "first time": "First-time Donor Tips",
-              "covid protocols": "COVID-19 Safety",
-              "requirements": "Donation Requirements",
-              "different types": "Types of Donations"
-            }[topic] || topic;
-            
-            const chip = document.createElement('button');
-            chip.textContent = displayText;
-            chip.style.backgroundColor = '#EFF6FF';
-            chip.style.color = '#2563EB';
-            chip.style.border = 'none';
-            chip.style.borderRadius = '16px';
-            chip.style.padding = '8px 12px';
-            chip.style.fontSize = '13px';
-            chip.style.cursor = 'pointer';
-            chip.style.transition = 'all 0.2s';
-            
-            chip.addEventListener('mouseover', () => {
-              chip.style.backgroundColor = '#DBEAFE';
-              chip.style.transform = 'translateY(-2px)';
-            });
-            
-            chip.addEventListener('mouseout', () => {
-              chip.style.backgroundColor = '#EFF6FF';
-              chip.style.transform = 'translateY(0)';
-            });
-            
-            chip.addEventListener('click', () => {
-              userInput.value = displayText;
-              sendMessage();
-            });
-            
-            suggestionsDiv.appendChild(chip);
-          });
-          
-          chatMessages.appendChild(suggestionsDiv);
-          chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-      }
-
-      // Send message function with improved response timing
-      function sendMessage() {
-        const message = userInput.value.trim();
-        if (message.length === 0) return;
-        
-        // Add user message to chat and clear input
-        addMessage(message, 'user');
-        userInput.value = '';
-        
-        // Disable input while "thinking"
-        userInput.disabled = true;
-        sendMessageBtn.disabled = true;
-        
-        // Show typing indicator
-        showTypingIndicator();
-        
-        // Simulate AI thinking and responding with variable timing
-        // Longer responses take a bit more time to simulate realistic typing
-        const response = generateResponse(message);
-        const typingTime = Math.min(2500, 800 + response.length * 4);
-        
-        setTimeout(() => {
-          removeTypingIndicator();
-          addMessage(response, 'ai');
-          
-          // Add suggestion chips after a short delay
-          setTimeout(() => {
-            addSuggestionChips();
-          }, 500);
-          
-          // Re-enable input
-          userInput.disabled = false;
-          sendMessageBtn.disabled = false;
-          userInput.focus();
-        }, typingTime);
-      }
-
-      // Add chat notification badge
-      function addNotificationBadge() {
-        // Remove existing badge if present
-        const existingBadge = document.getElementById('chat-notification-badge');
-        if (existingBadge) {
-          existingBadge.remove();
-        }
-        
-        // Add new badge
-        const badge = document.createElement('div');
-        badge.id = 'chat-notification-badge';
-        badge.style.position = 'absolute';
-        badge.style.top = '-5px';
-        badge.style.right = '-5px';
-        badge.style.width = '12px';
-        badge.style.height = '12px';
-        badge.style.borderRadius = '50%';
-        badge.style.backgroundColor = '#EF4444';
-        badge.style.border = '2px solid white';
-        
-        openChatBtn.style.position = 'relative';
-        openChatBtn.appendChild(badge);
-      }
-
-      // Event listeners
-      openChatBtn.addEventListener('click', () => {
-        chatWindow.style.display = 'block';
-        
-        // Remove notification badge when chat is opened
-        const badge = document.getElementById('chat-notification-badge');
-        if (badge) {
-          badge.remove();
-        }
-        
-        if (chatMessages.children.length === 0) {
-          showInitialMessage();
-        }
-        
-        // Add subtle animation when opening
-        chatWindow.style.opacity = '0';
-        chatWindow.style.transform = 'translateY(20px)';
-        
-        setTimeout(() => {
-          chatWindow.style.opacity = '1';
-          chatWindow.style.transform = 'translateY(0)';
-          chatWindow.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-          
-          // Focus the input field
-          userInput.focus();
-        }, 50);
-      });
-
-      closeChatBtn.addEventListener('click', () => {
-        // Animate closing
-        chatWindow.style.opacity = '0';
-        chatWindow.style.transform = 'translateY(20px)';
-        
-        setTimeout(() => {
-          chatWindow.style.display = 'none';
-          // Reset transition
-          chatWindow.style.transition = 'none';
-        }, 300);
-      });
-
-      sendMessageBtn.addEventListener('click', sendMessage);
-
-      userInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          sendMessage();
-        }
-      });
-      
-      // Show input status (when user is typing)
-      userInput.addEventListener('input', () => {
-        if (userInput.value.trim().length > 0) {
-          sendMessageBtn.style.color = '#2563EB';
-        } else {
-          sendMessageBtn.style.color = '';
-        }
-      });
-
-      // Show initial message and suggested questions with improved UI
-      function showInitialMessage() {
-        const randomGreeting = aiResponses.greetings[Math.floor(Math.random() * aiResponses.greetings.length)];
-        addMessage(randomGreeting, 'ai');
-        
-        // Add welcome message with donation urgency
-        setTimeout(() => {
-          addMessage("We currently have a critical need for all blood types, especially O- (universal donors). Your donation could save up to 3 lives!", 'ai');
-          
-          // After welcome message, show suggestion chips
-          setTimeout(() => {
-            const suggestionsDiv = document.createElement('div');
-            suggestionsDiv.classList.add('suggestion-chips');
-            suggestionsDiv.style.display = 'flex';
-            suggestionsDiv.style.flexWrap = 'wrap';
-            suggestionsDiv.style.gap = '8px';
-            suggestionsDiv.style.marginTop = '12px';
-            
-            const suggestions = [
-              "Blood Types & Compatibility",
-              "Am I Eligible to Donate?",
-              "Where Can I Donate?",
-              "What's the Donation Process?",
-              "Why Are O- Donors Special?"
-            ];
-            
-            suggestions.forEach(suggestion => {
-              const chip = document.createElement('button');
-              chip.textContent = suggestion;
-              chip.style.backgroundColor = '#EFF6FF';
-              chip.style.color = '#2563EB';
-              chip.style.border = 'none';
-              chip.style.borderRadius = '16px';
-              chip.style.padding = '8px 12px';
-              chip.style.fontSize = '13px';
-              chip.style.cursor = 'pointer';
-              chip.style.transition = 'all 0.2s';
-              chip.style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)';
-              
-              chip.addEventListener('mouseover', () => {
-                chip.style.backgroundColor = '#DBEAFE';
-                chip.style.transform = 'translateY(-2px)';
-                chip.style.boxShadow = '0 4px 6px rgba(0,0,0,0.05)';
-              });
-              
-              chip.addEventListener('mouseout', () => {
-                chip.style.backgroundColor = '#EFF6FF';
-                chip.style.transform = 'translateY(0)';
-                chip.style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)';
-              });
-              
-              chip.addEventListener('click', () => {
-                userInput.value = suggestion;
-                sendMessage();
-              });
-              
-              suggestionsDiv.appendChild(chip);
-            });
-            
-            chatMessages.appendChild(suggestionsDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-          }, 1000);
-        }, 1000);
-        
-        // Add notification badge after 30 seconds if chat isn't open
-        setTimeout(() => {
-          if (chatWindow.style.display !== 'block') {
-            addNotificationBadge();
-          }
-          const suggestionsDiv = document.createElement('div');
-          suggestionsDiv.classList.add('suggestion-chips');
-          suggestionsDiv.style.display = 'flex';
-          suggestionsDiv.style.flexWrap = 'wrap';
-          suggestionsDiv.style.gap = '8px';
-          suggestionsDiv.style.marginTop = '12px';
-          
-          const suggestions = [
-            "What blood types are compatible?",
-            "Am I eligible to donate?",
-            "Where can I donate blood?",
-            "What happens during donation?",
-            "Why is O- special?"
-          ];
-          
-          suggestions.forEach(suggestion => {
-            const chip = document.createElement('button');
-            chip.textContent = suggestion;
-            chip.style.backgroundColor = '#EFF6FF';
-            chip.style.color = '#2563EB';
-            chip.style.border = 'none';
-            chip.style.borderRadius = '16px';
-            chip.style.padding = '8px 12px';
-            chip.style.fontSize = '14px';
-            chip.style.cursor = 'pointer';
-            chip.style.transition = 'all 0.2s';
-            
-            chip.addEventListener('mouseover', () => {
-              chip.style.backgroundColor = '#DBEAFE';
-            });
-            
-            chip.addEventListener('mouseout', () => {
-              chip.style.backgroundColor = '#EFF6FF';
-            });
-            
-            chip.addEventListener('click', () => {
-              userInput.value = suggestion;
-              sendMessage();
-            });
-            
-            suggestionsDiv.appendChild(chip);
-          });
-          
-          chatMessages.appendChild(suggestionsDiv);
-          chatMessages.scrollTop = chatMessages.scrollHeight;
-        }, 1000);
-      }
     });
   </script>
 </body>

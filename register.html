@@ -8,6 +8,58 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        /* Sidebar styles */
+        .sidebar {
+            width: 250px;
+            min-height: 100vh;
+            background: linear-gradient(to bottom, #1e40af, #1e3a8a);
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+        
+        .sidebar-menu a {
+            display: block;
+            padding: 12px 20px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+        
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid white;
+        }
+        
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid white;
+        }
+        
+        .sidebar-menu i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 1rem 2rem;
+        }
+        
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -159,289 +211,325 @@
         .input-error {
             border-color: #ef4444 !important;
         }
+
+        @media (min-width: 1280px) {
+            .main-content {
+                max-width: 90%;
+                margin-left: 250px;
+                padding: 2rem 5rem;
+            }
+            
+            .form-container {
+                max-width: none;
+                width: 100%;
+        }
+}
     </style>
 </head>
 
-<body class="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen py-12">
-    
-    <!-- Back Button (kept in original position) -->
-    <div class="absolute top-4 left-4">
-        <a href="homepage.html" class="text-blue-600 hover:text-blue-800 transition">
-            <i class="fas fa-arrow-left text-2xl"></i>
-        </a>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <a href="homepage.html" class="text-2xl font-bold text-white">DonorSync</a>
+        </div>
+        
+        <div class="sidebar-menu">
+            <a href="homepage.html">
+                <i class="fas fa-home"></i> Home
+            </a>
+            <a href="register.html" class="active">
+                <i class="fas fa-heartbeat"></i> Donor Portal
+            </a>
+            <a href="hospital_registration.html">
+                <i class="fas fa-hospital"></i> Hospital Portal
+            </a>
+            <a href="about.html">
+                <i class="fas fa-info-circle"></i> About
+            </a>
+        </div>
     </div>
 
-    <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-lg transform transition-all duration-300 hover:shadow-xl mt-12">
-        <div class="text-center mb-8">
-            <h2 class="text-4xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-transparent bg-clip-text animate-fade-in">
-                Donor Information Form
-            </h2>
-            <p class="text-gray-600">Join us in saving lives through donation</p>
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="absolute top-4 right-4 z-50">
+            <a href="donor_login.html" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-semibold shadow-lg transform transition-all duration-300 hover:scale-105">
+                <i class="fas fa-sign-in-alt mr-2"></i>Login
+            </a>
         </div>
-        
-        <div class="progress-bar mb-8">
-            <div class="progress-bar-fill" style="width: 0%"></div>
-        </div>
-        
-        <form id="donorForm" class="space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="floating-label form-group">
-                    <input type="text" name="fullName" required placeholder=" " class="w-full p-3 border rounded-md" />
-                    <label>Full Name</label>
-                    <i class="fas fa-user absolute right-3 top-3 text-gray-400"></i>
-                </div>
-                
-                <div class="floating-label form-group">
-                    <input type="number" name="age" required placeholder=" " class="w-full p-3 border rounded-md" min="18" max="65" />
-                    <label>Age</label>
-                    <i class="fas fa-birthday-cake absolute right-3 top-3 text-gray-400"></i>
-                </div>
-                
-                <div class="floating-label form-group">
-                    <select name="bloodType" required class="w-full p-3 border rounded-md">
-                        <option value=""> </option>
-                        <option>A+</option>
-                        <option>A-</option>
-                        <option>B+</option>
-                        <option>B-</option>
-                        <option>AB+</option>
-                        <option>AB-</option>
-                        <option>O+</option>
-                        <option>O-</option>
-                    </select>
-                    <label>Blood Type</label>
-                    <i class="fas fa-tint absolute right-3 top-3 text-gray-400"></i>
-                </div>
-                
-                <div class="floating-label form-group">
-                    <input type="tel" name="contact" required placeholder=" " 
-                           class="w-full p-3 border rounded-md contact-input" 
-                           pattern="[0-9]{10,15}" 
-                           title="Please enter only digits (10-15 digits)"
-                           minlength="10"
-                           maxlength="10" />
-                    <label>Contact Number</label>
-                    <i class="fas fa-phone absolute right-3 top-3 text-gray-400"></i>
-                    <div class="error-message contact-error">Please enter a valid phone number (digits only)</div>
-                </div>
-                
-                <div class="floating-label form-group">
-                    <input type="email" name="email" placeholder=" " class="w-full p-3 border rounded-md" />
-                    <label>Email Address</label>
-                    <i class="fas fa-envelope absolute right-3 top-3 text-gray-400"></i>
-                </div>
-                
-                <div class="col-span-2">
-                    <label class="block font-medium mb-4 text-gray-700">Address</label>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="floating-label form-group">
-                            <input type="text" name="street" placeholder=" " required class="w-full p-3 border rounded-md" />
-                            <label>Street Address</label>
-                        </div>
-                        <div class="floating-label form-group">
-                            <input type="text" name="city" placeholder=" " required class="w-full p-3 border rounded-md" />
-                            <label>City</label>
-                        </div>
-                        <div class="floating-label form-group">
-                            <select name="state" required class="w-full p-3 border rounded-md">
-                                <option value=""> </option>
-                                <option value="AL">Alabama (AL)</option>
-                                <option value="AK">Alaska (AK)</option>
-                                <option value="AZ">Arizona (AZ)</option>
-                                <option value="AR">Arkansas (AR)</option>
-                                <option value="CA">California (CA)</option>
-                                <option value="CO">Colorado (CO)</option>
-                                <option value="CT">Connecticut (CT)</option>
-                                <option value="DE">Delaware (DE)</option>
-                                <option value="FL">Florida (FL)</option>
-                                <option value="GA">Georgia (GA)</option>
-                                <option value="HI">Hawaii (HI)</option>
-                                <option value="ID">Idaho (ID)</option>
-                                <option value="IL">Illinois (IL)</option>
-                                <option value="IN">Indiana (IN)</option>
-                                <option value="IA">Iowa (IA)</option>
-                                <option value="KS">Kansas (KS)</option>
-                                <option value="KY">Kentucky (KY)</option>
-                                <option value="LA">Louisiana (LA)</option>
-                                <option value="ME">Maine (ME)</option>
-                                <option value="MD">Maryland (MD)</option>
-                                <option value="MA">Massachusetts (MA)</option>
-                                <option value="MI">Michigan (MI)</option>
-                                <option value="MN">Minnesota (MN)</option>
-                                <option value="MS">Mississippi (MS)</option>
-                                <option value="MO">Missouri (MO)</option>
-                                <option value="MT">Montana (MT)</option>
-                                <option value="NE">Nebraska (NE)</option>
-                                <option value="NV">Nevada (NV)</option>
-                                <option value="NH">New Hampshire (NH)</option>
-                                <option value="NJ">New Jersey (NJ)</option>
-                                <option value="NM">New Mexico (NM)</option>
-                                <option value="NY">New York (NY)</option>
-                                <option value="NC">North Carolina (NC)</option>
-                                <option value="ND">North Dakota (ND)</option>
-                                <option value="OH">Ohio (OH)</option>
-                                <option value="OK">Oklahoma (OK)</option>
-                                <option value="OR">Oregon (OR)</option>
-                                <option value="PA">Pennsylvania (PA)</option>
-                                <option value="RI">Rhode Island (RI)</option>
-                                <option value="SC">South Carolina (SC)</option>
-                                <option value="SD">South Dakota (SD)</option>
-                                <option value="TN">Tennessee (TN)</option>
-                                <option value="TX">Texas (TX)</option>
-                                <option value="UT">Utah (UT)</option>
-                                <option value="VT">Vermont (VT)</option>
-                                <option value="VA">Virginia (VA)</option>
-                                <option value="WA">Washington (WA)</option>
-                                <option value="WV">West Virginia (WV)</option>
-                                <option value="WI">Wisconsin (WI)</option>
-                                <option value="WY">Wyoming (WY)</option>
-                            </select>
-                            <label>State</label>
-                            <i class="fas fa-map-marker-alt absolute right-3 top-3 text-gray-400"></i>
-                        </div>
-                        <div class="floating-label form-group">
-                            <input type="text" name="zipcode" placeholder=" " required 
-                                   pattern="\d{5}" 
-                                   title="Zip code must be 5 digits"
-                                   class="w-full p-3 border rounded-md" />
-                            <label>Zip Code</label>
-                            <i class="fas fa-map-pin absolute right-3 top-3 text-gray-400"></i>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="floating-label form-group">
-                    <input type="tel" name="emergencyContact" required placeholder=" " 
-                           class="w-full p-3 border rounded-md contact-input" 
-                           pattern="[0-9]{10,15}" 
-                           title="Please enter only digits (10-15 digits)"
-                           minlength="10"
-                           maxlength="10" />
-                    <label>Emergency Contact</label>
-                    <i class="fas fa-phone-alt absolute right-3 top-3 text-gray-400"></i>
-                    <div class="error-message emergency-contact-error">Please enter a valid phone number (digits only)</div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="block font-medium mb-2 text-gray-700">Previous Health Conditions</label>
-                <textarea name="healthConditions" rows="3" class="w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"></textarea>
-            </div>
-
-            <div class="form-group">
-                <label class="block font-medium mb-4 text-gray-700">What would you like to donate?</label>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="checkbox-container p-3 rounded-lg border hover:border-blue-500 transition-all duration-300">
-                        <label class="inline-flex items-center cursor-pointer">
-                            <input type="checkbox" name="donationTypes" value="Blood" class="form-checkbox h-5 w-5 text-blue-600 transition duration-150 ease-in-out" />
-                            <span class="ml-3 text-gray-700">Blood</span>
-                        </label>
-                    </div>
-                    <div class="checkbox-container p-3 rounded-lg border hover:border-blue-500 transition-all duration-300">
-                        <label class="inline-flex items-center cursor-pointer">
-                            <input type="checkbox" name="donationTypes" value="Plasma" class="form-checkbox h-5 w-5 text-blue-600 transition duration-150 ease-in-out" />
-                            <span class="ml-3 text-gray-700">Plasma</span>
-                        </label>
-                    </div>
-                    <div class="checkbox-container p-3 rounded-lg border hover:border-blue-500 transition-all duration-300">
-                        <label class="inline-flex items-center cursor-pointer">
-                            <input type="checkbox" name="donationTypes" value="Platelets" class="form-checkbox h-5 w-5 text-blue-600 transition duration-150 ease-in-out" />
-                            <span class="ml-3 text-gray-700">Platelets</span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ID Verification Section -->
-            <div class="form-group bg-blue-50 p-6 rounded-lg border border-blue-200 animate-fade-in">
-                <div class="flex items-center mb-4">
-                    <span class="bg-blue-600 text-white p-2 rounded-full mr-3">
-                        <i class="fas fa-id-card"></i>
-                    </span>
-                    <h3 class="text-lg font-semibold text-blue-800">ID Verification</h3>
-                    <span class="ml-auto bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full flex items-center">
-                        <i class="fas fa-shield-alt mr-1"></i> Required for Verification
-                    </span>
-                </div>
-                
-                <p class="text-gray-600 mb-4 text-sm">
-                    Please provide your government-issued ID information. This helps hospitals verify your identity 
-                    and ensures the safety and integrity of the donation process. Your information is kept confidential.
-                </p>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="floating-label form-group">
-                        <select name="idType" required class="w-full p-3 border rounded-md">
-                            <option value=""> </option>
-                            <option value="driversLicense">Driver's License</option>
-                            <option value="stateID">State ID</option>
-                            <option value="passport">Passport</option>
-                            <option value="militaryID">Military ID</option>
-                        </select>
-                        <label>ID Type</label>
-                        <i class="fas fa-id-card absolute right-3 top-3 text-gray-400"></i>
-                    </div>
-                    
-                    <div class="floating-label form-group">
-                        <input type="text" name="idNumber" required placeholder=" " 
-                               class="w-full p-3 border rounded-md" 
-                               pattern="[A-Za-z0-9-]*"
-                               title="ID Number (letters, numbers, and hyphens only)" />
-                        <label>ID Number</label>
-                        <i class="fas fa-fingerprint absolute right-3 top-3 text-gray-400"></i>
-                    </div>
-                    
-                    <div class="floating-label form-group">
-                        <input type="text" name="issuingState" required placeholder=" " class="w-full p-3 border rounded-md" />
-                        <label>Issuing State/Authority</label>
-                        <i class="fas fa-building absolute right-3 top-3 text-gray-400"></i>
-                    </div>
-                    
-                    <div class="floating-label form-group">
-                        <input type="date" name="expirationDate" required placeholder=" " class="w-full p-3 border rounded-md" />
-                        <label>Expiration Date</label>
-                        <i class="fas fa-calendar absolute right-3 top-3 text-gray-400"></i>
-                    </div>
-                </div>
-                
-                <div class="mt-4">
-                    <label class="block font-medium mb-2 text-gray-700">Upload ID Image (Optional)</label>
-                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:bg-gray-50 transition cursor-pointer relative">
-                        <input type="file" name="idImage" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
-                        <i class="fas fa-upload text-3xl text-gray-400 mb-2"></i>
-                        <p class="text-sm text-gray-500">Drag and drop your ID image here, or click to browse</p>
-                        <p class="text-xs text-gray-400 mt-1">Supported formats: JPG, PNG, PDF (Max 5MB)</p>
-                    </div>
-                    <div id="imagePreview" class="mt-3 hidden">
-                        <div class="flex items-center">
-                            <img id="previewImg" class="h-16 border rounded" />
-                            <button type="button" id="removeImage" class="ml-2 text-red-500 hover:text-red-700">
-                                <i class="fas fa-times"></i> Remove
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="mt-4 bg-gray-50 p-3 rounded-lg border border-gray-200">
-                    <label class="flex items-start cursor-pointer">
-                        <input type="checkbox" name="idConsent" required class="form-checkbox mt-1 h-5 w-5 text-blue-600 transition duration-150 ease-in-out" />
-                        <span class="ml-3 text-gray-700 text-sm">
-                            I certify that the ID information provided is accurate and belongs to me. I authorize hospitals to verify this information
-                            for the purpose of blood donation. I understand that falsifying identification may result in legal consequences.
-                        </span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="block font-medium mb-2 text-gray-700">Additional Notes</label>
-                <textarea name="notes" rows="3" class="w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"></textarea>
+    
+        <div class="max-w-5xl mx-auto bg-white p-8 rounded-xl shadow-lg transform transition-all duration-300 hover:shadow-xl mt-12">
+            <div class="text-center mb-8">
+                <h2 class="text-4xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-transparent bg-clip-text animate-fade-in">
+                    Donor Information Form
+                </h2>
+                <p class="text-gray-600">Join us in saving lives through donation</p>
             </div>
             
-            <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 rounded-lg font-semibold text-lg hover:from-blue-700 hover:to-indigo-700 transform transition-all duration-300 hover:scale-[1.02] submit-btn">
-                Submit Registration
-            </button>
-        </form>
+            <div class="progress-bar mb-8">
+                <div class="progress-bar-fill" style="width: 0%"></div>
+            </div>
+            
+            <form id="donorForm" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="floating-label form-group">
+                        <input type="text" name="fullName" required placeholder=" " class="w-full p-3 border rounded-md" />
+                        <label>Full Name</label>
+                        <i class="fas fa-user absolute right-3 top-3 text-gray-400"></i>
+                    </div>
+                    
+                    <div class="floating-label form-group">
+                        <input type="number" name="age" required placeholder=" " class="w-full p-3 border rounded-md" min="18" max="65" />
+                        <label>Age</label>
+                        <i class="fas fa-birthday-cake absolute right-3 top-3 text-gray-400"></i>
+                    </div>
+                    
+                    <div class="floating-label form-group">
+                        <select name="bloodType" required class="w-full p-3 border rounded-md">
+                            <option value=""> </option>
+                            <option>A+</option>
+                            <option>A-</option>
+                            <option>B+</option>
+                            <option>B-</option>
+                            <option>AB+</option>
+                            <option>AB-</option>
+                            <option>O+</option>
+                            <option>O-</option>
+                        </select>
+                        <label>Blood Type</label>
+                        <i class="fas fa-tint absolute right-3 top-3 text-gray-400"></i>
+                    </div>
+                    
+                    <div class="floating-label form-group">
+                        <input type="tel" name="contact" required placeholder=" " 
+                               class="w-full p-3 border rounded-md contact-input" 
+                               pattern="[0-9]{10,15}" 
+                               title="Please enter only digits (10-15 digits)"
+                               minlength="10"
+                               maxlength="10" />
+                        <label>Contact Number</label>
+                        <i class="fas fa-phone absolute right-3 top-3 text-gray-400"></i>
+                        <div class="error-message contact-error">Please enter a valid phone number (digits only)</div>
+                    </div>
+                    
+                    <div class="floating-label form-group">
+                        <input type="email" name="email" placeholder=" " class="w-full p-3 border rounded-md" />
+                        <label>Email Address</label>
+                        <i class="fas fa-envelope absolute right-3 top-3 text-gray-400"></i>
+                    </div>
+                    
+                    <div class="col-span-2">
+                        <label class="block font-medium mb-4 text-gray-700">Address</label>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="floating-label form-group">
+                                <input type="text" name="street" placeholder=" " required class="w-full p-3 border rounded-md" />
+                                <label>Street Address</label>
+                            </div>
+                            <div class="floating-label form-group">
+                                <input type="text" name="city" placeholder=" " required class="w-full p-3 border rounded-md" />
+                                <label>City</label>
+                            </div>
+                            <div class="floating-label form-group">
+                                <select name="state" required class="w-full p-3 border rounded-md">
+                                    <option value=""> </option>
+                                    <option value="AL">Alabama (AL)</option>
+                                    <option value="AK">Alaska (AK)</option>
+                                    <option value="AZ">Arizona (AZ)</option>
+                                    <option value="AR">Arkansas (AR)</option>
+                                    <option value="CA">California (CA)</option>
+                                    <option value="CO">Colorado (CO)</option>
+                                    <option value="CT">Connecticut (CT)</option>
+                                    <option value="DE">Delaware (DE)</option>
+                                    <option value="FL">Florida (FL)</option>
+                                    <option value="GA">Georgia (GA)</option>
+                                    <option value="HI">Hawaii (HI)</option>
+                                    <option value="ID">Idaho (ID)</option>
+                                    <option value="IL">Illinois (IL)</option>
+                                    <option value="IN">Indiana (IN)</option>
+                                    <option value="IA">Iowa (IA)</option>
+                                    <option value="KS">Kansas (KS)</option>
+                                    <option value="KY">Kentucky (KY)</option>
+                                    <option value="LA">Louisiana (LA)</option>
+                                    <option value="ME">Maine (ME)</option>
+                                    <option value="MD">Maryland (MD)</option>
+                                    <option value="MA">Massachusetts (MA)</option>
+                                    <option value="MI">Michigan (MI)</option>
+                                    <option value="MN">Minnesota (MN)</option>
+                                    <option value="MS">Mississippi (MS)</option>
+                                    <option value="MO">Missouri (MO)</option>
+                                    <option value="MT">Montana (MT)</option>
+                                    <option value="NE">Nebraska (NE)</option>
+                                    <option value="NV">Nevada (NV)</option>
+                                    <option value="NH">New Hampshire (NH)</option>
+                                    <option value="NJ">New Jersey (NJ)</option>
+                                    <option value="NM">New Mexico (NM)</option>
+                                    <option value="NY">New York (NY)</option>
+                                    <option value="NC">North Carolina (NC)</option>
+                                    <option value="ND">North Dakota (ND)</option>
+                                    <option value="OH">Ohio (OH)</option>
+                                    <option value="OK">Oklahoma (OK)</option>
+                                    <option value="OR">Oregon (OR)</option>
+                                    <option value="PA">Pennsylvania (PA)</option>
+                                    <option value="RI">Rhode Island (RI)</option>
+                                    <option value="SC">South Carolina (SC)</option>
+                                    <option value="SD">South Dakota (SD)</option>
+                                    <option value="TN">Tennessee (TN)</option>
+                                    <option value="TX">Texas (TX)</option>
+                                    <option value="UT">Utah (UT)</option>
+                                    <option value="VT">Vermont (VT)</option>
+                                    <option value="VA">Virginia (VA)</option>
+                                    <option value="WA">Washington (WA)</option>
+                                    <option value="WV">West Virginia (WV)</option>
+                                    <option value="WI">Wisconsin (WI)</option>
+                                    <option value="WY">Wyoming (WY)</option>
+                                </select>
+                                <label>State</label>
+                                <i class="fas fa-map-marker-alt absolute right-3 top-3 text-gray-400"></i>
+                            </div>
+                            <div class="floating-label form-group">
+                                <input type="text" name="zipcode" placeholder=" " required 
+                                       pattern="\d{5}" 
+                                       title="Zip code must be 5 digits"
+                                       class="w-full p-3 border rounded-md" />
+                                <label>Zip Code</label>
+                                <i class="fas fa-map-pin absolute right-3 top-3 text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="floating-label form-group">
+                        <input type="tel" name="emergencyContact" required placeholder=" " 
+                               class="w-full p-3 border rounded-md contact-input" 
+                               pattern="[0-9]{10,15}" 
+                               title="Please enter only digits (10-15 digits)"
+                               minlength="10"
+                               maxlength="10" />
+                        <label>Emergency Contact</label>
+                        <i class="fas fa-phone-alt absolute right-3 top-3 text-gray-400"></i>
+                        <div class="error-message emergency-contact-error">Please enter a valid phone number (digits only)</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="block font-medium mb-2 text-gray-700">Previous Health Conditions</label>
+                    <textarea name="healthConditions" rows="3" class="w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="block font-medium mb-4 text-gray-700">What would you like to donate?</label>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="checkbox-container p-3 rounded-lg border hover:border-blue-500 transition-all duration-300">
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="donationTypes" value="Blood" class="form-checkbox h-5 w-5 text-blue-600 transition duration-150 ease-in-out" />
+                                <span class="ml-3 text-gray-700">Blood</span>
+                            </label>
+                        </div>
+                        <div class="checkbox-container p-3 rounded-lg border hover:border-blue-500 transition-all duration-300">
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="donationTypes" value="Plasma" class="form-checkbox h-5 w-5 text-blue-600 transition duration-150 ease-in-out" />
+                                <span class="ml-3 text-gray-700">Plasma</span>
+                            </label>
+                        </div>
+                        <div class="checkbox-container p-3 rounded-lg border hover:border-blue-500 transition-all duration-300">
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="donationTypes" value="Platelets" class="form-checkbox h-5 w-5 text-blue-600 transition duration-150 ease-in-out" />
+                                <span class="ml-3 text-gray-700">Platelets</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ID Verification Section -->
+                <div class="form-group bg-blue-50 p-6 rounded-lg border border-blue-200 animate-fade-in">
+                    <div class="flex items-center mb-4">
+                        <span class="bg-blue-600 text-white p-2 rounded-full mr-3">
+                            <i class="fas fa-id-card"></i>
+                        </span>
+                        <h3 class="text-lg font-semibold text-blue-800">ID Verification</h3>
+                        <span class="ml-auto bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full flex items-center">
+                            <i class="fas fa-shield-alt mr-1"></i> Required for Verification
+                        </span>
+                    </div>
+                    
+                    <p class="text-gray-600 mb-4 text-sm">
+                        Please provide your government-issued ID information. This helps hospitals verify your identity 
+                        and ensures the safety and integrity of the donation process. Your information is kept confidential.
+                    </p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="floating-label form-group">
+                            <select name="idType" required class="w-full p-3 border rounded-md">
+                                <option value=""> </option>
+                                <option value="driversLicense">Driver's License</option>
+                                <option value="stateID">State ID</option>
+                                <option value="passport">Passport</option>
+                                <option value="militaryID">Military ID</option>
+                            </select>
+                            <label>ID Type</label>
+                            <i class="fas fa-id-card absolute right-3 top-3 text-gray-400"></i>
+                        </div>
+                        
+                        <div class="floating-label form-group">
+                            <input type="text" name="idNumber" required placeholder=" " 
+                                   class="w-full p-3 border rounded-md" 
+                                   pattern="[A-Za-z0-9-]*"
+                                   title="ID Number (letters, numbers, and hyphens only)" />
+                            <label>ID Number</label>
+                            <i class="fas fa-fingerprint absolute right-3 top-3 text-gray-400"></i>
+                        </div>
+                        
+                        <div class="floating-label form-group">
+                            <input type="text" name="issuingState" required placeholder=" " class="w-full p-3 border rounded-md" />
+                            <label>Issuing State/Authority</label>
+                            <i class="fas fa-building absolute right-3 top-3 text-gray-400"></i>
+                        </div>
+                        
+                        <div class="floating-label form-group">
+                            <input type="date" name="expirationDate" required placeholder=" " class="w-full p-3 border rounded-md" />
+                            <label>Expiration Date</label>
+                            <i class="fas fa-calendar absolute right-3 top-3 text-gray-400"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <label class="block font-medium mb-2 text-gray-700">Upload ID Image (Optional)</label>
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:bg-gray-50 transition cursor-pointer relative">
+                            <input type="file" name="idImage" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                            <i class="fas fa-upload text-3xl text-gray-400 mb-2"></i>
+                            <p class="text-sm text-gray-500">Drag and drop your ID image here, or click to browse</p>
+                            <p class="text-xs text-gray-400 mt-1">Supported formats: JPG, PNG, PDF (Max 5MB)</p>
+                        </div>
+                        <div id="imagePreview" class="mt-3 hidden">
+                            <div class="flex items-center">
+                                <img id="previewImg" class="h-16 border rounded" />
+                                <button type="button" id="removeImage" class="ml-2 text-red-500 hover:text-red-700">
+                                    <i class="fas fa-times"></i> Remove
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                        <label class="flex items-start cursor-pointer">
+                            <input type="checkbox" name="idConsent" required class="form-checkbox mt-1 h-5 w-5 text-blue-600 transition duration-150 ease-in-out" />
+                            <span class="ml-3 text-gray-700 text-sm">
+                                I certify that the ID information provided is accurate and belongs to me. I authorize hospitals to verify this information
+                                for the purpose of blood donation. I understand that falsifying identification may result in legal consequences.
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="block font-medium mb-2 text-gray-700">Additional Notes</label>
+                    <textarea name="notes" rows="3" class="w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"></textarea>
+                </div>
+                
+                <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 rounded-lg font-semibold text-lg hover:from-blue-700 hover:to-indigo-700 transform transition-all duration-300 hover:scale-[1.02] submit-btn">
+                    Submit Registration
+                </button>
+            </form>
+        </div>
     </div>
 
     <script>
@@ -646,7 +734,7 @@
                     submitBtn.classList.add('bg-green-600', 'hover:bg-green-700');
                     
                     setTimeout(() => {
-                        window.location.href = 'confirmation.html';
+                        window.location.href = 'donor_home.html';
                     }, 1500);
                 };
                 

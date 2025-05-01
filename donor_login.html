@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Donor Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        /* Sidebar styles */
+        .sidebar {
+            width: 250px;
+            min-height: 100vh;
+            background: linear-gradient(to bottom, #1e40af, #1e3a8a);
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+        
+        .sidebar-menu a {
+            display: block;
+            padding: 12px 20px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+        
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid white;
+        }
+        
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid white;
+        }
+        
+        .sidebar-menu i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 1rem 2rem;
+        }
+        
+        body {
+            font-family: 'Segoe UI', sans-serif;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-indigo-100">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <a href="homepage.html" class="text-2xl font-bold text-white">DonorSync</a>
+        </div>
+        
+        <div class="sidebar-menu">
+            <a href="homepage.html">
+                <i class="fas fa-home"></i> Home
+            </a>
+            <a href="register.html">
+                <i class="fas fa-heartbeat"></i> Donor Portal
+            </a>
+            <a href="hospital_registration.html">
+                <i class="fas fa-hospital"></i> Hospital Portal
+            </a>
+            <a href="about.html">
+                <i class="fas fa-info-circle"></i> About
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="bg-white p-10 rounded-2xl shadow-xl max-w-md w-full space-y-6">
+            <h2 class="text-3xl font-extrabold text-center text-indigo-700">Donor Portal Login</h2>
+            <p class="text-center text-gray-500 text-sm">Access your donation records and impact</p>
+            <form id="loginForm" class="space-y-4">
+                <div class="floating-label">
+                    <input type="email" name="email" placeholder=" " required 
+                           class="w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-indigo-500 transition" />
+                    <label><i class="fas fa-envelope mr-2"></i>Email</label>
+                </div>
+                
+                <div class="floating-label">
+                    <input type="text" name="idNumber" placeholder=" " required 
+                           class="w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-indigo-500 transition" />
+                    <label><i class="fas fa-id-card mr-2"></i>ID Number</label>
+                </div>
+                
+                <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-blue-600 text-white py-3 rounded-lg font-semibold hover:from-indigo-700 hover:to-blue-700 transition transform hover:scale-[1.02] shadow-lg">
+                    <i class="fas fa-sign-in-alt mr-2"></i> Login
+                </button>
+            </form>
+            <p id="loginError" class="text-red-500 text-sm text-center hidden">
+                <i class="fas fa-exclamation-circle mr-1"></i> Invalid credentials. Please try again.
+            </p>
+            <div class="text-center pt-4">
+                <a href="register.html" class="text-sm text-indigo-600 hover:underline font-medium">
+                    <i class="fas fa-user-plus mr-1"></i> Register as a donor
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("loginForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            const email = e.target.email.value;
+            const idNumber = e.target.idNumber.value;
+
+            const donors = JSON.parse(localStorage.getItem("donors") || "[]");
+            const donor = donors.find(d => d.email === email && d.idVerification.idNumber === idNumber);
+
+            if (donor) {
+                localStorage.setItem("currentUser", JSON.stringify(donor));
+                window.location.href = "donor_home.html";
+            } else {
+                document.getElementById("loginError").classList.remove("hidden");
+            }
+        });
+    </script>
+</body>
+</html>

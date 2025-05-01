@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Donor Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        .sidebar {
+            width: 250px;
+            min-height: 100vh;
+            background: linear-gradient(to bottom, #1e40af, #1e3a8a);
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+        
+        .sidebar-menu a {
+            display: block;
+            padding: 12px 20px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+        
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid white;
+        }
+        
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid white;
+        }
+        
+        .sidebar-menu i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+        }
+        
+        .donation-card {
+            transition: all 0.3s ease;
+        }
+        
+        .donation-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .message-item {
+            border-left: 4px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .message-item.unread {
+            border-left: 4px solid #3b82f6;
+            background-color: #f8fafc;
+        }
+        
+        .message-item:hover {
+            background-color: #f1f5f9;
+        }
+        
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.5s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <a href="homepage.html" class="text-2xl font-bold text-white">DonorSync</a>
+        </div>
+        
+        <div class="sidebar-menu">
+            <a href="homepage.html">
+                <i class="fas fa-home"></i> Home
+            </a>
+            <a href="donor_home.html" class="active">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+            <a href="blood_drives.html">
+                <i class="fas fa-heartbeat"></i> Donate Now
+            </a>
+            <a href="donor_leaderboard.html">
+                <i class="fas fa-trophy"></i> Leaderboard
+            </a>
+            <a href="#" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">Donor Dashboard</h1>
+            <div class="flex items-center space-x-4">
+                <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm font-medium">
+                    <i class="fas fa-user-circle mr-1"></i> <span id="userName">John Doe</span>
+                </span>
+                <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">
+                    <i class="fas fa-tint mr-1"></i> <span id="userBloodType">O+</span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-xl shadow-md p-6 donation-card">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
+                        <i class="fas fa-heartbeat text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-sm">Total Donations</p>
+                        <h3 class="text-2xl font-bold"><span id="totalDonations">1</span></h3>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-md p-6 donation-card">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+                        <i class="fas fa-life-ring text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-sm">Lives Impacted</p>
+                        <h3 class="text-2xl font-bold"><span id="livesImpacted">3</span></h3>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-md p-6 donation-card">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
+                        <i class="fas fa-medal text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-sm">Your Rank</p>
+                        <h3 class="text-2xl font-bold">#<span id="donorRank">15</span></h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Two Column Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Messages Section -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                <div class="bg-indigo-600 text-white px-6 py-4">
+                    <h2 class="text-xl font-semibold flex items-center">
+                        <i class="fas fa-inbox mr-2"></i> Hospital Messages
+                    </h2>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-4" id="messagesContainer">
+                        <p class="text-gray-500 text-center py-8">No messages in your inbox</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Donation Eligibility Section -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                <div class="bg-indigo-600 text-white px-6 py-4">
+                    <h2 class="text-xl font-semibold flex items-center">
+                        <i class="fas fa-clock mr-2"></i> Donation Eligibility
+                    </h2>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-6">
+                        <!-- Blood Donation Eligibility -->
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="font-medium text-gray-700">
+                                    <i class="fas fa-tint text-red-500 mr-2"></i> Whole Blood
+                                </h3>
+                                <span class="text-sm font-medium" id="bloodStatus">Loading...</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div id="bloodProgress" class="bg-red-600 h-2.5 rounded-full" style="width: 0%"></div>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-1" id="bloodLastDonation">Last donation: Loading...</p>
+                            <p class="text-sm text-gray-500" id="bloodNextDate">Next eligible: Loading...</p>
+                        </div>
+                        
+                        <!-- Plasma Donation Eligibility -->
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="font-medium text-gray-700">
+                                    <i class="fas fa-flask text-blue-500 mr-2"></i> Plasma
+                                </h3>
+                                <span class="text-sm font-medium" id="plasmaStatus">Loading...</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div id="plasmaProgress" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-1" id="plasmaLastDonation">Last donation: Loading...</p>
+                            <p class="text-sm text-gray-500" id="plasmaNextDate">Next eligible: Loading...</p>
+                        </div>
+                        
+                        <!-- Platelets Donation Eligibility -->
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="font-medium text-gray-700">
+                                    <i class="fas fa-microscope text-purple-500 mr-2"></i> Platelets
+                                </h3>
+                                <span class="text-sm font-medium" id="plateletsStatus">Loading...</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div id="plateletsProgress" class="bg-purple-600 h-2.5 rounded-full" style="width: 0%"></div>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-1" id="plateletsLastDonation">Last donation: Loading...</p>
+                            <p class="text-sm text-gray-500" id="plateletsNextDate">Next eligible: Loading...</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <h3 class="font-medium text-blue-800 mb-2">
+                            <i class="fas fa-info-circle mr-2"></i> Donation Guidelines
+                        </h3>
+                        <ul class="text-sm text-gray-700 space-y-1">
+                            <li><i class="fas fa-check-circle text-green-500 mr-2"></i> Whole Blood: Every 56 days</li>
+                            <li><i class="fas fa-check-circle text-green-500 mr-2"></i> Plasma: Every 28 days</li>
+                            <li><i class="fas fa-check-circle text-green-500 mr-2"></i> Platelets: Every 7 days (up to 24 times/year)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Donations Section -->
+        <div class="mt-8 bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="bg-indigo-600 text-white px-6 py-4">
+                <h2 class="text-xl font-semibold flex items-center">
+                    <i class="fas fa-history mr-2"></i> Recent Donations
+                </h2>
+            </div>
+            <div class="p-6">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Impact</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200" id="donationsTable">
+                            <!-- Will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leaderboard CTA -->
+        <div class="mt-8 bg-gradient-to-r from-indigo-500 to-blue-600 rounded-xl shadow-lg overflow-hidden">
+            <div class="p-6 flex flex-col md:flex-row items-center justify-between">
+                <div class="text-white mb-4 md:mb-0">
+                    <h2 class="text-xl font-bold mb-1">See where you stand this month!</h2>
+                    <p class="opacity-90">Check out the donor leaderboard and see how you compare to others.</p>
+                </div>
+                <a href="donor_leaderboard.html" class="bg-white text-indigo-600 hover:bg-gray-100 px-6 py-3 rounded-lg font-semibold shadow-md transform transition-all duration-300 hover:scale-105">
+                    <i class="fas fa-trophy mr-2"></i> View Leaderboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create a date exactly 6 months ago for the sample donation
+            const sixMonthsAgo = new Date();
+            sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+            
+            // Sample donor data with a donation from 6 months ago
+            const sampleDonor = {
+                id: 1,
+                name: "John Doe",
+                bloodGroup: "O+",
+                donationHistory: [
+                    {
+                        date: sixMonthsAgo.toISOString(),
+                        type: "Whole Blood",
+                        location: "Central Blood Bank",
+                        impact: "Saved 3 lives"
+                    }
+                ],
+                messages: []
+            };
+
+            // Store sample data if no donor exists (for demo purposes)
+            if (!localStorage.getItem("currentUser")) {
+                localStorage.setItem("currentUser", JSON.stringify(sampleDonor));
+                
+                // Initialize donors array if it doesn't exist
+                const donors = JSON.parse(localStorage.getItem("donors")) || [];
+                if (!donors.some(d => d.id === sampleDonor.id)) {
+                    donors.push(sampleDonor);
+                    localStorage.setItem("donors", JSON.stringify(donors));
+                }
+            }
+
+            const donor = JSON.parse(localStorage.getItem("currentUser")) || sampleDonor;
+            
+            // Get all donors data
+            const allDonors = JSON.parse(localStorage.getItem("donors")) || [sampleDonor];
+            
+            // Calculate stats based on actual data
+            const donationHistory = donor.donationHistory || [];
+            const donationCount = donationHistory.length;
+            document.getElementById("totalDonations").textContent = donationCount;
+            document.getElementById("livesImpacted").textContent = donationCount * 3;
+            
+            // Set user info
+            document.getElementById("userName").textContent = donor.name || "Donor";
+            document.getElementById("userBloodType").textContent = donor.bloodGroup || "Unknown";
+            
+            // Calculate rank based on donation count compared to other donors
+            if (donationCount > 0 && allDonors.length > 1) {
+                // Sort donors by donation count (descending)
+                const sortedDonors = [...allDonors].sort((a, b) => {
+                    const aCount = a.donationHistory ? a.donationHistory.length : 0;
+                    const bCount = b.donationHistory ? b.donationHistory.length : 0;
+                    return bCount - aCount;
+                });
+                
+                // Find current user's rank
+                const userRank = sortedDonors.findIndex(d => d.id === donor.id) + 1;
+                document.getElementById("donorRank").textContent = userRank;
+            } else {
+                document.getElementById("donorRank").textContent = "-";
+            }
+            
+            // Populate recent donations table
+            const donationsTable = document.getElementById("donationsTable");
+            donationsTable.innerHTML = '';
+            
+            if (donationHistory.length > 0) {
+                donationHistory.forEach(donation => {
+                    const row = document.createElement('tr');
+                    row.className = 'donor-row';
+                    
+                    const donationDate = new Date(donation.date);
+                    const formattedDate = formatDateDifference(donationDate);
+                    
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            ${formattedDate}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            ${donation.type || "Whole Blood"}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            ${donation.location || "Unknown"}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            ${donation.impact || "Saved lives"}
+                        </td>
+                    `;
+                    donationsTable.appendChild(row);
+                });
+            } else {
+                donationsTable.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">
+                            No donation history found
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            // Calculate eligibility if there are donations
+            if (donationHistory.length > 0) {
+                const now = new Date();
+                const lastDonations = {
+                    blood: null,
+                    plasma: null,
+                    platelets: null
+                };
+                
+                // Find most recent donation of each type
+                donationHistory.forEach(donation => {
+                    const donationDate = new Date(donation.date);
+                    const type = donation.type ? donation.type.toLowerCase() : "blood";
+                    
+                    if (type.includes("blood") && (!lastDonations.blood || donationDate > new Date(lastDonations.blood.date))) {
+                        lastDonations.blood = { 
+                            date: donation.date, 
+                            type: donation.type || "Whole Blood",
+                            formattedDate: formatDateDifference(donationDate)
+                        };
+                    }
+                    if (type.includes("plasma") && (!lastDonations.plasma || donationDate > new Date(lastDonations.plasma.date))) {
+                        lastDonations.plasma = { 
+                            date: donation.date, 
+                            type: donation.type || "Plasma",
+                            formattedDate: formatDateDifference(donationDate)
+                        };
+                    }
+                    if (type.includes("platelet") && (!lastDonations.platelets || donationDate > new Date(lastDonations.platelets.date))) {
+                        lastDonations.platelets = { 
+                            date: donation.date, 
+                            type: donation.type || "Platelets",
+                            formattedDate: formatDateDifference(donationDate)
+                        };
+                    }
+                });
+                
+                // Update eligibility for each donation type with correct cooldown periods
+                updateEligibility(lastDonations.blood, "blood", 56);  // 56 days for whole blood
+                updateEligibility(lastDonations.plasma, "plasma", 28); // 28 days for plasma
+                updateEligibility(lastDonations.platelets, "platelets", 7); // 7 days for platelets
+            } else {
+                // If no donations, set all to default state
+                updateEligibility(null, "blood", 56);
+                updateEligibility(null, "plasma", 28);
+                updateEligibility(null, "platelets", 7);
+            }
+            
+            // Load messages
+            const messagesContainer = document.getElementById("messagesContainer");
+            if (donor.messages && donor.messages.length > 0) {
+                messagesContainer.innerHTML = '';
+                
+                // Sort messages by date (newest first) and mark unread
+                donor.messages.sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                // Show only the last 5 messages
+                const recentMessages = donor.messages.slice(0, 5);
+                
+                recentMessages.forEach(msg => {
+                    const messageElement = document.createElement('div');
+                    messageElement.className = `message-item ${msg.read ? '' : 'unread'}`;
+                    
+                    const formattedDate = new Date(msg.date).toLocaleString();
+                    const hospitalInitials = msg.hospitalName.split(' ').map(n => n[0]).join('');
+                    
+                    messageElement.innerHTML = `
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 bg-blue-100 text-blue-600 rounded-full w-10 h-10 flex items-center justify-center mr-3">
+                                ${hospitalInitials}
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="font-medium text-gray-900 truncate">
+                                    ${msg.hospitalName}
+                                </p>
+                                <p class="text-sm text-gray-500">
+                                    ${msg.message}
+                                </p>
+                                <p class="text-xs text-gray-400 mt-1">
+                                    ${formattedDate}
+                                </p>
+                            </div>
+                            ${msg.read ? '' : '<span class="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">New</span>'}
+                        </div>
+                    `;
+                    
+                    messagesContainer.appendChild(messageElement);
+                });
+            }
+
+            function formatDateDifference(date) {
+                const now = new Date();
+                const diffTime = Math.abs(now - date);
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)); 
+                const diffMonths = Math.floor(diffDays / 30);
+                
+                if (diffMonths > 0) {
+                    return `${diffMonths} month${diffMonths > 1 ? 's' : ''} ago`;
+                }
+                if (diffDays > 0) {
+                    return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+                }
+                return "Today";
+            }
+            
+            function updateEligibility(lastDonation, type, cooldownDays) {
+                const statusElement = document.getElementById(`${type}Status`);
+                const progressElement = document.getElementById(`${type}Progress`);
+                const lastDonationElement = document.getElementById(`${type}LastDonation`);
+                const nextDateElement = document.getElementById(`${type}NextDate`);
+                
+                if (!lastDonation) {
+                    statusElement.textContent = "No donations recorded";
+                    statusElement.className = "text-sm font-medium text-gray-500";
+                    progressElement.style.width = "0%";
+                    lastDonationElement.textContent = "Last donation: Never";
+                    nextDateElement.textContent = "Next eligible: Register a donation";
+                    return;
+                }
+                
+                const now = new Date();
+                const lastDate = new Date(lastDonation.date);
+                const timeDiff = now.getTime() - lastDate.getTime();
+                const daysSinceDonation = Math.floor(timeDiff / (1000 * 3600 * 24));
+                const daysLeft = Math.max(0, cooldownDays - daysSinceDonation);
+                const progressPercent = Math.min(100, (daysSinceDonation / cooldownDays) * 100);
+                const nextEligibleDate = new Date(lastDate.getTime() + cooldownDays * 24 * 60 * 60 * 1000);
+                
+                progressElement.style.width = `${progressPercent}%`;
+                lastDonationElement.textContent = `Last donation: ${lastDonation.formattedDate} (${lastDonation.type})`;
+                
+                if (daysLeft > 0) {
+                    statusElement.textContent = `${daysLeft} days left`;
+                    statusElement.className = "text-sm font-medium text-yellow-600";
+                    nextDateElement.textContent = `Next eligible: ${nextEligibleDate.toLocaleDateString()}`;
+                } else {
+                    statusElement.textContent = "Eligible now!";
+                    statusElement.className = "text-sm font-medium text-green-600";
+                    nextDateElement.textContent = "You can donate now!";
+                }
+            }
+            
+            // Logout functionality
+            document.getElementById("logoutBtn").addEventListener("click", function(e) {
+                e.preventDefault();
+                localStorage.removeItem("currentUser");
+                window.location.href = "donor_login.html";
+            });
+        });
+    </script>
+</body>
+</html>

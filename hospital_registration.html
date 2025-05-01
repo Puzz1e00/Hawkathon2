@@ -14,9 +14,57 @@
             --primary-light: #dcfce7;
         }
         
+        /* Sidebar styles - Green Theme */
+        .sidebar {
+            width: 250px;
+            min-height: 100vh;
+            background: linear-gradient(to bottom, #16a34a, #15803d);
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+        
+        .sidebar-menu a {
+            display: block;
+            padding: 12px 20px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+        
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid white;
+        }
+        
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid white;
+        }
+        
+        .sidebar-menu i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
         body {
             background: linear-gradient(135deg, #f0fdf4 0%, var(--primary-light) 100%);
             min-height: 100vh;
+            margin-left: 250px; /* Added to shift content right */
         }
         .nav-container {
             display: flex;
@@ -49,9 +97,34 @@
             background-position: right 12px center;
             background-size: 20px;
         }
-
+        .back-btn {
+            left: 270px !important; /* Adjusted to account for sidebar */
+        }
     </style>
 </head>
+<body>
+    <!-- Added Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <a href="homepage.html" class="text-2xl font-bold text-white">DonorSync</a>
+        </div>
+        
+        <div class="sidebar-menu">
+            <a href="homepage.html">
+                <i class="fas fa-home"></i> Home
+            </a>
+            <a href="hospital_login.html">
+                <i class="fas fa-sign-in-alt"></i> Hospital Login
+            </a>
+            <a href="hospital_registration.html" class="active">
+                <i class="fas fa-hospital"></i> Hospital Registration
+            </a>
+            <a href="register.html">
+                <i class="fas fa-user"></i> Donor Portal
+            </a>
+        </div>
+    </div>
+
     <a href="homepage.html" class="back-btn" style="position: absolute; top: 20px; left: 20px; color: var(--primary-600); text-decoration: none; font-size: 24px;">
         <i class="fas fa-arrow-left"></i>
     </a>
