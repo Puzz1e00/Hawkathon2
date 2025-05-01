@@ -119,10 +119,10 @@
             <h1 class="text-3xl font-bold text-gray-800">Donor Dashboard</h1>
             <div class="flex items-center space-x-4">
                 <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm font-medium">
-                    <i class="fas fa-user-circle mr-1"></i> <span id="userName">John Doe</span>
+                    <i class="fas fa-user-circle mr-1"></i> <span id="userName">Donor</span>
                 </span>
                 <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">
-                    <i class="fas fa-tint mr-1"></i> <span id="userBloodType">O+</span>
+                    <i class="fas fa-tint mr-1"></i> <span id="userBloodType">Unknown</span>
                 </span>
             </div>
         </div>
@@ -136,7 +136,7 @@
                     </div>
                     <div>
                         <p class="text-gray-500 text-sm">Total Donations</p>
-                        <h3 class="text-2xl font-bold"><span id="totalDonations">1</span></h3>
+                        <h3 class="text-2xl font-bold"><span id="totalDonations">0</span></h3>
                     </div>
                 </div>
             </div>
@@ -148,7 +148,7 @@
                     </div>
                     <div>
                         <p class="text-gray-500 text-sm">Lives Impacted</p>
-                        <h3 class="text-2xl font-bold"><span id="livesImpacted">3</span></h3>
+                        <h3 class="text-2xl font-bold"><span id="livesImpacted">0</span></h3>
                     </div>
                 </div>
             </div>
@@ -160,7 +160,7 @@
                     </div>
                     <div>
                         <p class="text-gray-500 text-sm">Your Rank</p>
-                        <h3 class="text-2xl font-bold">#<span id="donorRank">15</span></h3>
+                        <h3 class="text-2xl font-bold">#<span id="donorRank">-</span></h3>
                     </div>
                 </div>
             </div>
@@ -177,7 +177,7 @@
                 </div>
                 <div class="p-6">
                     <div class="space-y-4" id="messagesContainer">
-                        <p class="text-gray-500 text-center py-8">No messages in your inbox</p>
+                        <p class="text-gray-500 text-center py-8">No messages in your inbox. Hospitals will contact you here when your blood is needed.</p>
                     </div>
                 </div>
             </div>
@@ -197,13 +197,13 @@
                                 <h3 class="font-medium text-gray-700">
                                     <i class="fas fa-tint text-red-500 mr-2"></i> Whole Blood
                                 </h3>
-                                <span class="text-sm font-medium" id="bloodStatus">Loading...</span>
+                                <span class="text-sm font-medium" id="bloodStatus">No donations recorded</span>
                             </div>
                             <div class="w-full bg-gray-200 rounded-full h-2.5">
                                 <div id="bloodProgress" class="bg-red-600 h-2.5 rounded-full" style="width: 0%"></div>
                             </div>
-                            <p class="text-sm text-gray-500 mt-1" id="bloodLastDonation">Last donation: Loading...</p>
-                            <p class="text-sm text-gray-500" id="bloodNextDate">Next eligible: Loading...</p>
+                            <p class="text-sm text-gray-500 mt-1" id="bloodLastDonation">Last donation: Never</p>
+                            <p class="text-sm text-gray-500" id="bloodNextDate">Next eligible: Register a donation</p>
                         </div>
                         
                         <!-- Plasma Donation Eligibility -->
@@ -212,13 +212,13 @@
                                 <h3 class="font-medium text-gray-700">
                                     <i class="fas fa-flask text-blue-500 mr-2"></i> Plasma
                                 </h3>
-                                <span class="text-sm font-medium" id="plasmaStatus">Loading...</span>
+                                <span class="text-sm font-medium" id="plasmaStatus">No donations recorded</span>
                             </div>
                             <div class="w-full bg-gray-200 rounded-full h-2.5">
                                 <div id="plasmaProgress" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
                             </div>
-                            <p class="text-sm text-gray-500 mt-1" id="plasmaLastDonation">Last donation: Loading...</p>
-                            <p class="text-sm text-gray-500" id="plasmaNextDate">Next eligible: Loading...</p>
+                            <p class="text-sm text-gray-500 mt-1" id="plasmaLastDonation">Last donation: Never</p>
+                            <p class="text-sm text-gray-500" id="plasmaNextDate">Next eligible: Register a donation</p>
                         </div>
                         
                         <!-- Platelets Donation Eligibility -->
@@ -227,13 +227,13 @@
                                 <h3 class="font-medium text-gray-700">
                                     <i class="fas fa-microscope text-purple-500 mr-2"></i> Platelets
                                 </h3>
-                                <span class="text-sm font-medium" id="plateletsStatus">Loading...</span>
+                                <span class="text-sm font-medium" id="plateletsStatus">No donations recorded</span>
                             </div>
                             <div class="w-full bg-gray-200 rounded-full h-2.5">
                                 <div id="plateletsProgress" class="bg-purple-600 h-2.5 rounded-full" style="width: 0%"></div>
                             </div>
-                            <p class="text-sm text-gray-500 mt-1" id="plateletsLastDonation">Last donation: Loading...</p>
-                            <p class="text-sm text-gray-500" id="plateletsNextDate">Next eligible: Loading...</p>
+                            <p class="text-sm text-gray-500 mt-1" id="plateletsLastDonation">Last donation: Never</p>
+                            <p class="text-sm text-gray-500" id="plateletsNextDate">Next eligible: Register a donation</p>
                         </div>
                     </div>
                     
@@ -270,7 +270,11 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200" id="donationsTable">
-                            <!-- Will be populated by JavaScript -->
+                            <tr>
+                                <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">
+                                    No donation history found. Register your first donation to see it here!
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -293,75 +297,49 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Create a date exactly 6 months ago for the sample donation
-            const sixMonthsAgo = new Date();
-            sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+            // Get the current donor from localStorage (or null if not logged in)
+            const donor = JSON.parse(localStorage.getItem("currentUser"));
             
-            // Sample donor data with a donation from 6 months ago
-            const sampleDonor = {
-                id: 1,
-                name: "John Doe",
-                bloodGroup: "O+",
-                donationHistory: [
-                    {
-                        date: sixMonthsAgo.toISOString(),
-                        type: "Whole Blood",
-                        location: "Central Blood Bank",
-                        impact: "Saved 3 lives"
-                    }
-                ],
-                messages: []
-            };
-
-            // Store sample data if no donor exists (for demo purposes)
-            if (!localStorage.getItem("currentUser")) {
-                localStorage.setItem("currentUser", JSON.stringify(sampleDonor));
-                
-                // Initialize donors array if it doesn't exist
-                const donors = JSON.parse(localStorage.getItem("donors")) || [];
-                if (!donors.some(d => d.id === sampleDonor.id)) {
-                    donors.push(sampleDonor);
-                    localStorage.setItem("donors", JSON.stringify(donors));
-                }
+            // If no donor is logged in, redirect to login
+            if (!donor) {
+                window.location.href = "donor_login.html";
+                return;
             }
-
-            const donor = JSON.parse(localStorage.getItem("currentUser")) || sampleDonor;
             
-            // Get all donors data
-            const allDonors = JSON.parse(localStorage.getItem("donors")) || [sampleDonor];
-            
-            // Calculate stats based on actual data
-            const donationHistory = donor.donationHistory || [];
-            const donationCount = donationHistory.length;
-            document.getElementById("totalDonations").textContent = donationCount;
-            document.getElementById("livesImpacted").textContent = donationCount * 3;
-            
-            // Set user info
+            // Set user info (name and blood type)
             document.getElementById("userName").textContent = donor.name || "Donor";
             document.getElementById("userBloodType").textContent = donor.bloodGroup || "Unknown";
             
+            // Initialize empty arrays if they don't exist
+            donor.donationHistory = donor.donationHistory || [];
+            donor.messages = donor.messages || [];
+            
+            // Calculate stats based on actual data
+            const donationCount = donor.donationHistory.length;
+            document.getElementById("totalDonations").textContent = donationCount;
+            document.getElementById("livesImpacted").textContent = donationCount * 3;
+            
             // Calculate rank based on donation count compared to other donors
+            const allDonors = JSON.parse(localStorage.getItem("donors")) || [];
             if (donationCount > 0 && allDonors.length > 1) {
-                // Sort donors by donation count (descending)
                 const sortedDonors = [...allDonors].sort((a, b) => {
                     const aCount = a.donationHistory ? a.donationHistory.length : 0;
                     const bCount = b.donationHistory ? b.donationHistory.length : 0;
                     return bCount - aCount;
                 });
                 
-                // Find current user's rank
                 const userRank = sortedDonors.findIndex(d => d.id === donor.id) + 1;
                 document.getElementById("donorRank").textContent = userRank;
             } else {
                 document.getElementById("donorRank").textContent = "-";
             }
             
-            // Populate recent donations table
+            // Populate recent donations table only if there are donations
             const donationsTable = document.getElementById("donationsTable");
             donationsTable.innerHTML = '';
             
-            if (donationHistory.length > 0) {
-                donationHistory.forEach(donation => {
+            if (donor.donationHistory.length > 0) {
+                donor.donationHistory.forEach(donation => {
                     const row = document.createElement('tr');
                     row.className = 'donor-row';
                     
@@ -388,14 +366,14 @@
                 donationsTable.innerHTML = `
                     <tr>
                         <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">
-                            No donation history found
+                            No donation history found. Register your first donation to see it here!
                         </td>
                     </tr>
                 `;
             }
             
-            // Calculate eligibility if there are donations
-            if (donationHistory.length > 0) {
+            // Calculate eligibility only if there are donations
+            if (donor.donationHistory.length > 0) {
                 const now = new Date();
                 const lastDonations = {
                     blood: null,
@@ -404,7 +382,7 @@
                 };
                 
                 // Find most recent donation of each type
-                donationHistory.forEach(donation => {
+                donor.donationHistory.forEach(donation => {
                     const donationDate = new Date(donation.date);
                     const type = donation.type ? donation.type.toLowerCase() : "blood";
                     
@@ -431,10 +409,9 @@
                     }
                 });
                 
-                // Update eligibility for each donation type with correct cooldown periods
-                updateEligibility(lastDonations.blood, "blood", 56);  // 56 days for whole blood
-                updateEligibility(lastDonations.plasma, "plasma", 28); // 28 days for plasma
-                updateEligibility(lastDonations.platelets, "platelets", 7); // 7 days for platelets
+                updateEligibility(lastDonations.blood, "blood", 56);
+                updateEligibility(lastDonations.plasma, "plasma", 28);
+                updateEligibility(lastDonations.platelets, "platelets", 7);
             } else {
                 // If no donations, set all to default state
                 updateEligibility(null, "blood", 56);
@@ -442,15 +419,12 @@
                 updateEligibility(null, "platelets", 7);
             }
             
-            // Load messages
+            // Load messages only if there are any
             const messagesContainer = document.getElementById("messagesContainer");
-            if (donor.messages && donor.messages.length > 0) {
+            if (donor.messages.length > 0) {
                 messagesContainer.innerHTML = '';
                 
-                // Sort messages by date (newest first) and mark unread
                 donor.messages.sort((a, b) => new Date(b.date) - new Date(a.date));
-                
-                // Show only the last 5 messages
                 const recentMessages = donor.messages.slice(0, 5);
                 
                 recentMessages.forEach(msg => {
@@ -458,7 +432,7 @@
                     messageElement.className = `message-item ${msg.read ? '' : 'unread'}`;
                     
                     const formattedDate = new Date(msg.date).toLocaleString();
-                    const hospitalInitials = msg.hospitalName.split(' ').map(n => n[0]).join('');
+                    const hospitalInitials = msg.hospitalName ? msg.hospitalName.split(' ').map(n => n[0]).join('') : 'H';
                     
                     messageElement.innerHTML = `
                         <div class="flex items-start">
@@ -467,10 +441,10 @@
                             </div>
                             <div class="flex-1 min-w-0">
                                 <p class="font-medium text-gray-900 truncate">
-                                    ${msg.hospitalName}
+                                    ${msg.hospitalName || "Hospital"}
                                 </p>
                                 <p class="text-sm text-gray-500">
-                                    ${msg.message}
+                                    ${msg.message || "No message content"}
                                 </p>
                                 <p class="text-xs text-gray-400 mt-1">
                                     ${formattedDate}
@@ -482,6 +456,12 @@
                     
                     messagesContainer.appendChild(messageElement);
                 });
+            } else {
+                messagesContainer.innerHTML = `
+                    <p class="text-gray-500 text-center py-8">
+                        No messages in your inbox. Hospitals will contact you here when your blood is needed.
+                    </p>
+                `;
             }
 
             function formatDateDifference(date) {
