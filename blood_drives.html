@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Find Blood Drives</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        /* Sidebar styles (same as leaderboard) */
+        .sidebar {
+            width: 250px;
+            min-height: 100vh;
+            background: linear-gradient(to bottom, #1e40af, #1e3a8a);
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+        
+        .sidebar-menu a {
+            display: block;
+            padding: 12px 20px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+        
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid white;
+        }
+        
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid white;
+        }
+        
+        .sidebar-menu i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+        }
+        
+        .drive-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .drive-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #1e40af;
+        }
+        
+        .map-container {
+            height: 400px;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <a href="homepage.html" class="text-2xl font-bold text-white">DonorSync</a>
+        </div>
+        
+        <div class="sidebar-menu">
+            <a href="homepage.html">
+                <i class="fas fa-home"></i> Home
+            </a>
+            <a href="donor_home.html">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+            <a href="blood_drives.html" class="active">
+                <i class="fas fa-heartbeat"></i> Donate Now
+            </a>
+            <a href="donor_leaderboard.html">
+                <i class="fas fa-trophy"></i> Leaderboard
+            </a>
+            <a href="#" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">Find Blood Drives</h1>
+            <div class="flex items-center space-x-2">
+                <span id="locationBadge" class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">
+                    <i class="fas fa-map-marker-alt mr-1"></i>
+                    <span id="locationText">Loading location...</span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Search Filters -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
+                    <select id="dateRange" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="7">Next 7 days</option>
+                        <option value="14">Next 14 days</option>
+                        <option value="30">Next 30 days</option>
+                        <option value="all">All upcoming</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Blood Type Needed</label>
+                    <select id="bloodType" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="all">All blood types</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    <button id="searchBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition duration-150 ease-in-out">
+                        <i class="fas fa-search mr-2"></i> Search
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="p-4 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-800">
+                    <i class="fas fa-list-ul mr-2"></i> Upcoming Blood Drives in Your Area
+                </h2>
+            </div>
+            <div class="p-4">
+                <div id="loadingDrives" class="text-center py-8">
+                    <i class="fas fa-spinner fa-spin text-indigo-600 text-2xl mb-2"></i>
+                    <p class="text-gray-600">Finding blood drives near you...</p>
+                </div>
+                <div id="noDrivesFound" class="text-center py-8" style="display: none;">
+                    <i class="fas fa-map-marker-alt text-gray-300 text-2xl mb-2"></i>
+                    <h3 class="text-lg font-medium text-gray-700 mb-1">No Drives Found in Your Area</h3>
+                    <p class="text-gray-500 mb-4">We couldn't find any blood drives in ${donor.state || 'your state'}.</p>
+                    <button id="viewAllDrives" class="text-indigo-600 hover:text-indigo-800 font-medium">
+                        <i class="fas fa-expand mr-1"></i> View all available drives
+                    </button>
+                </div>
+                <div id="drivesList" class="space-y-4">
+                    <!-- Drive cards will be inserted here by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const donor = JSON.parse(localStorage.getItem("currentUser"));
+            if (!donor) {
+                window.location.href = "donor_login.html";
+                return;
+            }
+
+            // Display user's location
+            const locationText = document.getElementById("locationText");
+            if (donor.zipCode && donor.state) {
+                locationText.textContent = `${donor.city || ''} ${donor.state}, ${donor.zipCode}`.trim();
+            } else if (donor.state) {
+                locationText.textContent = donor.state;
+            } else {
+                locationText.textContent = "Location not specified";
+            }
+
+            // Sample blood drives data - in a real app, this would come from an API
+            // Filtered to only show drives in the donor's state
+            const allDrives = [
+                {
+                    id: 1,
+                    name: "Community Blood Drive",
+                    organization: "Red Cross",
+                    date: new Date(Date.now() + 86400000 * 2).toISOString(), // 2 days from now
+                    time: "10:00 AM - 4:00 PM",
+                    address: "123 Main St, " + (donor.city || "Anytown") + ", " + (donor.state || "CA") + " " + (donor.zipCode || "12345"),
+                    bloodTypesNeeded: ["O+", "A+", "B-"],
+                    registrationLink: "#",
+                    location: donor.state || "CA"
+                },
+                {
+                    id: 2,
+                    name: "City Hospital Blood Drive",
+                    organization: "City Medical Center",
+                    date: new Date(Date.now() + 86400000 * 5).toISOString(), // 5 days from now
+                    time: "8:00 AM - 6:00 PM",
+                    address: "456 Health Ave, " + (donor.city || "Anytown") + ", " + (donor.state || "CA") + " " + (donor.zipCode || "12345"),
+                    bloodTypesNeeded: ["O-", "AB+", "AB-"],
+                    registrationLink: "#",
+                    location: donor.state || "CA"
+                },
+                {
+                    id: 3,
+                    name: "University Blood Donation",
+                    organization: "State University",
+                    date: new Date(Date.now() + 86400000 * 7).toISOString(), // 7 days from now
+                    time: "9:00 AM - 3:00 PM",
+                    address: "789 College Blvd, " + (donor.city || "Anytown") + ", " + (donor.state || "CA") + " " + (donor.zipCode || "12345"),
+                    bloodTypesNeeded: ["A-", "B+", "O+"],
+                    registrationLink: "#",
+                    location: donor.state || "CA"
+                }
+            ];
+
+            // Filter drives to only show those in the donor's state by default
+            let filteredDrives = allDrives.filter(drive => drive.location === (donor.state || "CA"));
+
+            // Display drives after a short delay (simulating API call)
+            setTimeout(() => {
+                displayDrives(filteredDrives);
+            }, 1000);
+
+            // Search button handler
+            document.getElementById("searchBtn").addEventListener("click", function() {
+                const dateRange = document.getElementById("dateRange").value;
+                const bloodType = document.getElementById("bloodType").value;
+                
+                document.getElementById("loadingDrives").style.display = "block";
+                document.getElementById("noDrivesFound").style.display = "none";
+                document.getElementById("drivesList").innerHTML = "";
+                
+                // Filter by date range
+                let results = [...filteredDrives];
+                
+                if (dateRange !== "all") {
+                    const days = parseInt(dateRange);
+                    const cutoffDate = new Date();
+                    cutoffDate.setDate(cutoffDate.getDate() + days);
+                    
+                    results = results.filter(drive => {
+                        const driveDate = new Date(drive.date);
+                        return driveDate <= cutoffDate;
+                    });
+                }
+                
+                // Filter by blood type if needed
+                if (bloodType !== "all") {
+                    results = results.filter(drive => 
+                        drive.bloodTypesNeeded.includes(bloodType)
+                    );
+                }
+                
+                // Display results after short delay (simulating API call)
+                setTimeout(() => {
+                    displayDrives(results);
+                }, 500);
+            });
+
+            // View all drives handler
+            document.getElementById("viewAllDrives").addEventListener("click", function() {
+                filteredDrives = [...allDrives];
+                document.getElementById("searchBtn").click();
+            });
+
+            // Display drives function
+            function displayDrives(drives) {
+                const loadingElement = document.getElementById("loadingDrives");
+                const noDrivesElement = document.getElementById("noDrivesFound");
+                const drivesListElement = document.getElementById("drivesList");
+                
+                loadingElement.style.display = "none";
+                
+                if (drives.length === 0) {
+                    noDrivesElement.style.display = "block";
+                    return;
+                }
+                
+                drivesListElement.innerHTML = "";
+                
+                // Sort by date (soonest first)
+                drives.sort((a, b) => new Date(a.date) - new Date(b.date));
+                
+                drives.forEach(drive => {
+                    const driveElement = document.createElement("div");
+                    driveElement.className = "drive-card bg-white p-4 rounded-lg shadow border border-gray-100";
+                    
+                    const date = new Date(drive.date);
+                    const formattedDate = date.toLocaleDateString('en-US', { 
+                        weekday: 'short', 
+                        month: 'short', 
+                        day: 'numeric' 
+                    });
+                    
+                    driveElement.innerHTML = `
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-semibold text-lg text-gray-800">${drive.name}</h3>
+                            <span class="text-sm text-gray-500">
+                                ${drive.location}
+                            </span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-2">
+                            <i class="fas fa-hospital mr-1"></i> ${drive.organization}
+                        </p>
+                        <p class="text-sm text-gray-600 mb-3">
+                            <i class="far fa-calendar-alt mr-1"></i> ${formattedDate} • ${drive.time}
+                        </p>
+                        <p class="text-sm text-gray-600 mb-3">
+                            <i class="fas fa-map-marker-alt mr-1"></i> ${drive.address}
+                        </p>
+                        <div class="flex flex-wrap gap-1 mb-4">
+                            ${drive.bloodTypesNeeded.map(type => 
+                                `<span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">${type}</span>`
+                            ).join('')}
+                        </div>
+                        <a href="${drive.registrationLink}" class="block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md transition duration-150 ease-in-out">
+                            <i class="fas fa-heartbeat mr-1"></i> Register to Donate
+                        </a>
+                    `;
+                    
+                    drivesListElement.appendChild(driveElement);
+                });
+            }
+
+            // Logout functionality
+            document.getElementById("logoutBtn").addEventListener("click", function(e) {
+                e.preventDefault();
+                localStorage.removeItem("currentUser");
+                window.location.href = "donor_login.html";
+            });
+        });
+    </script>
+</body>
+</html>

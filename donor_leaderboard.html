@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Donor Leaderboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        /* Sidebar styles */
+        .sidebar {
+            width: 250px;
+            min-height: 100vh;
+            background: linear-gradient(to bottom, #1e40af, #1e3a8a);
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+        
+        .sidebar-menu a {
+            display: block;
+            padding: 12px 20px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+        
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid white;
+        }
+        
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid white;
+        }
+        
+        .sidebar-menu i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+        }
+        
+        .leaderboard-card {
+            background: linear-gradient(to bottom right, #1e40af, #1e3a8a);
+            color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .badge-gold {
+            background: linear-gradient(to right, #FFD700, #D4AF37);
+            color: #000;
+        }
+        
+        .badge-silver {
+            background: linear-gradient(to right, #C0C0C0, #A8A8A8);
+            color: #000;
+        }
+        
+        .badge-bronze {
+            background: linear-gradient(to right, #CD7F32, #B87333);
+            color: #000;
+        }
+        
+        .donor-row:hover {
+            background-color: #f3f4f6;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6b7280;
+        }
+        
+        .drive-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .drive-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #1e40af;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <a href="homepage.html" class="text-2xl font-bold text-white">DonorSync</a>
+        </div>
+        
+        <div class="sidebar-menu">
+            <a href="homepage.html">
+                <i class="fas fa-home"></i> Home
+            </a>
+            <a href="donor_home.html">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+            <a href="blood_drives.html" id="donateNowLink">
+                <i class="fas fa-heartbeat"></i> Donate Now
+            </a>
+            <a href="donor_leaderboard.html" class="active">
+                <i class="fas fa-trophy"></i> Leaderboard
+            </a>
+            <a href="#" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">Donor Leaderboard</h1>
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <select class="appearance-none bg-white border border-gray-300 rounded-lg pl-4 pr-8 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option>This Month</option>
+                        <option>Last Month</option>
+                        <option>All Time</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Donors Cards - Initially hidden -->
+        <div id="topDonorsSection" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8" style="display: none;">
+            <!-- Second Place -->
+            <div class="leaderboard-card p-6 flex items-center">
+                <div class="mr-4">
+                    <span class="badge-silver flex items-center justify-center w-12 h-12 rounded-full font-bold text-lg">2</span>
+                </div>
+                <div>
+                    <p class="text-white text-opacity-80 text-sm">Silver Donor</p>
+                    <h3 class="text-xl font-bold text-white" id="silverDonorName">--</h3>
+                    <p class="text-white text-opacity-80" id="silverDonorCount">-- donations</p>
+                </div>
+            </div>
+            
+            <!-- First Place -->
+            <div class="leaderboard-card p-6 flex items-center order-first md:order-none">
+                <div class="mr-4">
+                    <span class="badge-gold flex items-center justify-center w-12 h-12 rounded-full font-bold text-lg">1</span>
+                </div>
+                <div>
+                    <p class="text-white text-opacity-80 text-sm">Gold Donor</p>
+                    <h3 class="text-xl font-bold text-white" id="goldDonorName">--</h3>
+                    <p class="text-white text-opacity-80" id="goldDonorCount">-- donations</p>
+                </div>
+            </div>
+            
+            <!-- Third Place -->
+            <div class="leaderboard-card p-6 flex items-center">
+                <div class="mr-4">
+                    <span class="badge-bronze flex items-center justify-center w-12 h-12 rounded-full font-bold text-lg">3</span>
+                </div>
+                <div>
+                    <p class="text-white text-opacity-80 text-sm">Bronze Donor</p>
+                    <h3 class="text-xl font-bold text-white" id="bronzeDonorName">--</h3>
+                    <p class="text-white text-opacity-80" id="bronzeDonorCount">-- donations</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty state for top donors -->
+        <div id="noTopDonors" class="bg-white rounded-xl shadow-md p-8 mb-8 empty-state" style="display: none;">
+            <i class="fas fa-trophy fa-3x text-gray-300 mb-4"></i>
+            <h3 class="text-xl font-medium text-gray-700 mb-2">No Donor Data Available</h3>
+            <p class="text-gray-500 mb-4">There are no donors to display in the leaderboard yet.</p>
+            <a href="blood_drives.html" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                <i class="fas fa-heartbeat mr-2"></i> Find a blood drive near you
+            </a>
+        </div>
+
+        <!-- Full Leaderboard Table -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="bg-indigo-600 text-white px-6 py-4">
+                <h2 class="text-xl font-semibold flex items-center">
+                    <i class="fas fa-list-ol mr-2"></i> All Donors
+                </h2>
+            </div>
+            <div class="p-6">
+                <div id="donorTable" style="display: none;">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rank</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Donor</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Blood Type</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Donations</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Donation</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lives Impacted</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200" id="donorTableBody">
+                                <!-- Donor rows will be inserted here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="noDonorsTable" class="empty-state" style="display: none;">
+                    <i class="fas fa-users fa-3x text-gray-300 mb-4"></i>
+                    <h3 class="text-xl font-medium text-gray-700 mb-2">No Donors Found</h3>
+                    <p class="text-gray-500 mb-4">There are no donors to display in the leaderboard yet.</p>
+                    <a href="blood_drives.html" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                        <i class="fas fa-map-marker-alt mr-2"></i> Find nearby blood drives
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Your Position Card -->
+        <div class="mt-8 leaderboard-card p-6" id="userPositionCard" style="display: none;">
+            <h3 class="text-xl font-bold text-white mb-4 flex items-center">
+                <i class="fas fa-user mr-2"></i> Your Position
+            </h3>
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 h-12 w-12 rounded-full bg-white bg-opacity-20 flex items-center justify-center">
+                        <span class="text-white font-medium" id="userInitials">--</span>
+                    </div>
+                    <div class="ml-4">
+                        <div class="text-sm font-medium text-white text-opacity-80">Your Rank</div>
+                        <div class="flex items-center">
+                            <span id="userRankBadge" class="mr-2"></span>
+                            <span class="text-lg font-bold text-white" id="userRankPosition">Not ranked</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm font-medium text-white text-opacity-80">Your Donations</div>
+                    <div class="text-lg font-bold text-white" id="userDonationCount">0</div>
+                </div>
+            </div>
+            <div class="mt-4 pt-4 border-t border-white border-opacity-20">
+                <a href="blood_drives.html" class="inline-flex items-center justify-center w-full px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-md transition duration-150 ease-in-out">
+                    <i class="fas fa-heartbeat mr-2"></i> Schedule Your Next Donation
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const donor = JSON.parse(localStorage.getItem("currentUser"));
+            if (!donor) {
+                window.location.href = "donor_login.html";
+                return;
+            }
+
+            // Get all donors data
+            const donors = JSON.parse(localStorage.getItem("donors")) || [];
+            
+            // Set user info
+            if (donor.name) {
+                const names = donor.name.split(' ');
+                const initials = names[0].charAt(0) + (names.length > 1 ? names[1].charAt(0) : '');
+                document.getElementById("userInitials").textContent = initials;
+            }
+            
+            // Set user stats
+            const donationCount = donor.donationHistory ? donor.donationHistory.length : 0;
+            document.getElementById("userDonationCount").textContent = donationCount;
+            
+            if (donors.length > 0) {
+                // Show the leaderboard sections
+                document.getElementById("topDonorsSection").style.display = "grid";
+                document.getElementById("donorTable").style.display = "block";
+                document.getElementById("userPositionCard").style.display = "block";
+                
+                // Hide empty states
+                document.getElementById("noTopDonors").style.display = "none";
+                document.getElementById("noDonorsTable").style.display = "none";
+                
+                // Sort donors by donation count (descending)
+                const sortedDonors = [...donors].sort((a, b) => {
+                    const aCount = a.donationHistory ? a.donationHistory.length : 0;
+                    const bCount = b.donationHistory ? b.donationHistory.length : 0;
+                    return bCount - aCount;
+                });
+                
+                // Populate top donors
+                if (sortedDonors.length > 0) {
+                    document.getElementById("goldDonorName").textContent = sortedDonors[0].name || "Anonymous";
+                    document.getElementById("goldDonorCount").textContent = 
+                        (sortedDonors[0].donationHistory ? sortedDonors[0].donationHistory.length : 0) + " donations";
+                }
+                
+                if (sortedDonors.length > 1) {
+                    document.getElementById("silverDonorName").textContent = sortedDonors[1].name || "Anonymous";
+                    document.getElementById("silverDonorCount").textContent = 
+                        (sortedDonors[1].donationHistory ? sortedDonors[1].donationHistory.length : 0) + " donations";
+                }
+                
+                if (sortedDonors.length > 2) {
+                    document.getElementById("bronzeDonorName").textContent = sortedDonors[2].name || "Anonymous";
+                    document.getElementById("bronzeDonorCount").textContent = 
+                        (sortedDonors[2].donationHistory ? sortedDonors[2].donationHistory.length : 0) + " donations";
+                }
+                
+                // Populate full table
+                const tableBody = document.getElementById("donorTableBody");
+                tableBody.innerHTML = "";
+                
+                sortedDonors.forEach((donor, index) => {
+                    const donationCount = donor.donationHistory ? donor.donationHistory.length : 0;
+                    const lastDonation = donor.donationHistory && donor.donationHistory.length > 0 
+                        ? formatDate(donor.donationHistory[donor.donationHistory.length - 1].date) 
+                        : "Never";
+                    
+                    const row = document.createElement("tr");
+                    row.className = "donor-row";
+                    
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            <span class="${getRankBadgeClass(index)} px-2 py-1 rounded-full text-xs font-bold">${index + 1}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                                    <span class="text-indigo-600 font-medium">${getInitials(donor.name)}</span>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900">${donor.name || "Anonymous"}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">${donor.bloodGroup || "Unknown"}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${donationCount}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${lastDonation}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${donationCount * 3}</td>
+                    `;
+                    
+                    tableBody.appendChild(row);
+                });
+                
+                // Set user rank position and badge
+                const userIndex = sortedDonors.findIndex(d => d.id === donor.id);
+                if (userIndex >= 0) {
+                    document.getElementById("userRankPosition").textContent = "#" + (userIndex + 1);
+                    const rankBadge = document.getElementById("userRankBadge");
+                    
+                    if (userIndex === 0) {
+                        rankBadge.innerHTML = '<span class="badge-gold px-2 py-1 rounded-full text-xs font-bold">1</span>';
+                    } else if (userIndex === 1) {
+                        rankBadge.innerHTML = '<span class="badge-silver px-2 py-1 rounded-full text-xs font-bold">2</span>';
+                    } else if (userIndex === 2) {
+                        rankBadge.innerHTML = '<span class="badge-bronze px-2 py-1 rounded-full text-xs font-bold">3</span>';
+                    } else {
+                        rankBadge.innerHTML = `<span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-bold">${userIndex + 1}</span>`;
+                    }
+                } else if (donationCount > 0) {
+                    document.getElementById("userRankPosition").textContent = "Not in top " + sortedDonors.length;
+                } else {
+                    document.getElementById("userRankPosition").textContent = "Not ranked";
+                }
+            } else {
+                // No donor data available
+                document.getElementById("noTopDonors").style.display = "block";
+                document.getElementById("noDonorsTable").style.display = "block";
+                
+                // Only show user position card if they have donations
+                if (donationCount > 0) {
+                    document.getElementById("userPositionCard").style.display = "block";
+                    document.getElementById("userRankPosition").textContent = "Not ranked (no leaderboard data)";
+                }
+            }
+            
+            // Logout functionality
+            document.getElementById("logoutBtn").addEventListener("click", function(e) {
+                e.preventDefault();
+                localStorage.removeItem("currentUser");
+                window.location.href = "donor_login.html";
+            });
+            
+            // Helper functions
+            function getInitials(name) {
+                if (!name) return "--";
+                const names = name.split(' ');
+                return names[0].charAt(0) + (names.length > 1 ? names[1].charAt(0) : '');
+            }
+            
+            function getRankBadgeClass(rank) {
+                if (rank === 0) return "badge-gold";
+                if (rank === 1) return "badge-silver";
+                if (rank === 2) return "badge-bronze";
+                return "bg-gray-100 text-gray-800";
+            }
+            
+            function formatDate(dateString) {
+                if (!dateString) return "Unknown";
+                const date = new Date(dateString);
+                if (isNaN(date.getTime())) return "Invalid date";
+                
+                const now = new Date();
+                const diffInDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+                
+                if (diffInDays === 0) return "Today";
+                if (diffInDays === 1) return "Yesterday";
+                if (diffInDays < 7) return diffInDays + " days ago";
+                if (diffInDays < 30) return Math.floor(diffInDays / 7) + " weeks ago";
+                return Math.floor(diffInDays / 30) + " months ago";
+            }
+        });
+    </script>
+</body>
+</html>
