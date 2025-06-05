@@ -99,8 +99,8 @@
                 </div>
                 
                 <div class="floating-label">
-                    <label><i class="fas fa-id-card mr-2"></i>ID Number</label>
-                    <input type="text" name="idNumber" placeholder=" " required 
+                    <label><i class="fas fa-lock mr-2"></i>Password</label>
+                    <input type="password" name="password" placeholder=" " required 
                            class="w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-indigo-500 transition" />
                 </div>
                 
@@ -123,10 +123,10 @@
         document.getElementById("loginForm").addEventListener("submit", function(e) {
             e.preventDefault();
             const email = e.target.email.value;
-            const idNumber = e.target.idNumber.value;
+            const password = e.target.password.value;
 
             const donors = JSON.parse(localStorage.getItem("donors") || "[]");
-            const donor = donors.find(d => d.email === email && d.idVerification.idNumber === idNumber);
+            const donor = donors.find(d => d.email === email && d.password === password);
 
             if (donor) {
                 localStorage.setItem("currentUser", JSON.stringify(donor));

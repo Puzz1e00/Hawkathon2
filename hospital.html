@@ -187,6 +187,9 @@
             <a href="patientsForm.html">
                 <i class="fas fa-user-injured"></i> Make a Request
             </a>
+            <a href="donor_map.html">
+                <i class="fas fa-map-marker-alt"></i> Donor Map
+            </a>
             <a href="#" id="logoutBtn">
                 <i class="fas fa-sign-out-alt"></i> Logout
             </a>
@@ -227,7 +230,7 @@
                         <i class="fas fa-user-injured text-xl"></i>
                     </div>
                     <div>
-                        <p class="text-gray-500 text-sm">Active Patients</p>
+                        <p class="text-gray-500 text-sm">Active Donors</p>
                         <h3 class="text-2xl font-bold"><span id="activePatients">0</span></h3>
                     </div>
                 </div>
@@ -288,11 +291,6 @@
                         </button>
                     </div>
                     
-                    <div class="mt-4">
-                        <a href="patientsForm.html" class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
-                            <i class="fas fa-plus mr-2"></i> Request Blood
-                        </a>
-                    </div>
                 </div>
             </div>
 
@@ -365,6 +363,7 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.18.0/dist/tf.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const hospitalId = sessionStorage.getItem('loggedInHospitalId');
@@ -391,11 +390,47 @@
                 const totalUnits = Object.values(hospital.bloodInventory).reduce((sum, val) => sum + (parseInt(val) || 0), 0);
                 document.getElementById("totalBloodUnits").textContent = totalUnits;
                 
+                // Set active donors to number of registered donors
+                const donors = JSON.parse(localStorage.getItem('donors')) || [];
+                document.getElementById("activePatients").textContent = donors.length;
+                
                 // Display blood inventory
                 displayBloodInventory(hospital.bloodInventory);
                 
                 // Load donor messages
                 loadDonorMessages(hospitalId);
+
+                // Show accepted donors
+                const acceptedDonorsList = document.getElementById('acceptedDonorsList');
+                let acceptedDonors = [];
+                const allDonors = JSON.parse(localStorage.getItem('donors')) || [];
+                allDonors.forEach(donor => {
+                    if (Array.isArray(donor.messages)) {
+                        donor.messages.forEach(msg => {
+                            if (msg.hospitalName === hospital.name && msg.acceptedAppointment) {
+                                acceptedDonors.push({
+                                    name: donor.name,
+                                    email: donor.email,
+                                    bloodGroup: donor.bloodGroup,
+                                    appointment: msg.acceptedAppointment,
+                                    message: msg.message
+                                });
+                            }
+                        });
+                    }
+                });
+                if (acceptedDonors.length > 0) {
+                    acceptedDonorsList.innerHTML = acceptedDonors.map(d => `
+                        <div class="mb-4 p-4 rounded-lg border bg-gray-50">
+                            <div class="font-bold text-lg text-green-700 flex items-center"><i class="fas fa-user mr-2"></i> ${d.name} <span class="ml-2 text-xs text-gray-500">(${d.bloodGroup})</span></div>
+                            <div class="text-sm text-gray-700 mb-1"><b>Email:</b> ${d.email}</div>
+                            <div class="text-sm text-gray-700 mb-1"><b>Appointment:</b> ${d.appointment.date} at ${d.appointment.time}</div>
+                            <div class="text-xs text-gray-500"><b>Message:</b> ${d.message}</div>
+                        </div>
+                    `).join('');
+                } else {
+                    acceptedDonorsList.innerHTML = '<div class="text-gray-500">No accepted donors yet.</div>';
+                }
             }
             
             // Logout functionality

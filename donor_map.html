@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nearby Donors Map</title>
+    <link rel="stylesheet" href="hl_style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        :root {
+            --primary-500: #22c55e;
+            --primary-600: #16a34a;
+            --primary-700: #15803d;
+            --primary-light: #dcfce7;
+        }
+        .sidebar {
+            width: 250px;
+            min-height: 100vh;
+            background: linear-gradient(to bottom, #16a34a, #15803d);
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+        .sidebar-menu a {
+            display: block;
+            padding: 12px 20px;
+            color: rgb(255, 255, 255);
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+        .sidebar-header a {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid white;
+        }
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid white;
+        }
+        .sidebar-menu i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        body {
+            background: linear-gradient(135deg, #f0fdf4 0%, var(--primary-light) 100%);
+            min-height: 100vh;
+            margin-left: 250px;
+        }
+        .back-btn {
+            left: 270px !important;
+            position: absolute;
+            top: 20px;
+            color: var(--primary-600);
+            text-decoration: none;
+            font-size: 24px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            padding: 32px;
+        }
+        h1 {
+            color: #15803d;
+            margin-bottom: 24px;
+        }
+        #donorMap {
+            position: absolute;
+            top: 0;
+            left: 250px;
+            width: calc(100vw - 250px);
+            height: 100vh;
+            border-radius: 0;
+            border: none;
+            z-index: 1;
+        }
+        .container, h1 {
+            display: none !important;
+        }
+        .back-btn {
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <a href="homepage.html" class="text-2xl font-bold text-white">DonorSync</a>
+        </div>
+        
+        <div class="sidebar-menu">
+            <a href="homepage.html">
+                <i class="fas fa-home"></i> Home
+            </a>
+            <a href="hospital.html" >
+                <i class="fas fa-hospital"></i> Dashboard
+            </a>
+            <a href="hospital_find_donor.html">
+                <i class="fas fa-user-edit"></i> Find Donor
+            </a>
+            <a href="patientsForm.html">
+                <i class="fas fa-user-injured"></i> Make a Request
+            </a>
+            <a href="donor_map.html" class="active">
+                <i class="fas fa-map-marker-alt"></i> Donor Map
+            </a>
+            <a href="#" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </div>
+    <a href="homepage.html" class="back-btn">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+    <div id="donorMap"></div>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // Fetch hospital from localStorage (assume the logged-in hospital is stored in sessionStorage)
+        let hospital = null;
+        const hospitalId = sessionStorage.getItem('loggedInHospitalId');
+        const hospitals = JSON.parse(localStorage.getItem('hospitals')) || [];
+        if (hospitalId) {
+            hospital = hospitals.find(h => String(h.id) === String(hospitalId));
+        } else if (hospitals.length > 0) {
+            // fallback: use the first hospital if not logged in
+            hospital = hospitals[0];
+        }
+
+        let map; // Declare map variable for later use
+
+        if (hospital && (hospital.address || hospital.city || hospital.state)) {
+            // Build address string
+            const addressParts = [
+                hospital.address || '', // Some hospital objects may have a single address field
+                hospital.city || (hospital.address && hospital.address.city) || '',
+                hospital.state || (hospital.address && hospital.address.state) || '',
+                hospital.zipcode || (hospital.address && hospital.address.zipcode) || ''
+            ];
+            const hospitalAddress = addressParts.filter(Boolean).join(', ');
+
+            // Geocode hospital address
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(hospitalAddress)}`)
+                .then(response => response.json())
+                .then(data => {
+                    let lat = 37.7749, lng = -122.4194; // Default to San Francisco if not found
+                    if (data && data.length > 0) {
+                        lat = parseFloat(data[0].lat);
+                        lng = parseFloat(data[0].lon);
+                    }
+                    // Initialize map centered on hospital
+                    map = L.map('donorMap').setView([lat, lng], 13);
+
+                    // Add OpenStreetMap tiles
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '© OpenStreetMap contributors'
+                    }).addTo(map);
+
+                    // Add hospital marker
+                    L.marker([lat, lng], {
+                        icon: L.icon({
+                            iconUrl: 'https://cdn-icons-png.flaticon.com/512/3177/3177361.png',
+                            iconSize: [36, 36],
+                            iconAnchor: [18, 36],
+                            popupAnchor: [0, -36]
+                        })
+                    }).addTo(map)
+                      .bindPopup(`<b>Hospital</b><br>${hospital.name || ''}<br>${hospitalAddress}`)
+                      .openPopup();
+
+                    // Now add donor pins (same as before, but after map is initialized)
+                    addDonorPins();
+                });
+        } else {
+            // Fallback: no hospital address, use default location
+            map = L.map('donorMap').setView([37.7749, -122.4194], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+            addDonorPins();
+        }
+
+        // Function to add donor pins (same as before)
+        function addDonorPins() {
+            const donors = JSON.parse(localStorage.getItem('donors')) || [];
+            donors.forEach(donor => {
+                if (donor.address && (donor.address.street || donor.address.city || donor.address.state)) {
+                    const addressParts = [donor.address.street, donor.address.city, donor.address.state, donor.address.zipcode];
+                    const address = addressParts.filter(Boolean).join(', ');
+                    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data && data.length > 0) {
+                                const lat = parseFloat(data[0].lat);
+                                const lng = parseFloat(data[0].lon);
+                                L.marker([lat, lng], {
+                                    icon: L.icon({
+                                        iconUrl: 'https://cdn-icons-png.flaticon.com/512/149/149060.png',
+                                        iconSize: [28, 28],
+                                        iconAnchor: [14, 28],
+                                        popupAnchor: [0, -28]
+                                    })
+                                }).addTo(map)
+                                  .bindPopup(`<b>
+                                    <a href="send_message.html?id=${donor.id}" class="donor-name-link">
+                                      ${donor.name}
+                                    </a>
+                                  </b><br>${address}`);
+                            }
+                        });
+                }
+            });
+        }
+    </script>
+</body>
+</html> 

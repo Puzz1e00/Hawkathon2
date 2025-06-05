@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set Appointment - Blood Donation</title>
+    <link rel="stylesheet" href="hl_style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            min-height: 100vh;
+            margin-left: 250px;
+        }
+        .sidebar {
+            width: 250px;
+            min-height: 100vh;
+            background: linear-gradient(to bottom, #1e40af, #1e3a8a);
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+        .sidebar-menu a {
+            display: block;
+            padding: 12px 20px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid white;
+        }
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid white;
+        }
+        .sidebar-menu i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        .appointment-container {
+            max-width: 500px;
+            margin: 60px auto;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            padding: 32px 28px;
+        }
+        .appointment-header {
+            color: #1e3a8a;
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 18px;
+        }
+        .hospital-message {
+            background: #f1f5f9;
+            border-left: 4px solid #1e40af;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+        .form-label {
+            font-weight: 500;
+            color: #374151;
+        }
+        .form-input, .form-select {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            margin-bottom: 18px;
+            font-size: 1rem;
+        }
+        .form-input:focus, .form-select:focus {
+            border-color: #1e40af;
+            outline: none;
+        }
+        .submit-btn {
+            background: linear-gradient(to right, #1e40af, #1e3a8a);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 0;
+            width: 100%;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .submit-btn:hover {
+            background: linear-gradient(to right, #1e3a8a, #1e40af);
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <a href="homepage.html" class="text-2xl font-bold text-white">DonorSync</a>
+        </div>
+        <div class="sidebar-menu">
+            <a href="homepage.html">
+                <i class="fas fa-home"></i> Home
+            </a>
+            <a href="donor_home.html">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+            <a href="blood_drives.html">
+                <i class="fas fa-heartbeat"></i> Donate Now
+            </a>
+            <a href="donor_leaderboard.html">
+                <i class="fas fa-trophy"></i> Leaderboard
+            </a>
+            <a href="#" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </div>
+    <div class="appointment-container">
+        <div class="appointment-header">Set Your Appointment</div>
+        <div class="hospital-message" id="hospitalMessageBox">
+            <!-- Hospital message will appear here -->
+        </div>
+        <form id="appointmentForm">
+            <label class="form-label" for="appointmentDate">Select Date</label>
+            <input type="date" id="appointmentDate" name="appointmentDate" class="form-input" required min="{{today}}" />
+            <label class="form-label" for="appointmentTime">Select Time</label>
+            <input type="time" id="appointmentTime" name="appointmentTime" class="form-input" required />
+            <button type="submit" class="submit-btn"><i class="fas fa-calendar-check mr-2"></i>Confirm Appointment</button>
+        </form>
+        <div id="confirmationMsg" class="mt-4 text-green-600 font-semibold text-center" style="display:none;"></div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.18.0/dist/tf.min.js"></script>
+    <script>
+    // Show hospital message from sessionStorage
+    const request = JSON.parse(sessionStorage.getItem('appointmentRequest') || '{}');
+    const hospitalMessageBox = document.getElementById('hospitalMessageBox');
+    if (request && request.message) {
+        hospitalMessageBox.innerHTML = `<b>Message from ${request.hospitalName || 'Hospital'}:</b><br>${request.message}`;
+    } else {
+        hospitalMessageBox.innerHTML = '<i>No hospital message found.</i>';
+    }
+    // Set min date to today
+    document.getElementById('appointmentDate').min = new Date().toISOString().split('T')[0];
+    // Handle appointment form submission
+    document.getElementById('appointmentForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const date = document.getElementById('appointmentDate').value;
+        const time = document.getElementById('appointmentTime').value;
+        document.getElementById('confirmationMsg').style.display = '';
+        document.getElementById('confirmationMsg').textContent = `Appointment set for ${date} at ${time}. Thank you for your willingness to donate!`;
+        // Save to localStorage: mark the message as accepted and store appointment info
+        const donor = JSON.parse(localStorage.getItem('currentUser'));
+        if (donor && Array.isArray(donor.messages)) {
+            const msgIndex = donor.messages.findIndex(m => m.date === request.date && m.hospitalName === request.hospitalName && m.message === request.message);
+            if (msgIndex !== -1) {
+                donor.messages[msgIndex].acceptedAppointment = { date, time };
+                donor.messages[msgIndex].declined = false;
+                localStorage.setItem('currentUser', JSON.stringify(donor));
+                // Also update in donors array
+                const allDonors = JSON.parse(localStorage.getItem('donors')) || [];
+                const donorIdx = allDonors.findIndex(d => d.id === donor.id);
+                if (donorIdx !== -1) {
+                    allDonors[donorIdx].messages = donor.messages;
+                    localStorage.setItem('donors', JSON.stringify(allDonors));
+                }
+                // Notify hospital
+                const hospitals = JSON.parse(localStorage.getItem('hospitals')) || [];
+                const hospital = hospitals.find(h => h.name === request.hospitalName);
+                if (hospital) {
+                    if (!Array.isArray(hospital.messages)) hospital.messages = [];
+                    hospital.messages.unshift({
+                        donorName: donor.name,
+                        donorId: donor.id,
+                        bloodType: donor.bloodGroup,
+                        message: `Donor ${donor.name} accepted your request and set an appointment for ${date} at ${time}.`,
+                        date: new Date().toISOString(),
+                        appointment: { date, time }
+                    });
+                    localStorage.setItem('hospitals', JSON.stringify(hospitals));
+                }
+            }
+        }
+        document.getElementById('appointmentForm').reset();
+        // Redirect to homepage after 2 seconds
+        setTimeout(() => {
+            window.location.href = 'donor_home.html';
+        }, 2000);
+    });
+    // Logout functionality
+    document.getElementById("logoutBtn").addEventListener("click", function(e) {
+        e.preventDefault();
+        localStorage.removeItem("currentUser");
+        window.location.href = "donor_login.html";
+    });
+    </script>
+</body>
+</html> 

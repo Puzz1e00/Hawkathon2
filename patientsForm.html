@@ -41,6 +41,7 @@
       text-decoration: none;
       transition: all 0.3s;
       border-left: 4px solid transparent;
+      font-size: 1rem;
     }
     
     .sidebar-menu a:hover {
@@ -66,8 +67,6 @@
 
     body {
       font-family: 'Segoe UI', sans-serif;
-      font-size: 1.15rem;
-      background-color: #fffdf7;
       color: #222;
     }
 
@@ -427,6 +426,42 @@
       });
     });
 
+    function getLastDonationDate(donor) {
+      if (!donor.donationHistory || !Array.isArray(donor.donationHistory) || donor.donationHistory.length === 0) {
+        return "No previous donations";
+      }
+      const sortedDonations = [...donor.donationHistory].sort((a, b) => 
+        new Date(b.date) - new Date(a.date)
+      );
+      return new Date(sortedDonations[0].date).toLocaleDateString();
+    }
+
+    function isEligibleToDonate(donor, bloodProduct) {
+      if (!donor.donationHistory || !Array.isArray(donor.donationHistory) || donor.donationHistory.length === 0) {
+        return true; // If no donation history, consider eligible
+      }
+      
+      const today = new Date();
+      // Sort donations by date in descending order and get the most recent one
+      const sortedDonations = [...donor.donationHistory].sort((a, b) => 
+        new Date(b.date) - new Date(a.date)
+      );
+      const lastDonation = new Date(sortedDonations[0].date);
+      const daysSinceLastDonation = Math.floor((today - lastDonation) / (1000 * 60 * 60 * 24));
+      
+      switch(bloodProduct) {
+        case 'wholeBlood':
+        case 'redCells':
+          return daysSinceLastDonation >= 56; // 8 weeks
+        case 'plasma':
+          return daysSinceLastDonation >= 28; // 4 weeks
+        case 'platelets':
+          return daysSinceLastDonation >= 7; // 1 week
+        default:
+          return true;
+      }
+    }
+
     function findMatchingDonors(bloodType, hospitalState) {
       const donors = JSON.parse(localStorage.getItem('donors')) || [];
       let matchingDonors = [];
@@ -437,57 +472,59 @@
       const unitsNeeded = document.getElementById('units-needed').value;
       const bloodProduct = document.getElementById('blood-product').value;
       const urgencyLevel = document.getElementById('urgency').value;
-      // Get universal donors preference
       const prioritizeUniversalDonors = document.getElementById('prioritize-universal-donors').checked;
+      
+      // Filter donors by eligibility first
+      const eligibleDonors = donors.filter(donor => isEligibleToDonate(donor, bloodProduct));
       
       // For AB+ (universal receiver), show all blood types
       if (bloodType === 'AB+') {
         // Filter donors by state
         if (hospitalState) {
-          matchingDonors = donors.filter(donor => {
+          matchingDonors = eligibleDonors.filter(donor => {
             const donorState = donor.state || (donor.address && donor.address.state) || '';
             return donorState.toLowerCase() === hospitalState.toLowerCase();
           });
           
           // Filter donors from other states
-          otherStateDonors = donors.filter(donor => {
+          otherStateDonors = eligibleDonors.filter(donor => {
             const donorState = donor.state || (donor.address && donor.address.state) || '';
             return donorState.toLowerCase() !== hospitalState.toLowerCase();
           });
         } else {
-          matchingDonors = donors;
+          matchingDonors = eligibleDonors;
         }
         
-        headerMessage = `Donors for AB+ Blood Type (Universal Receiver - Can Receive Any Blood Type)`;
+        headerMessage = `Eligible Donors for AB+ Blood Type (Universal Receiver - Can Receive Any Blood Type)`;
       } else {
         // Find donors matching the selected blood type
         if (hospitalState) {
-          matchingDonors = donors.filter(donor => {
+          matchingDonors = eligibleDonors.filter(donor => {
             const donorState = donor.state || (donor.address && donor.address.state) || '';
             return donor.bloodGroup === bloodType &&
               donorState.toLowerCase() === hospitalState.toLowerCase();
           });
           
           // Filter other state donors with matching blood type
-          otherStateDonors = donors.filter(donor => {
+          otherStateDonors = eligibleDonors.filter(donor => {
             const donorState = donor.state || (donor.address && donor.address.state) || '';
             return donor.bloodGroup === bloodType &&
               donorState.toLowerCase() !== hospitalState.toLowerCase();
           });
         } else {
-          matchingDonors = donors.filter(donor => donor.bloodGroup === bloodType);
+          matchingDonors = eligibleDonors.filter(donor => donor.bloodGroup === bloodType);
         }
         
         // Always include O- donors (universal donors) if selected blood type is not already O- and option is checked
         if (bloodType !== 'O-' && prioritizeUniversalDonors) {
-          const universalDonors = donors.filter(donor => {
+          const universalDonors = eligibleDonors.filter(donor => {
             const donorState = donor.state || (donor.address && donor.address.state) || '';
             return donor.bloodGroup === 'O-' &&
               (!hospitalState || donorState.toLowerCase() === hospitalState.toLowerCase());
           });
           
           // Universal donors from other states
-          const otherStateUniversalDonors = donors.filter(donor => {
+          const otherStateUniversalDonors = eligibleDonors.filter(donor => {
             const donorState = donor.state || (donor.address && donor.address.state) || '';
             return donor.bloodGroup === 'O-' &&
               hospitalState && donorState.toLowerCase() !== hospitalState.toLowerCase();
@@ -515,9 +552,14 @@
         }
         
         headerMessage = bloodType === 'O-' ? 
-          `Donors with O- Blood Type (Universal Donors)` : 
-          (prioritizeUniversalDonors ? `Donors with ${bloodType} Blood Type + Universal Donors (O-)` : `Donors with ${bloodType} Blood Type`);
+          `Eligible Donors with O- Blood Type (Universal Donors)` : 
+          (prioritizeUniversalDonors ? `Eligible Donors with ${bloodType} Blood Type + Universal Donors (O-)` : `Eligible Donors with ${bloodType} Blood Type`);
       }
+
+      // Add eligibility information to the header message
+      const waitingPeriod = bloodProduct === 'wholeBlood' || bloodProduct === 'redCells' ? '56 days' :
+                          bloodProduct === 'plasma' ? '28 days' : '7 days';
+      headerMessage += ` (Minimum ${waitingPeriod} since last donation)`;
 
       // Sort donors to group by blood type
       matchingDonors.sort((a, b) => a.bloodGroup.localeCompare(b.bloodGroup));
@@ -565,6 +607,7 @@
               <div><strong>Email:</strong> ${donor.email || 'N/A'}</div>
               <div><strong>City:</strong> ${donor.city || (donor.address && donor.address.city) || 'N/A'}</div>
               <div><strong>State:</strong> ${donor.state || (donor.address && donor.address.state) || 'N/A'}</div>
+              <div><strong>Last Donation:</strong> ${getLastDonationDate(donor)}</div>
               <a href="send_message.html?id=${donor.id}&bloodType=${bloodType}&unitsNeeded=${unitsNeeded}&urgency=${urgencyLevel}&bloodProduct=${bloodProduct}" 
                  style="display: block; width: 100%; padding: 8px; background-color: #28a745; color: white; text-align: center; border-radius: 4px; margin-top: 10px; margin-left: -10px; text-decoration: none;">
                 Contact Donor
@@ -608,6 +651,7 @@
                         <div><strong>Contact:</strong> ${donor.contact || 'N/A'}</div>
                         <div><strong>City:</strong> ${donor.city || (donor.address && donor.address.city) || 'N/A'}</div>
                         <div><strong>State:</strong> <span style="background-color: #dbeafe; padding: 2px 6px; border-radius: 4px;">${donorState}</span></div>
+                        <div><strong>Last Donation:</strong> ${getLastDonationDate(donor)}</div>
                         <a href="send_message.html?id=${donor.id}&bloodType=${bloodType}&unitsNeeded=${unitsNeeded}&urgency=${urgencyLevel}&bloodProduct=${bloodProduct}" 
                            style="display: block; width: 100%; padding: 8px; background-color: #4f46e5; color: white; text-align: center; border-radius: 4px; margin-top: 10px; margin-left: -10px; text-decoration: none;">
                           Contact Donor
@@ -741,6 +785,86 @@
         inventoryContainer.appendChild(summary);
       }
     }
+
+    function updateWaitingPeriod() {
+      const bloodProduct = document.getElementById('blood-product').value;
+      const lastDonationInput = document.getElementById('last-donation');
+      const waitingPeriodInfo = document.getElementById('waiting-period-info');
+      const today = new Date();
+      
+      // Set minimum date based on blood product type
+      let minDays = 0;
+      let message = '';
+      
+      switch(bloodProduct) {
+        case 'wholeBlood':
+        case 'redCells':
+          minDays = 56; // 8 weeks
+          message = 'Minimum 56 days (8 weeks) between whole blood donations';
+          break;
+        case 'plasma':
+          minDays = 28; // 4 weeks
+          message = 'Minimum 28 days (4 weeks) between plasma donations';
+          break;
+        case 'platelets':
+          minDays = 7; // 1 week
+          message = 'Minimum 7 days (1 week) between platelet donations';
+          break;
+      }
+      
+      // Calculate minimum date
+      const minDate = new Date(today);
+      minDate.setDate(today.getDate() - minDays);
+      
+      // Set minimum date for the input
+      lastDonationInput.min = minDate.toISOString().split('T')[0];
+      
+      // Update info message
+      waitingPeriodInfo.textContent = message;
+      
+      // Validate current value if it exists
+      if (lastDonationInput.value) {
+        const selectedDate = new Date(lastDonationInput.value);
+        if (selectedDate > minDate) {
+          lastDonationInput.setCustomValidity(`Last donation must be at least ${minDays} days ago`);
+        } else {
+          lastDonationInput.setCustomValidity('');
+        }
+      }
+    }
+    
+    // Add event listener for date input
+    document.getElementById('last-donation').addEventListener('change', function() {
+      const bloodProduct = document.getElementById('blood-product').value;
+      const selectedDate = new Date(this.value);
+      const today = new Date();
+      let minDays = 0;
+      
+      switch(bloodProduct) {
+        case 'wholeBlood':
+        case 'redCells':
+          minDays = 56;
+          break;
+        case 'plasma':
+          minDays = 28;
+          break;
+        case 'platelets':
+          minDays = 7;
+          break;
+      }
+      
+      const minDate = new Date(today);
+      minDate.setDate(today.getDate() - minDays);
+      
+      if (selectedDate > minDate) {
+        this.setCustomValidity(`Last donation must be at least ${minDays} days ago`);
+      } else {
+        this.setCustomValidity('');
+      }
+    });
+    
+    // Initialize waiting period on page load
+    document.addEventListener('DOMContentLoaded', updateWaitingPeriod);
   </script>
 </head>
 <body>
@@ -755,10 +879,16 @@
         <i class="fas fa-home"></i> Home
       </a>
       <a href="hospital.html">
-        <i class="fas fa-tachometer-alt"></i> Dashboard
+        <i class="fas fa-hospital"></i> Dashboard
+      </a>
+      <a href="hospital_find_donor.html">
+        <i class="fas fa-user-edit"></i> Find Donor
       </a>
       <a href="patientsForm.html" class="active">
         <i class="fas fa-user-injured"></i> Make a Request
+      </a>
+      <a href="donor_map.html">
+        <i class="fas fa-map-marker-alt"></i> Donor Map
       </a>
       <a href="#" id="logoutBtn">
         <i class="fas fa-sign-out-alt"></i> Logout
@@ -814,7 +944,9 @@
                 <option value="emergency">Emergency</option>
               </select>
             </div>
-            
+          </div>
+
+          <div class="form-row">
             <div class="form-group">
               <label for="blood-product">Type of Blood Product:</label>
               <select id="blood-product" name="blood-product" required>
@@ -823,6 +955,14 @@
                 <option value="plasma">Plasma</option>
                 <option value="platelets">Platelets</option>
               </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="last-donation">Last Donation Date:</label>
+              <input type="date" id="last-donation" name="last-donation" required>
+              <small id="waiting-period-info" class="text-sm text-gray-600"></small>
             </div>
           </div>
 

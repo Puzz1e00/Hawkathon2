@@ -182,4 +182,6 @@ button:hover {
         max-height: none;
     }
 }
+
+/* TensorFlow.js will be included in your main HTML files via CDN script tag. */
   

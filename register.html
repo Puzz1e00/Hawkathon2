@@ -313,6 +313,12 @@
                         <i class="fas fa-envelope absolute right-3 top-3 text-gray-400"></i>
                     </div>
                     
+                    <div class="floating-label form-group">
+                        <input type="password" name="password" required placeholder=" " class="w-full p-3 border rounded-md" />
+                        <label>Password</label>
+                        <i class="fas fa-lock absolute right-3 top-3 text-gray-400"></i>
+                    </div>
+                    
                     <div class="col-span-2">
                         <label class="block font-medium mb-4 text-gray-700">Address</label>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -712,7 +718,8 @@
                             verificationStatus: 'pending', // Initial status: pending, verified, rejected
                             verifiedBy: null,
                             verifiedDate: null
-                        }
+                        },
+                        password: formData.get('password')
                     };
                     
                     // Only add the image data if it exists (to prevent large localStorage objects)
