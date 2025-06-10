@@ -302,7 +302,7 @@
                                 ${donation.units} units
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                ${donation.donationType || 'N/A'}
+                                ${donation.type || 'N/A'}
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-500">
                                 ${donation.notes || 'N/A'}
@@ -327,7 +327,7 @@
                 const newDonation = {
                     date: donationDate,
                     units: parseInt(bloodUnits),
-                    donationType: donationType,
+                    type: donationType,
                     notes: notes,
                     hospitalId: parseInt(hospitalId)
                 };
@@ -343,14 +343,26 @@
                 donors[donorIndex] = donor;
                 localStorage.setItem('donors', JSON.stringify(donors));
 
+                // Also update currentUser if this is the logged-in donor
+                const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+                if (currentUser && currentUser.id === donor.id) {
+                    // Update the entire donor object in currentUser to ensure all properties are in sync
+                    currentUser.donationHistory = donor.donationHistory;
+                    currentUser.badges = donor.badges || [];
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                }
+
                 // Reset form
                 e.target.reset();
 
                 // Update donation history display
                 renderDonationHistory();
 
-                // Show success message
+                // Show success message and redirect
                 alert('Donation record added successfully!');
+                
+                // Force a page reload when redirecting to ensure badges are recalculated
+                window.location.href = 'donor_home.html';
             });
 
             // Handle logout
