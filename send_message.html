@@ -201,6 +201,36 @@
           <h2 id="donorName">Donor Name</h2>
         </div>
         
+        <!-- New Donation Eligibility Section -->
+        <div class="detail-card" style="background-color: #f8fafc; border: 1px solid #e2e8f0;">
+          <h3 style="margin: 0 0 15px 0; color: #1e293b; font-size: 1.1em;">Donation Eligibility Status</h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+            <div class="eligibility-item" style="padding: 12px; border-radius: 8px; background-color: white; border: 1px solid #e2e8f0;">
+              <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                <i class="fas fa-tint" style="color: #dc2626; margin-right: 8px;"></i>
+                <span style="font-weight: 600;">Whole Blood</span>
+              </div>
+              <div id="wholeBloodEligibility" style="font-size: 0.9em; color: #64748b;">Checking...</div>
+            </div>
+            
+            <div class="eligibility-item" style="padding: 12px; border-radius: 8px; background-color: white; border: 1px solid #e2e8f0;">
+              <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                <i class="fas fa-flask" style="color: #3b82f6; margin-right: 8px;"></i>
+                <span style="font-weight: 600;">Plasma</span>
+              </div>
+              <div id="plasmaEligibility" style="font-size: 0.9em; color: #64748b;">Checking...</div>
+            </div>
+            
+            <div class="eligibility-item" style="padding: 12px; border-radius: 8px; background-color: white; border: 1px solid #e2e8f0;">
+              <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                <i class="fas fa-microscope" style="color: #8b5cf6; margin-right: 8px;"></i>
+                <span style="font-weight: 600;">Platelets</span>
+              </div>
+              <div id="plateletEligibility" style="font-size: 0.9em; color: #64748b;">Checking...</div>
+            </div>
+          </div>
+        </div>
+        
         <div class="detail-card">
           <div class="detail-item">
             <span class="detail-label">Last Donated</span>
@@ -266,7 +296,7 @@
       
       <div class="notify-panel">
         <h3>Send Notification</h3>
-        <p>Send a message to this donor</p>
+        <p>Send a request to this donor</p>
         
         <textarea id="messageInput" placeholder="Enter your message here...">Urgent: We need your blood type at our hospital immediately. Please respond if you can donate.</textarea>
         
@@ -377,6 +407,83 @@
       console.log('Donor object loaded from localStorage:', donor);
 
       if (donor) {
+        // Calculate donation eligibility
+        function calculateEligibility(lastDonationDate, donationType) {
+          if (!lastDonationDate) return { eligible: true, message: 'Eligible to donate' };
+          
+          const now = new Date();
+          const lastDonation = new Date(lastDonationDate);
+          const daysSinceLastDonation = Math.floor((now - lastDonation) / (1000 * 60 * 60 * 24));
+          
+          switch(donationType) {
+            case 'whole':
+              return daysSinceLastDonation >= 56 
+                ? { eligible: true, message: 'Eligible to donate' }
+                : { eligible: false, message: `Eligible in ${56 - daysSinceLastDonation} days` };
+            case 'plasma':
+              return daysSinceLastDonation >= 28
+                ? { eligible: true, message: 'Eligible to donate' }
+                : { eligible: false, message: `Eligible in ${28 - daysSinceLastDonation} days` };
+            case 'platelet':
+              return daysSinceLastDonation >= 7
+                ? { eligible: true, message: 'Eligible to donate' }
+                : { eligible: false, message: `Eligible in ${7 - daysSinceLastDonation} days` };
+            default:
+              return { eligible: true, message: 'Eligible to donate' };
+          }
+        }
+
+        // Find last donation dates for each type
+        const lastDonations = {
+          whole: null,
+          plasma: null,
+          platelet: null
+        };
+
+        if (donor.donationHistory && donor.donationHistory.length > 0) {
+          donor.donationHistory.forEach(donation => {
+            const donationType = donation.type ? donation.type.toLowerCase() : 'whole';
+            const donationDate = new Date(donation.date);
+            
+            if (donationType.includes('plasma')) {
+              if (!lastDonations.plasma || donationDate > new Date(lastDonations.plasma)) {
+                lastDonations.plasma = donation.date;
+              }
+            } else if (donationType.includes('platelet')) {
+              if (!lastDonations.platelet || donationDate > new Date(lastDonations.platelet)) {
+                lastDonations.platelet = donation.date;
+              }
+            } else {
+              if (!lastDonations.whole || donationDate > new Date(lastDonations.whole)) {
+                lastDonations.whole = donation.date;
+              }
+            }
+          });
+        }
+
+        // Update eligibility status in UI
+        const wholeBloodEligibility = calculateEligibility(lastDonations.whole, 'whole');
+        const plasmaEligibility = calculateEligibility(lastDonations.plasma, 'plasma');
+        const plateletEligibility = calculateEligibility(lastDonations.platelet, 'platelet');
+
+        document.getElementById('wholeBloodEligibility').innerHTML = `
+          <span style="color: ${wholeBloodEligibility.eligible ? '#16a34a' : '#dc2626'}">
+            ${wholeBloodEligibility.message}
+          </span>
+        `;
+
+        document.getElementById('plasmaEligibility').innerHTML = `
+          <span style="color: ${plasmaEligibility.eligible ? '#16a34a' : '#dc2626'}">
+            ${plasmaEligibility.message}
+          </span>
+        `;
+
+        document.getElementById('plateletEligibility').innerHTML = `
+          <span style="color: ${plateletEligibility.eligible ? '#16a34a' : '#dc2626'}">
+            ${plateletEligibility.message}
+          </span>
+        `;
+
         // Populate donor details
         document.getElementById('bloodType').textContent = donor.bloodGroup || 'Unknown';
         document.getElementById('donorName').textContent = donor.name || 'Donor';
@@ -575,7 +682,7 @@
               const donorId = this.getAttribute('data-id');
               // Preserve existing URL parameters
               const params = new URLSearchParams(window.location.search);
-              params.set('id', donorId);
+              params.set('d', donorId);
               window.location.href = `send_message.html?${params.toString()}`;
             });
           });

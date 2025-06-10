@@ -178,7 +178,7 @@
                 console.log('Initializing test donor data');
                 donors = [
                     {
-                        id: "D001",
+                        id: 1,
                         name: "John Doe",
                         bloodGroup: "O+",
                         medicalConditions: "",
@@ -187,7 +187,7 @@
                         donationHistory: []
                     },
                     {
-                        id: "D002",
+                        id: 2,
                         name: "Jane Smith",
                         bloodGroup: "A+",
                         medicalConditions: "",
@@ -221,9 +221,12 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${donor.donationHistory?.length || 0}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             <a href="hospital_update_donor.html?id=${donor.id}" 
-                               class="text-green-600 hover:text-green-900"
-                               onclick="console.log('Clicking update for donor:', '${donor.id}')">
-                                Update Details
+                               class="text-green-600 hover:text-green-900 mr-4">
+                               Update Details
+                            </a>
+                            <a href="send_message.html?donorId=${donor.id}" 
+                               class="text-blue-600 hover:text-blue-900">
+                               Send Message
                             </a>
                         </td>
                     </tr>

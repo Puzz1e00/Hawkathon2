@@ -190,6 +190,7 @@
             <a href="donor_map.html">
                 <i class="fas fa-map-marker-alt"></i> Donor Map
             </a>
+
             <a href="#" id="logoutBtn">
                 <i class="fas fa-sign-out-alt"></i> Logout
             </a>
@@ -298,7 +299,7 @@
             <div class="bg-white rounded-xl shadow-md overflow-hidden">
                 <div class="bg-hospital-primary text-white px-6 py-4">
                     <h2 class="text-xl font-semibold flex items-center">
-                        <i class="fas fa-comments mr-2"></i> Recent Messages
+                        <i class="fas fa-calendar-check mr-2"></i> Confirmed Appointments
                     </h2>
                 </div>
                 <div class="p-0">
@@ -310,7 +311,7 @@
                             <!-- Messages will be loaded here -->
                             <div class="no-messages">
                                 <i class="fas fa-comment-slash text-2xl mb-2"></i>
-                                <p>No donor messages yet</p>
+                                <p>No confirmed appointments yet</p>
                             </div>
                         </div>
                     </div>
@@ -569,8 +570,8 @@
                     const messagesContainer = document.getElementById("donorMessages");
                     messagesContainer.innerHTML = `
                         <div class="no-messages">
-                            <i class="fas fa-comment-slash text-2xl mb-2"></i>
-                            <p>No donor messages yet</p>
+                            <i class="fas fa-calendar-times text-2xl mb-2"></i>
+                            <p>No confirmed appointments yet</p>
                         </div>
                     `;
                     return;

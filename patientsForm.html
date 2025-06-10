@@ -473,6 +473,14 @@
       const bloodProduct = document.getElementById('blood-product').value;
       const urgencyLevel = document.getElementById('urgency').value;
       const prioritizeUniversalDonors = document.getElementById('prioritize-universal-donors').checked;
+
+      // Update URL with form values
+      const params = new URLSearchParams(window.location.search);
+      params.set('bloodType', bloodType);
+      params.set('unitsNeeded', unitsNeeded);
+      params.set('bloodProduct', bloodProduct);
+      params.set('urgency', urgencyLevel);
+      window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`);
       
       // Filter donors by eligibility first
       const eligibleDonors = donors.filter(donor => isEligibleToDonate(donor, bloodProduct));
@@ -626,55 +634,170 @@
         let otherStatesDonorsHTML = '';
         if (otherStateDonors.length > 0) {
           otherStatesDonorsHTML = `
-            <div style="grid-column: 1/-1; margin-top: 30px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h3 style="margin: 0;">Donors from Other States</h3>
-                <div>
-                  <label style="margin-right: 10px; display: inline-flex; align-items: center;">
-                    <input type="checkbox" id="showOtherStates" checked style="margin-right: 5px;"> Show donors from other states
-                  </label>
-                </div>
-              </div>
-              <div id="otherStatesDonorsContainer" style="max-height: 400px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px;">
-                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px;">
-                  ${otherStateDonors.map(donor => {
-                    const donorState = donor.state || (donor.address && donor.address.state) || 'Unknown';
-                    const isUniversalDonor = donor.bloodGroup === 'O-';
-                    return `
-                      <div style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; background-color: white; border-left: 4px solid ${isUniversalDonor ? '#dc3545' : '#3b82f6'};">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                          <div style="font-weight: bold;">${donor.name || 'N/A'}</div>
-                          <div style="color: ${getBloodTypeColor(donor.bloodGroup)}; font-weight: bold; background-color: ${isUniversalDonor ? '#fef2f2' : '#eff6ff'}; padding: 3px 8px; border-radius: 12px;">
-                            ${donor.bloodGroup || 'N/A'} ${getBloodTypeLabel(donor.bloodGroup)}
-                          </div>
-                        </div>
-                        <div><strong>Contact:</strong> ${donor.contact || 'N/A'}</div>
-                        <div><strong>City:</strong> ${donor.city || (donor.address && donor.address.city) || 'N/A'}</div>
-                        <div><strong>State:</strong> <span style="background-color: #dbeafe; padding: 2px 6px; border-radius: 4px;">${donorState}</span></div>
-                        <div><strong>Last Donation:</strong> ${getLastDonationDate(donor)}</div>
-                        <a href="send_message.html?id=${donor.id}&bloodType=${bloodType}&unitsNeeded=${unitsNeeded}&urgency=${urgencyLevel}&bloodProduct=${bloodProduct}" 
-                           style="display: block; width: 100%; padding: 8px; background-color: #4f46e5; color: white; text-align: center; border-radius: 4px; margin-top: 10px; margin-left: -10px; text-decoration: none;">
-                          Contact Donor
-                        </a>
-                      </div>
-                    `;
-                  }).join('')}
-                </div>
+            <div style="grid-column: 1/-1; margin-top: 20px;">
+              <h3 style="font-size: 18px; color: #333; margin-bottom: 15px;">Donors in Other States</h3>
+              <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+                ${otherStateDonors.map(donor => `
+                  <div style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; background-color: white;">
+                    <div><strong>Name:</strong> ${donor.name || 'N/A'}</div>
+                    <div style="color: ${getBloodTypeColor(donor.bloodGroup)}; font-weight: bold;">
+                      <strong>Blood Group:</strong> ${donor.bloodGroup || 'N/A'} 
+                      ${getBloodTypeLabel(donor.bloodGroup)}
+                    </div>
+                    <div><strong>Contact:</strong> ${donor.contact || 'N/A'}</div>
+                    <div><strong>Email:</strong> ${donor.email || 'N/A'}</div>
+                    <div><strong>City:</strong> ${donor.city || (donor.address && donor.address.city) || 'N/A'}</div>
+                    <div><strong>State:</strong> ${donor.state || (donor.address && donor.address.state) || 'N/A'}</div>
+                    <div><strong>Last Donation:</strong> ${getLastDonationDate(donor)}</div>
+                    <a href="send_message.html?id=${donor.id}&bloodType=${bloodType}&unitsNeeded=${unitsNeeded}&urgency=${urgencyLevel}&bloodProduct=${bloodProduct}" 
+                       style="display: block; width: 100%; padding: 8px; background-color: #28a745; color: white; text-align: center; border-radius: 4px; margin-top: 10px; margin-left: -10px; text-decoration: none;">
+                      Contact Donor
+                    </a>
+                  </div>
+                `).join('')}
               </div>
             </div>
           `;
         }
 
-        // Combine sections
-        donorsList.innerHTML = infoMessage + localDonorsHTML + otherStatesDonorsHTML;
+        // Add "Send Message to All" button if there are matching donors
+        if (matchingDonors.length > 0) {
+          const sendToAllButton = `
+            <div style="grid-column: 1/-1; margin: 20px 0; text-align: center;">
+              <button id="sendToAllBtn" style="
+                padding: 12px 24px;
+                background-color: #1e40af;
+                color: white;
+                border: none;
+                border-radius: 6px;
+                font-size: 16px;
+                font-weight: 600;
+                cursor: pointer;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                transition: all 0.3s ease;
+              ">
+                <i class="fas fa-paper-plane"></i>
+                Send Message to All Matching Donors
+              </button>
+            </div>
+          `;
+          // Move the button to appear before the donors list
+          donorsList.innerHTML = infoMessage + sendToAllButton + localDonorsHTML + otherStatesDonorsHTML;
+        } else {
+          donorsList.innerHTML = infoMessage + localDonorsHTML + otherStatesDonorsHTML;
+        }
         
-        // Add toggle functionality for other states section
-        const showOtherStatesCheckbox = document.getElementById('showOtherStates');
-        if (showOtherStatesCheckbox) {
-          const otherStatesDonorsContainer = document.getElementById('otherStatesDonorsContainer');
-          showOtherStatesCheckbox.addEventListener('change', function() {
-            if (otherStatesDonorsContainer) {
-              otherStatesDonorsContainer.style.display = this.checked ? 'block' : 'none';
+        // Add event listeners to contact buttons
+        const contactButtons = donorsList.querySelectorAll('.contact-btn');
+        contactButtons.forEach(button => {
+          button.addEventListener('click', function() {
+            const donorId = this.getAttribute('data-id');
+            // Preserve existing URL parameters
+            const params = new URLSearchParams(window.location.search);
+            params.set('id', donorId);
+            window.location.href = `send_message.html?${params.toString()}`;
+          });
+        });
+
+        // Function to save message to donor's history
+        function saveMessageToDonor(donorId, messageText, hospitalName) {
+          console.log('Attempting to save message for donor ID:', donorId);
+          let allDonors = JSON.parse(localStorage.getItem('donors')) || [];
+          const currentUser = JSON.parse(localStorage.getItem('currentUser')); // Get current user
+          
+          const donorIndex = allDonors.findIndex(d => String(d.id).trim().toLowerCase() === String(donorId).trim().toLowerCase());
+
+          if (donorIndex > -1) {
+            const donorToUpdate = allDonors[donorIndex];
+            if (!donorToUpdate.messages) {
+              donorToUpdate.messages = [];
+            }
+            const newMessage = {
+              message: messageText,
+              hospitalName: hospitalName,
+              date: new Date().toISOString(), // Use ISO string for consistent date saving
+              read: false // Mark new messages as unread
+            };
+            donorToUpdate.messages.push(newMessage);
+            
+            localStorage.setItem('donors', JSON.stringify(allDonors));
+            console.log('Message saved successfully to donor in donors array:', donorId, newMessage);
+
+            // If the updated donor is the current user, update currentUser in localStorage as well
+            if (currentUser && String(currentUser.id).trim().toLowerCase() === String(donorId).trim().toLowerCase()) {
+              localStorage.setItem('currentUser', JSON.stringify(donorToUpdate));
+              console.log('currentUser updated in localStorage with new message.');
+            }
+          } else {
+            console.error('Donor not found in localStorage for saving message!', donorId);
+            throw new Error('Donor not found');
+          }
+        }
+
+        // Add event listener for "Send Message to All" button
+        const sendToAllBtn = document.getElementById('sendToAllBtn');
+        if (sendToAllBtn) {
+          sendToAllBtn.addEventListener('click', async function() {
+            if (!confirm(`Are you sure you want to send a message to all ${matchingDonors.length} matching donors?`)) {
+              return;
+            }
+
+            // Show loading state
+            sendToAllBtn.disabled = true;
+            sendToAllBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending Messages...';
+
+            try {
+              // Get current hospital info
+              const hospitalId = sessionStorage.getItem('loggedInHospitalId');
+              const hospitals = JSON.parse(localStorage.getItem('hospitals')) || [];
+              const hospital = hospitals.find(h => h.id == hospitalId) || { name: 'our hospital', contact: '' };
+
+              // Get URL parameters
+              const params = new URLSearchParams(window.location.search);
+              const bloodType = params.get('bloodType') || 'blood';
+              const unitsNeeded = params.get('unitsNeeded') || '1';
+              const urgencyLevel = params.get('urgency') || 'normal';
+              const bloodProduct = params.get('bloodProduct') || 'whole blood';
+
+              // Create message template
+              const messageTemplate = `Urgent blood donation request: ${unitsNeeded} units of ${bloodType} ${bloodProduct} needed. 
+                Urgency level: ${urgencyLevel}. Please respond if you can help.`;
+
+              let successCount = 0;
+              let errorCount = 0;
+
+              // Send messages to all matching donors
+              for (const donor of matchingDonors) {
+                try {
+                  // Save message to donor's history
+                  saveMessageToDonor(donor.id, messageTemplate, hospital.name);
+                  successCount++;
+                } catch (error) {
+                  console.error(`Error sending message to donor ${donor.id}:`, error);
+                  errorCount++;
+                }
+              }
+
+              // Show result
+              if (errorCount === 0) {
+                alert(`Successfully sent messages to all ${successCount} donors!`);
+              } else {
+                alert(`Sent messages to ${successCount} donors. Failed to send to ${errorCount} donors.`);
+              }
+
+              // Reset button state
+              sendToAllBtn.disabled = false;
+              sendToAllBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Message to All Matching Donors';
+
+            } catch (error) {
+              console.error('Error in bulk message sending:', error);
+              alert('An error occurred while sending messages. Please try again.');
+              
+              // Reset button state
+              sendToAllBtn.disabled = false;
+              sendToAllBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Message to All Matching Donors';
             }
           });
         }
@@ -955,14 +1078,6 @@
                 <option value="plasma">Plasma</option>
                 <option value="platelets">Platelets</option>
               </select>
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="last-donation">Last Donation Date:</label>
-              <input type="date" id="last-donation" name="last-donation" required>
-              <small id="waiting-period-info" class="text-sm text-gray-600"></small>
             </div>
           </div>
 

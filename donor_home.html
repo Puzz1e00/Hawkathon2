@@ -343,7 +343,7 @@
                     </div>
                     <div>
                         <p class="text-gray-500 text-sm">Current Streak</p>
-                        <h3 class="text-2xl font-bold"><span id="streakCount">0</span> Donations</h3>
+                        <h3 class="text-2xl font-bold"><span id="streakCount">0</span></h3>
                     </div>
                 </div>
             </div>
@@ -367,7 +367,7 @@
             <div class="bg-white rounded-xl shadow-md overflow-hidden">
                 <div class="bg-indigo-600 text-white px-6 py-4">
                     <h2 class="text-xl font-semibold flex items-center">
-                        <i class="fas fa-inbox mr-2"></i> Hospital Messages
+                        <i class="fas fa-hand-holding-medical mr-2"></i> Donation Requests
                     </h2>
                 </div>
                 <div class="p-6">
@@ -590,7 +590,7 @@
             donor.donationHistory = donor.donationHistory || [];
             donor.messages = donor.messages || [];
             donor.badges = donor.badges || [];
-
+            
             // Get all hospitals to display location names
             const allHospitals = JSON.parse(localStorage.getItem('hospitals')) || [];
             
@@ -814,7 +814,9 @@
                         <div class="flex space-x-2 mt-3 justify-end">
                             <button class="accept-btn bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs" data-idx="${idx}"><i class="fas fa-check mr-1"></i>Accept</button>
                             <button class="decline-btn bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs" data-idx="${idx}"><i class="fas fa-times mr-1"></i>Decline</button>
+                            <!-- Reply button commented out
                             <button class="reply-btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs" data-idx="${idx}"><i class="fas fa-reply mr-1"></i>Reply</button>
+                            -->
                         </div>
                         ` : msg.acceptedAppointment ? `
                         <div class='text-xs text-green-500 mt-2 text-right'>Appointment Set: ${msg.acceptedAppointment.date} at ${msg.acceptedAppointment.time}</div>
@@ -822,6 +824,7 @@
                         <div class='text-xs text-red-500 mt-2 text-right'>Declined</div>
                         `}
                         
+                        <!-- Reply form commented out
                         <div class="reply-form hidden mt-3 bg-gray-50 p-3 rounded-lg" data-idx="${idx}">
                             <textarea class="w-full border border-gray-300 rounded p-2 text-sm" rows="3" placeholder="Type your reply here..."></textarea>
                             <div class="flex justify-end space-x-2 mt-2">
@@ -829,6 +832,7 @@
                                 <button class="send-reply-btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs">Send Reply</button>
                             </div>
                         </div>
+                        -->
                     `;
                     messagesContainer.appendChild(messageElement);
                 });
@@ -860,7 +864,7 @@
                 });
             });
 
-            // Add event listeners for reply functionality
+            /* Reply functionality event listeners commented out
             messagesContainer.querySelectorAll('.reply-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const idx = parseInt(this.getAttribute('data-idx'));
@@ -916,6 +920,7 @@
                     }
                 });
             });
+            */
 
             // Clear and reinitialize badges container
             const badgesContainer = document.getElementById('badgesContainer');
@@ -1152,9 +1157,9 @@
             if (newlyEarnedBadges.length > 0) {
                 newlyEarnedBadges.forEach(badge => {
                     if (!donor.badges.includes(badge.id)) {
-                        donor.badges.push(badge.id);
-                        // Show modal for newly earned badges
-                        showBadgeModal(badge);
+                    donor.badges.push(badge.id);
+                    // Show modal for newly earned badges
+                    showBadgeModal(badge);
                     }
                 });
                 // Update both currentUser and the donor in the donors array
@@ -1231,7 +1236,7 @@
             }
             if (badgeProgressBarElement) {
                 badgeProgressBarElement.style.width = `${progressPercent}%`;
-            }
+                }
 
             function formatDateDifference(date) {
                 const now = new Date();
