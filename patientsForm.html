@@ -134,11 +134,12 @@
     }
 
     .header {
-      background-color: lightgray;
+      background-color: rgb(66, 157, 70);
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 15px 30px;
+      border-radius: 10px;
     }
 
     .title {
@@ -151,6 +152,7 @@
       font-size: 2.2rem;
       font-weight: bold;
       margin-left:150px;
+      color:white;
     }
 
     .logo {
@@ -170,12 +172,19 @@
       flex-direction: column;
       margin: 0 auto;
       width: 75vw;
+      border: 0px;
+    }
+
+    .form {
+      background-color:rgb(205, 239, 221);
+      margin-top:50px;
+      border: 5px solid rgb(51, 125, 55);
     }
 
     fieldset {
       margin: 25px 0;
       padding: 25px 15px 20px 15px;
-      border: 1px solid #999;
+      border: 0px solid #999;
       position: relative;
     }
 
@@ -183,8 +192,9 @@
       font-weight: bold;
       font-size: 1.2rem;
       padding: 0 10px;
-      background-color: white;
+      background-color: rgb(51, 125, 55);
       margin-left: 10px;
+      color:white;
     }
 
     .submit-btn {
@@ -357,7 +367,11 @@
       padding: 2px 8px;
       border-radius: 10px;
     }
-
+    .inventory-status {
+      margin-left:250px;
+      margin-bottom:50px;
+    }
+    
     .inventory-summary {
       grid-column: 1 / -1;
       background-color: #f8fafc;
@@ -1033,7 +1047,7 @@
     </header>
 
     <main>
-      <form id="donorSearchForm" onsubmit="return false;">
+      <form id="donorSearchForm" onsubmit="return false;" class="form">
         <fieldset id="medical-request">
           <legend>Patient Medical Request</legend>
           <div class="form-row">
@@ -1081,6 +1095,8 @@
             </div>
           </div>
 
+
+
           <!-- Universal Donors Section -->
           <div id="universalDonorsSection" style="margin-top: 20px; padding: 15px; background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: 8px;">
             <h4 style="color: #721c24; margin-top: 0;">Universal Donors (O-) Priority System</h4>
@@ -1117,10 +1133,10 @@
         </button>
         
           
-          </div>
+          
         </fieldset>
       </form>
-
+    </div>
       <div id="donorsResults" style="margin-top: 30px; display: none;">
         <h3 id="resultsHeading">Matching Donors</h3>
         <div id="donorsList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-top: 15px;"></div>
