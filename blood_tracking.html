@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Blood Tracking | DonorSync</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        .sidebar {
+            width: 250px;
+            min-height: 100vh;
+            background: linear-gradient(to bottom, #1e40af, #1e3a8a);
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+        
+        .sidebar-menu a {
+            display: block;
+            padding: 12px 20px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+        
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid white;
+        }
+        
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid white;
+        }
+        
+        .sidebar-menu i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+        }
+        
+        .tracking-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .tracking-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-processed {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .status-transfused {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+        
+        .status-expired {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.5s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <a href="homepage.html" class="text-2xl font-bold text-white">DonorSync</a>
+        </div>
+        
+        <div class="sidebar-menu">
+            <a href="homepage.html">
+                <i class="fas fa-home"></i> Home
+            </a>
+            <a href="donor_home.html">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+            <a href="blood_drives.html">
+                <i class="fas fa-heartbeat"></i> Donate Now
+            </a>
+            <a href="donor_leaderboard.html">
+                <i class="fas fa-trophy"></i> Leaderboard
+            </a>
+            <a href="blood_tracking.html" class="active">
+                <i class="fas fa-map"></i> Blood Tracking
+            </a>
+            <a href="donor_login.html" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">Blood Tracking</h1>
+            <div class="flex items-center space-x-4">
+                <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm font-medium">
+                    <i class="fas fa-user-circle mr-1"></i> <span id="userName">Donor</span>
+                </span>
+                <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">
+                    <i class="fas fa-tint mr-1"></i> <span id="userBloodType">Unknown</span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Blood Tracking Content -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="bg-indigo-600 text-white px-6 py-4">
+                <h2 class="text-xl font-semibold flex items-center">
+                    <i class="fas fa-vial mr-2"></i> Your Blood Donations
+                </h2>
+                <p class="text-sm opacity-90 mt-1">Track the journey of your blood donations from collection to transfusion</p>
+            </div>
+            <div class="p-6">
+                <div class="space-y-4" id="bloodDonationsContainer">
+                    <!-- Blood donations will be populated here -->
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-vial text-4xl mb-4 opacity-30"></i>
+                        <p>No blood donations found with tracking information.</p>
+                        <p class="text-sm mt-2">Your recent donations will appear here with their status updates.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get the current donor from localStorage
+            const donor = JSON.parse(localStorage.getItem("currentUser"));
+            
+            // If no donor is logged in, redirect to login
+            if (!donor) {
+                window.location.href = "donor_login.html";
+                return;
+            }
+
+            // Set user info
+            document.getElementById("userName").textContent = donor.name || "Donor";
+            document.getElementById("userBloodType").textContent = donor.bloodGroup || "Unknown";
+            
+            // Initialize arrays if they don't exist
+            donor.donationHistory = donor.donationHistory || [];
+            donor.bloodTracking = donor.bloodTracking || [];
+
+            // Get all hospitals
+            const allHospitals = JSON.parse(localStorage.getItem('hospitals')) || [];
+
+            // Function to generate blood ID
+            function generateBloodId() {
+                return 'BLD-' + Math.random().toString(36).substr(2, 8).toUpperCase();
+            }
+
+            // Modified: Function to create tracking entry for a donation
+            function createTrackingEntry(donation) {
+                const now = new Date();
+                const donationDate = new Date(donation.date);
+                
+                // Create base tracking entry
+                const trackingEntry = {
+                    bloodId: generateBloodId(),
+                    donationId: donation.id,
+                    donationDate: donation.date,
+                    donationType: donation.type || "Whole Blood",
+                    hospitalId: donation.hospitalId,
+                    status: "pending",
+                    statusUpdates: [{
+                        status: "pending",
+                        date: donation.date,
+                        message: "Blood collected and in processing queue"
+                    }]
+                };
+
+                // Always create processed status update (1-3 days after donation)
+                const processingDate = new Date(donationDate);
+                processingDate.setDate(processingDate.getDate() + 1 + Math.floor(Math.random() * 3));
+                
+                trackingEntry.statusUpdates.push({
+                    status: "processed",
+                    date: processingDate.toISOString(),
+                    message: "Blood processed and tested"
+                });
+
+                // Set expiration date (42 days after processing)
+                const expirationDate = new Date(processingDate);
+                expirationDate.setDate(expirationDate.getDate() + 42);
+                trackingEntry.estimatedUseDate = expirationDate.toISOString();
+
+                // Determine current status based on time passed
+                const daysSinceProcessing = Math.floor((now - processingDate) / (1000 * 60 * 60 * 24));
+                
+                if (daysSinceProcessing < 0) {
+                    // Still in collection phase (before processing)
+                    trackingEntry.status = "pending";
+                } 
+                else if (daysSinceProcessing < 42) {
+                    // Within the 42-day window
+                    const willBeUsed = Math.random() > 0.3; // 70% chance of being used
+                    
+                    if (willBeUsed) {
+                        // Used between processing and expiration
+                        const usageDate = new Date(processingDate);
+                        const usageDaysAfterProcessing = Math.min(
+                            Math.floor(Math.random() * 42) + 1, // 1-42 days
+                            daysSinceProcessing // But no more than actual days passed
+                        );
+                        usageDate.setDate(usageDate.getDate() + usageDaysAfterProcessing);
+                        
+                        trackingEntry.status = "transfused";
+                        trackingEntry.statusUpdates.push({
+                            status: "transfused",
+                            date: usageDate.toISOString(),
+                            message: "Blood successfully transfused to a patient"
+                        });
+                    } else {
+                        // Not used yet but still within 42-day window
+                        trackingEntry.status = "processed";
+                    }
+                } 
+                else {
+                    // Expired
+                    trackingEntry.status = "expired";
+                    trackingEntry.statusUpdates.push({
+                        status: "expired",
+                        date: expirationDate.toISOString(),
+                        message: "Blood expired after 42 days in storage"
+                    });
+                }
+
+                return trackingEntry;
+            }
+
+            // Ensure all donations have tracking entries
+            donor.donationHistory.forEach(donation => {
+                const existingTracking = donor.bloodTracking.find(t => t.donationId === donation.id);
+                if (!existingTracking) {
+                    donor.bloodTracking.push(createTrackingEntry(donation));
+                }
+            });
+
+            // Save updated data
+            localStorage.setItem("currentUser", JSON.stringify(donor));
+            
+            // Update donors array
+            const allDonors = JSON.parse(localStorage.getItem("donors")) || [];
+            const donorIndex = allDonors.findIndex(d => d.id === donor.id);
+            if (donorIndex !== -1) {
+                allDonors[donorIndex] = donor;
+                localStorage.setItem("donors", JSON.stringify(allDonors));
+            }
+
+            // Display tracking information
+            const container = document.getElementById("bloodDonationsContainer");
+            container.innerHTML = '';
+
+            if (donor.bloodTracking.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-vial text-4xl mb-4 opacity-30"></i>
+                        <p>No blood donations found with tracking information.</p>
+                        <p class="text-sm mt-2">Your recent donations will appear here with their status updates.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Sort by donation date (newest first)
+            const sortedTracking = [...donor.bloodTracking].sort((a, b) => 
+                new Date(b.donationDate) - new Date(a.donationDate)
+            );
+
+            sortedTracking.forEach(track => {
+                const donationDate = new Date(track.donationDate);
+                const formattedDate = donationDate.toLocaleDateString();
+                const hospital = allHospitals.find(h => h.id === track.hospitalId) || { name: "Unknown Hospital" };
+                const statusClass = `status-${track.status}`;
+                const statusText = track.status.charAt(0).toUpperCase() + track.status.slice(1);
+                const lastUpdate = track.statusUpdates[track.statusUpdates.length - 1];
+                const lastUpdateDate = new Date(lastUpdate.date);
+                const daysSinceUpdate = Math.floor((new Date() - lastUpdateDate) / (1000 * 60 * 60 * 24));
+
+                const card = document.createElement('div');
+                card.className = `tracking-card bg-white rounded-lg shadow-sm p-4 ${statusClass}`;
+                
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-medium text-gray-900">Blood ID: ${track.bloodId}</h3>
+                            <p class="text-sm text-gray-600">${track.donationType} Donation</p>
+                        </div>
+                        <span class="px-2 py-1 rounded-full text-xs font-medium ${statusClass}">
+                            ${statusText}
+                        </span>
+                    </div>
+                    <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-sm text-gray-500"><i class="fas fa-calendar-alt mr-2"></i> Donated: ${formattedDate}</p>
+                            <p class="text-sm text-gray-500"><i class="fas fa-hospital mr-2"></i> ${hospital.name}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500"><i class="fas fa-info-circle mr-2"></i> ${lastUpdate.message}</p>
+                            <p class="text-sm text-gray-500"><i class="fas fa-clock mr-2"></i> ${daysSinceUpdate} days ago</p>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <button class="view-details-btn bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded text-sm" data-bloodid="${track.bloodId}">
+                            View Details
+                        </button>
+                    </div>
+                    <div class="details-content hidden mt-4 border-t pt-4" id="details-${track.bloodId}">
+                        <h4 class="font-medium text-gray-700 mb-2">Status Timeline</h4>
+                        <div class="space-y-3">
+                            ${track.statusUpdates.map(update => `
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 mt-1">
+                                        <div class="h-2 w-2 rounded-full bg-${update.status === 'pending' ? 'yellow' : 
+                                          update.status === 'processed' ? 'blue' : 
+                                          update.status === 'transfused' ? 'green' : 'red'}-500"></div>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm font-medium text-gray-900">${update.message}</p>
+                                        <p class="text-xs text-gray-500">${new Date(update.date).toLocaleString()}</p>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+
+            // Add event listeners for view details buttons
+            document.querySelectorAll('.view-details-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const bloodId = this.getAttribute('data-bloodid');
+                    const detailsContent = document.getElementById(`details-${bloodId}`);
+                    detailsContent.classList.toggle('hidden');
+                    
+                    if (detailsContent.classList.contains('hidden')) {
+                        this.textContent = 'View Details';
+                    } else {
+                        this.textContent = 'Hide Details';
+                    }
+                });
+            });
+
+            // Logout functionality
+            document.getElementById("logoutBtn").addEventListener("click", function(e) {
+                e.preventDefault();
+                localStorage.removeItem("currentUser");
+                window.location.href = "donor_login.html";
+            });
+        });
+    </script>
+</body>
+</html>
