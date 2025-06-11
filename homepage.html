@@ -94,7 +94,7 @@
         <ul class="flex gap-8 text-lg font-medium">
           <li><a href="#" class="hover:text-blue-600">Home</a></li>
           <li><a href="#" class="hover:text-blue-600">About Us</a></li>
-          <li><a href="register.html" class="hover:text-blue-600">Become a Donor</a></li>
+          <li><a href="register.html" class="hover:text-blue-600">Donor Portal</a></li>
           <li><a href="hospital_login.html" class="hover:text-blue-600">Hospital Portal</a></li>
           <li><a href="search_hospital.html" class="hover:text-blue-600">Associated Hospitals</a></li>
         </ul>
@@ -108,14 +108,11 @@
       <h2 class="text-4xl font-bold mb-4">Connecting Lives. One Match at a Time.</h2>
       <p class="text-lg mb-8">Our platform bridges the gap between generous donors and patients in need through hospital partnerships.</p>
       <div class="flex justify-center gap-4">
-        <a href="register.html" class="bg-white text-blue-600 border border-blue-600 px-6 py-3 rounded-xl shadow hover:bg-blue-50 transition">
-          Become a Donor
+        <a href="register.html" class="bg-blue-600 text-white px-6 py-3 rounded-xl shadow hover:bg-blue-700 transition">
+          Donor Portal
         </a>
-        <a href="hospital_login.html" class="bg-blue-400 text-white px-6 py-3 rounded-xl shadow hover:bg-blue-700 transition">
+        <a href="hospital_login.html" class="bg-blue-600 text-white px-6 py-3 rounded-xl shadow hover:bg-blue-700 transition">
           Hospital Portal
-        </a>
-        <a href="hospital_registration.html" class="bg-blue-600 text-white px-6 py-3 rounded-xl shadow hover:bg-blue-700 transition">
-          Register Hospital
         </a>
       </div>
     </div>
@@ -244,6 +241,103 @@
             <span>AI predicts increased demand for all blood types during upcoming holiday season</span>
           </li>
         </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI-Powered Blood Demand Prediction System -->
+  <section class="py-16 bg-gradient-to-b from-gray-50 to-white">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="text-center mb-12">
+        <h3 class="text-3xl font-semibold mb-4">AI-Powered Demand Prediction</h3>
+        <p class="text-gray-600">Our advanced AI system analyzes historical data, seasonal patterns, and current trends to predict future blood supply needs</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-8 mb-12">
+        <!-- Prediction Timeline -->
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <h4 class="text-xl font-semibold mb-4 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600 mr-2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            7-Day Demand Forecast
+          </h4>
+          <div class="h-64">
+            <canvas id="predictionChart"></canvas>
+          </div>
+          <p class="text-sm text-gray-500 mt-4">
+            AI predicts blood type demand based on historical patterns and current trends
+          </p>
+        </div>
+
+        <!-- Risk Assessment -->
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <h4 class="text-xl font-semibold mb-4 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600 mr-2">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+              <path d="M2 17l10 5 10-5"></path>
+              <path d="M2 12l10 5 10-5"></path>
+            </svg>
+            Shortage Risk Assessment
+          </h4>
+          <div class="space-y-4">
+            <div class="flex items-center justify-between" data-blood-type="O-">
+              <span class="font-medium">O- Blood Type</span>
+              <div class="flex items-center">
+                <div class="w-48 bg-gray-200 rounded-full h-2.5 mr-3">
+                  <div class="risk-bar bg-red-600 h-2.5 rounded-full" style="width: 85%"></div>
+                </div>
+                <span class="risk-label text-red-600 font-bold">High Risk</span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between" data-blood-type="A-">
+              <span class="font-medium">A- Blood Type</span>
+              <div class="flex items-center">
+                <div class="w-48 bg-gray-200 rounded-full h-2.5 mr-3">
+                  <div class="risk-bar bg-yellow-500 h-2.5 rounded-full" style="width: 65%"></div>
+                </div>
+                <span class="risk-label text-yellow-600 font-bold">Medium Risk</span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between" data-blood-type="B+">
+              <span class="font-medium">B+ Blood Type</span>
+              <div class="flex items-center">
+                <div class="w-48 bg-gray-200 rounded-full h-2.5 mr-3">
+                  <div class="risk-bar bg-green-500 h-2.5 rounded-full" style="width: 30%"></div>
+                </div>
+                <span class="risk-label text-green-600 font-bold">Low Risk</span>
+              </div>
+            </div>
+          </div>
+          <p class="text-sm text-gray-500 mt-4">
+            AI risk assessment based on current inventory, historical usage, and predicted demand
+          </p>
+        </div>
+      </div>
+
+      <!-- AI Insights Panel -->
+      <div class="bg-blue-50 border border-blue-100 rounded-xl p-6">
+        <h4 class="text-xl font-semibold mb-4 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600 mr-2">
+            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+          </svg>
+          AI-Generated Insights
+        </h4>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <h5 class="font-medium mb-2">Short-term Predictions (7 days)</h5>
+            <ul class="space-y-2 text-gray-700 predictions-list">
+              <!-- Predictions will be dynamically inserted here -->
+            </ul>
+          </div>
+          <div>
+            <h5 class="font-medium mb-2">Strategic Recommendations</h5>
+            <ul class="space-y-2 text-gray-700 recommendations-list">
+              <!-- Recommendations will be dynamically inserted here -->
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -1051,6 +1145,207 @@
         }, 1000);
       }
     });
+
+    // Prediction Chart
+    const predictionCtx = document.getElementById('predictionChart').getContext('2d');
+    const predictionChart = new Chart(predictionCtx, {
+      type: 'line',
+      data: {
+        labels: ['Today', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'],
+        datasets: [
+          {
+            label: 'O- Demand',
+            data: [],
+            borderColor: 'rgba(220, 38, 38, 0.8)',
+            backgroundColor: 'rgba(220, 38, 38, 0.1)',
+            tension: 0.4,
+            fill: true
+          },
+          {
+            label: 'A- Demand',
+            data: [],
+            borderColor: 'rgba(234, 88, 12, 0.8)',
+            backgroundColor: 'rgba(234, 88, 12, 0.1)',
+            tension: 0.4,
+            fill: true
+          },
+          {
+            label: 'B+ Demand',
+            data: [],
+            borderColor: 'rgba(34, 197, 94, 0.8)',
+            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+            tension: 0.4,
+            fill: true
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'top',
+          },
+          tooltip: {
+            mode: 'index',
+            intersect: false,
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Demand Level'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Timeline'
+            }
+          }
+        }
+      }
+    });
+
+    // Function to generate simulated prediction data
+    function generateSimulatedData() {
+      const today = new Date();
+      const dates = [];
+      const predictions = {
+        'O-': [],
+        'A-': [],
+        'B+': []
+      };
+
+      // Generate 7 days of predictions
+      for (let i = 0; i < 7; i++) {
+        const date = new Date(today);
+        date.setDate(today.getDate() + i);
+        dates.push(date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }));
+
+        // Generate base values with realistic patterns
+        const baseO = 85 + Math.sin(i * 0.5) * 10; // Oscillating pattern
+        const baseA = 65 + Math.cos(i * 0.7) * 8;  // Different oscillation
+        const baseB = 45 + Math.sin(i * 0.3) * 5;  // Smaller oscillation
+
+        // Add random variation (±5%)
+        predictions['O-'].push(Math.round(baseO * (1 + (Math.random() - 0.5) * 0.1)));
+        predictions['A-'].push(Math.round(baseA * (1 + (Math.random() - 0.5) * 0.1)));
+        predictions['B+'].push(Math.round(baseB * (1 + (Math.random() - 0.5) * 0.1)));
+      }
+
+      return { dates, predictions };
+    }
+
+    // Function to generate simulated risk assessment
+    function generateRiskAssessment() {
+      const riskLevels = ['High', 'Medium', 'Low'];
+      const bloodTypes = ['O-', 'A-', 'B+'];
+      
+      return bloodTypes.reduce((acc, type) => {
+        const riskLevel = riskLevels[Math.floor(Math.random() * 3)];
+        const riskPercentage = riskLevel === 'High' ? 75 + Math.random() * 20 :
+                              riskLevel === 'Medium' ? 45 + Math.random() * 25 :
+                              20 + Math.random() * 20;
+        
+        acc[type] = {
+          risk_level: riskLevel,
+          risk_percentage: Math.round(riskPercentage)
+        };
+        return acc;
+      }, {});
+    }
+
+    // Function to generate simulated insights
+    function generateInsights() {
+      const predictions = [
+        { severity: 'red', message: 'Critical shortage of O- blood expected in next 48 hours' },
+        { severity: 'yellow', message: 'A- supply trending below optimal levels' },
+        { severity: 'green', message: 'B+ inventory remains stable' }
+      ];
+
+      const recommendations = [
+        { priority: 'red', action: 'Urgent need for O- donors in metropolitan areas' },
+        { priority: 'yellow', action: 'Schedule additional A- donation drives' },
+        { priority: 'blue', action: 'Maintain current B+ collection schedule' }
+      ];
+
+      return {
+        short_term_predictions: predictions,
+        recommendations: recommendations
+      };
+    }
+
+    // Update prediction chart with simulated data
+    function updatePredictionChart() {
+      const { dates, predictions } = generateSimulatedData();
+      
+      predictionChart.data.labels = dates;
+      predictionChart.data.datasets[0].data = predictions['O-'];
+      predictionChart.data.datasets[1].data = predictions['A-'];
+      predictionChart.data.datasets[2].data = predictions['B+'];
+      
+      predictionChart.update();
+    }
+
+    // Update risk assessment with simulated data
+    function updateRiskAssessment() {
+      const riskData = generateRiskAssessment();
+      
+      Object.entries(riskData).forEach(([bloodType, info]) => {
+        const riskBar = document.querySelector(`[data-blood-type="${bloodType}"] .risk-bar`);
+        const riskLabel = document.querySelector(`[data-blood-type="${bloodType}"] .risk-label`);
+        
+        if (riskBar && riskLabel) {
+          riskBar.style.width = `${info.risk_percentage}%`;
+          riskBar.className = `risk-bar bg-${info.risk_level.toLowerCase()}-500`;
+          riskLabel.textContent = info.risk_level;
+          riskLabel.className = `risk-label text-${info.risk_level.toLowerCase()}-600 font-bold`;
+        }
+      });
+    }
+
+    // Update insights with simulated data
+    function updateInsights() {
+      const insights = generateInsights();
+      
+      // Update predictions
+      const predictionsList = document.querySelector('.predictions-list');
+      if (predictionsList) {
+        predictionsList.innerHTML = insights.short_term_predictions.map(pred => `
+          <li class="flex items-start">
+            <span class="text-${pred.severity}-600 mr-2">●</span>
+            <span>${pred.message}</span>
+          </li>
+        `).join('');
+      }
+      
+      // Update recommendations
+      const recommendationsList = document.querySelector('.recommendations-list');
+      if (recommendationsList) {
+        recommendationsList.innerHTML = insights.recommendations.map(rec => `
+          <li class="flex items-start">
+            <span class="text-${rec.priority}-600 mr-2">●</span>
+            <span>${rec.action}</span>
+          </li>
+        `).join('');
+      }
+    }
+
+    // Update all data
+    function updateAllData() {
+      updatePredictionChart();
+      updateRiskAssessment();
+      updateInsights();
+    }
+
+    // Initial update
+    updateAllData();
+
+    // Set up periodic updates every 5 seconds
+    setInterval(updateAllData, 5000);
   </script>
 </body>
 </html>

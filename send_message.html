@@ -201,7 +201,42 @@
           <h2 id="donorName">Donor Name</h2>
         </div>
         
+        <!-- New Donation Eligibility Section -->
+        <div class="detail-card" style="background-color: #f8fafc; border: 1px solid #e2e8f0;">
+          <h3 style="margin: 0 0 15px 0; color: #1e293b; font-size: 1.1em;">Donation Eligibility Status</h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+            <div class="eligibility-item" style="padding: 12px; border-radius: 8px; background-color: white; border: 1px solid #e2e8f0;">
+              <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                <i class="fas fa-tint" style="color: #dc2626; margin-right: 8px;"></i>
+                <span style="font-weight: 600;">Whole Blood</span>
+              </div>
+              <div id="wholeBloodEligibility" style="font-size: 0.9em; color: #64748b;">Checking...</div>
+            </div>
+            
+            <div class="eligibility-item" style="padding: 12px; border-radius: 8px; background-color: white; border: 1px solid #e2e8f0;">
+              <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                <i class="fas fa-flask" style="color: #3b82f6; margin-right: 8px;"></i>
+                <span style="font-weight: 600;">Plasma</span>
+              </div>
+              <div id="plasmaEligibility" style="font-size: 0.9em; color: #64748b;">Checking...</div>
+            </div>
+            
+            <div class="eligibility-item" style="padding: 12px; border-radius: 8px; background-color: white; border: 1px solid #e2e8f0;">
+              <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                <i class="fas fa-microscope" style="color: #8b5cf6; margin-right: 8px;"></i>
+                <span style="font-weight: 600;">Platelets</span>
+              </div>
+              <div id="plateletEligibility" style="font-size: 0.9em; color: #64748b;">Checking...</div>
+            </div>
+          </div>
+        </div>
+        
         <div class="detail-card">
+          <div class="detail-item">
+            <span class="detail-label">Last Donated</span>
+            <div id="lastDonatedDate" class="detail-value">-</div>
+          </div>
+
           <div class="detail-item">
             <span class="detail-label">Age</span>
             <div id="donorAge" class="detail-value">-</div>
@@ -261,7 +296,7 @@
       
       <div class="notify-panel">
         <h3>Send Notification</h3>
-        <p>Send a message to this donor</p>
+        <p>Send a request to this donor</p>
         
         <textarea id="messageInput" placeholder="Enter your message here...">Urgent: We need your blood type at our hospital immediately. Please respond if you can donate.</textarea>
         
@@ -368,32 +403,119 @@
       // Find donor data
       const donors = JSON.parse(localStorage.getItem('donors')) || [];
       const donor = donors.find(d => String(d.id) === String(donorId));
-      
+
+      console.log('Donor object loaded from localStorage:', donor);
+
       if (donor) {
-        // Populate donor details
-        document.getElementById('donorName').textContent = donor.name || 'Unknown';
-        document.getElementById('bloodType').textContent = donor.bloodGroup || 'Unknown';
-        document.getElementById('donorAge').textContent = donor.age || 'Unknown';
-        document.getElementById('donorContact').textContent = donor.contact || 'Unknown';
-        document.getElementById('donorEmail').textContent = donor.email || 'Unknown';
-        
-        // Address details
-        if (donor.address) {
-          document.getElementById('donorStreet').textContent = donor.address.street || 'Unknown';
-          document.getElementById('donorCity').textContent = donor.address.city || 'Unknown';
-          document.getElementById('donorState').textContent = donor.address.state || 'Unknown';
-          document.getElementById('donorZip').textContent = donor.address.zipcode || 'Unknown';
+        // Calculate donation eligibility
+        function calculateEligibility(lastDonationDate, donationType) {
+          if (!lastDonationDate) return { eligible: true, message: 'Eligible to donate' };
+          
+          const now = new Date();
+          const lastDonation = new Date(lastDonationDate);
+          const daysSinceLastDonation = Math.floor((now - lastDonation) / (1000 * 60 * 60 * 24));
+          
+          switch(donationType) {
+            case 'whole':
+              return daysSinceLastDonation >= 56 
+                ? { eligible: true, message: 'Eligible to donate' }
+                : { eligible: false, message: `Eligible in ${56 - daysSinceLastDonation} days` };
+            case 'plasma':
+              return daysSinceLastDonation >= 28
+                ? { eligible: true, message: 'Eligible to donate' }
+                : { eligible: false, message: `Eligible in ${28 - daysSinceLastDonation} days` };
+            case 'platelet':
+              return daysSinceLastDonation >= 7
+                ? { eligible: true, message: 'Eligible to donate' }
+                : { eligible: false, message: `Eligible in ${7 - daysSinceLastDonation} days` };
+            default:
+              return { eligible: true, message: 'Eligible to donate' };
+          }
         }
-        
-        // Health and donation info
-        document.getElementById('donorHealth').textContent = donor.healthConditions || 'None provided';
-        document.getElementById('donorDonationTypes').textContent = 
-          donor.donationTypes ? donor.donationTypes.join(', ') : 'Blood';
-        
-        // Format registration date
-        const regDate = donor.registrationDate ? 
-          new Date(donor.registrationDate).toLocaleDateString() : 'Unknown';
-        document.getElementById('registrationDate').textContent = regDate;
+
+        // Find last donation dates for each type
+        const lastDonations = {
+          whole: null,
+          plasma: null,
+          platelet: null
+        };
+
+        if (donor.donationHistory && donor.donationHistory.length > 0) {
+          donor.donationHistory.forEach(donation => {
+            const donationType = donation.type ? donation.type.toLowerCase() : 'whole';
+            const donationDate = new Date(donation.date);
+            
+            if (donationType.includes('plasma')) {
+              if (!lastDonations.plasma || donationDate > new Date(lastDonations.plasma)) {
+                lastDonations.plasma = donation.date;
+              }
+            } else if (donationType.includes('platelet')) {
+              if (!lastDonations.platelet || donationDate > new Date(lastDonations.platelet)) {
+                lastDonations.platelet = donation.date;
+              }
+            } else {
+              if (!lastDonations.whole || donationDate > new Date(lastDonations.whole)) {
+                lastDonations.whole = donation.date;
+              }
+            }
+          });
+        }
+
+        // Update eligibility status in UI
+        const wholeBloodEligibility = calculateEligibility(lastDonations.whole, 'whole');
+        const plasmaEligibility = calculateEligibility(lastDonations.plasma, 'plasma');
+        const plateletEligibility = calculateEligibility(lastDonations.platelet, 'platelet');
+
+        document.getElementById('wholeBloodEligibility').innerHTML = `
+          <span style="color: ${wholeBloodEligibility.eligible ? '#16a34a' : '#dc2626'}">
+            ${wholeBloodEligibility.message}
+          </span>
+        `;
+
+        document.getElementById('plasmaEligibility').innerHTML = `
+          <span style="color: ${plasmaEligibility.eligible ? '#16a34a' : '#dc2626'}">
+            ${plasmaEligibility.message}
+          </span>
+        `;
+
+        document.getElementById('plateletEligibility').innerHTML = `
+          <span style="color: ${plateletEligibility.eligible ? '#16a34a' : '#dc2626'}">
+            ${plateletEligibility.message}
+          </span>
+        `;
+
+        // Populate donor details
+        document.getElementById('bloodType').textContent = donor.bloodGroup || 'Unknown';
+        document.getElementById('donorName').textContent = donor.name || 'Donor';
+        document.getElementById('donorAge').textContent = donor.age || '-'; // Assuming age is stored in donor object
+        document.getElementById('donorContact').textContent = donor.contact || '-'; // Assuming contact is stored
+        document.getElementById('donorEmail').textContent = donor.email || '-';   // Assuming email is stored
+        document.getElementById('donorStreet').textContent = donor.address?.street || '-';
+        document.getElementById('donorCity').textContent = donor.address?.city || '-';
+        document.getElementById('donorState').textContent = donor.address?.state || '-';
+        document.getElementById('donorZip').textContent = donor.address?.zipcode || '-'; // Corrected property name
+        document.getElementById('donorHealth').textContent = donor.healthConditions || '-'; // Corrected property name
+        document.getElementById('donorDonationTypes').textContent = donor.donationTypes?.join(', ') || '-'; // Corrected property name
+
+        // Populate Registration Date
+        const registrationDateElement = document.getElementById('registrationDate');
+        if (donor.registrationDate) {
+             const regDate = new Date(donor.registrationDate).toLocaleDateString();
+             registrationDateElement.textContent = regDate;
+        } else {
+             registrationDateElement.textContent = '-';
+        }
+
+        // Find and display last donation date
+        const lastDonatedDateElement = document.getElementById('lastDonatedDate');
+        if (donor.donationHistory && donor.donationHistory.length > 0) {
+            // Sort donations by date to find the most recent
+            const sortedHistory = donor.donationHistory.sort((a, b) => new Date(b.date) - new Date(a.date));
+            const lastDonation = sortedHistory[0];
+            lastDonatedDateElement.textContent = new Date(lastDonation.date).toLocaleDateString(); // Display just the date
+        } else {
+            lastDonatedDateElement.textContent = 'Never';
+        }
         
         // Get hospital info for signature
         const hospitalSignature = hospital ? 
@@ -560,7 +682,7 @@
               const donorId = this.getAttribute('data-id');
               // Preserve existing URL parameters
               const params = new URLSearchParams(window.location.search);
-              params.set('id', donorId);
+              params.set('d', donorId);
               window.location.href = `send_message.html?${params.toString()}`;
             });
           });
@@ -684,6 +806,8 @@
             showStatus('Failed to send messages: ' + errorMessages[0], 'error');
           }
           
+          // Save the message to the donor's history in localStorage
+          saveMessageToDonor(donorId, fullMessage, hospital.name);
         } catch (error) {
           // Show general error
           showStatus('Failed to send messages', 'error');
@@ -803,6 +927,41 @@
         };
         
         return compatibility[donorType] && compatibility[donorType].includes(patientType);
+      }
+
+      // Function to save message to donor's localStorage data
+      function saveMessageToDonor(donorId, messageText, hospitalName) {
+          console.log('Attempting to save message for donor ID:', donorId);
+          let allDonors = JSON.parse(localStorage.getItem('donors')) || [];
+          const currentUser = JSON.parse(localStorage.getItem('currentUser')); // Get current user
+          
+          const donorIndex = allDonors.findIndex(d => String(d.id).trim().toLowerCase() === String(donorId).trim().toLowerCase());
+
+          if (donorIndex > -1) {
+              const donorToUpdate = allDonors[donorIndex];
+              if (!donorToUpdate.messages) {
+                  donorToUpdate.messages = [];
+              }
+              const newMessage = {
+                  message: messageText,
+                  hospitalName: hospitalName,
+                  date: new Date().toISOString(), // Use ISO string for consistent date saving
+                  read: false // Mark new messages as unread
+              };
+              donorToUpdate.messages.push(newMessage);
+              
+              localStorage.setItem('donors', JSON.stringify(allDonors));
+              console.log('Message saved successfully to donor in donors array:', donorId, newMessage);
+
+              // If the updated donor is the current user, update currentUser in localStorage as well
+              if (currentUser && String(currentUser.id).trim().toLowerCase() === String(donorId).trim().toLowerCase()) {
+                   localStorage.setItem('currentUser', JSON.stringify(donorToUpdate));
+                   console.log('currentUser updated in localStorage with new message.');
+              }
+
+          } else {
+              console.error('Donor not found in localStorage for saving message!', donorId);
+          }
       }
     });
   </script>

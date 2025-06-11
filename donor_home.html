@@ -138,8 +138,17 @@
         }
 
         .badge-icon {
-            font-size: 2rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             margin-bottom: 8px;
+        }
+
+        .badge-icon i {
+            font-size: 24px;
+            line-height: 1;
         }
 
         .badge-title {
@@ -232,8 +241,17 @@
         }
 
         .badge-modal-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+        }
+
+        .badge-modal-icon i {
+            font-size: 36px;
+            line-height: 1;
         }
 
         .badge-modal-title {
@@ -325,7 +343,7 @@
                     </div>
                     <div>
                         <p class="text-gray-500 text-sm">Current Streak</p>
-                        <h3 class="text-2xl font-bold"><span id="streakCount">0</span> Donations</h3>
+                        <h3 class="text-2xl font-bold"><span id="streakCount">0</span></h3>
                     </div>
                 </div>
             </div>
@@ -349,7 +367,7 @@
             <div class="bg-white rounded-xl shadow-md overflow-hidden">
                 <div class="bg-indigo-600 text-white px-6 py-4">
                     <h2 class="text-xl font-semibold flex items-center">
-                        <i class="fas fa-inbox mr-2"></i> Hospital Messages
+                        <i class="fas fa-hand-holding-medical mr-2"></i> Donation Requests
                     </h2>
                 </div>
                 <div class="p-6">
@@ -520,6 +538,48 @@
             if (!donor) {
                 window.location.href = "donor_login.html";
                 return;
+            }
+
+            // Initialize modal elements first
+            const badgeModal = document.getElementById('badgeModal');
+            const badgeModalClose = document.getElementById('badgeModalClose');
+            const modalIcon = document.getElementById('badgeModalIcon');
+            const modalTitle = document.getElementById('badgeModalTitle');
+            const modalDesc = document.getElementById('badgeModalDesc');
+
+            // Badge modal functionality
+            function showBadgeModal(badge) {
+                if (!badgeModal || !modalIcon || !modalTitle || !modalDesc) {
+                    console.error('Badge modal elements not found');
+                    return;
+                }
+
+                const iconElement = document.createElement('i');
+                iconElement.className = `fas ${badge.icon}`;
+                
+                modalIcon.className = `badge-modal-icon ${badge.color}`;
+                modalIcon.innerHTML = '';
+                modalIcon.appendChild(iconElement);
+                modalTitle.textContent = badge.title;
+                modalDesc.textContent = badge.description;
+                
+                badgeModal.style.display = 'flex';
+            }
+
+            if (badgeModalClose) {
+                badgeModalClose.addEventListener('click', () => {
+                    if (badgeModal) {
+                        badgeModal.style.display = 'none';
+                    }
+                });
+            }
+
+            if (badgeModal) {
+                badgeModal.addEventListener('click', (e) => {
+                    if (e.target === badgeModal) {
+                        badgeModal.style.display = 'none';
+                    }
+                });
             }
             
             // Set user info (name and blood type)
@@ -754,7 +814,9 @@
                         <div class="flex space-x-2 mt-3 justify-end">
                             <button class="accept-btn bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs" data-idx="${idx}"><i class="fas fa-check mr-1"></i>Accept</button>
                             <button class="decline-btn bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs" data-idx="${idx}"><i class="fas fa-times mr-1"></i>Decline</button>
+                            <!-- Reply button commented out
                             <button class="reply-btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs" data-idx="${idx}"><i class="fas fa-reply mr-1"></i>Reply</button>
+                            -->
                         </div>
                         ` : msg.acceptedAppointment ? `
                         <div class='text-xs text-green-500 mt-2 text-right'>Appointment Set: ${msg.acceptedAppointment.date} at ${msg.acceptedAppointment.time}</div>
@@ -762,6 +824,7 @@
                         <div class='text-xs text-red-500 mt-2 text-right'>Declined</div>
                         `}
                         
+                        <!-- Reply form commented out
                         <div class="reply-form hidden mt-3 bg-gray-50 p-3 rounded-lg" data-idx="${idx}">
                             <textarea class="w-full border border-gray-300 rounded p-2 text-sm" rows="3" placeholder="Type your reply here..."></textarea>
                             <div class="flex justify-end space-x-2 mt-2">
@@ -769,6 +832,7 @@
                                 <button class="send-reply-btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs">Send Reply</button>
                             </div>
                         </div>
+                        -->
                     `;
                     messagesContainer.appendChild(messageElement);
                 });
@@ -800,7 +864,7 @@
                 });
             });
 
-            // Add event listeners for reply functionality
+            /* Reply functionality event listeners commented out
             messagesContainer.querySelectorAll('.reply-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const idx = parseInt(this.getAttribute('data-idx'));
@@ -856,6 +920,15 @@
                     }
                 });
             });
+            */
+
+            // Clear and reinitialize badges container
+            const badgesContainer = document.getElementById('badgesContainer');
+            if (!badgesContainer) {
+                console.error('Badges container not found');
+                return;
+            }
+            badgesContainer.innerHTML = '';
 
             // Define all possible badges
             const allBadges = [
@@ -865,8 +938,7 @@
                     description: 'Completed your first blood donation',
                     icon: 'fa-heart',
                     color: 'text-red-500',
-                    condition: () => donationCount >= 1,
-                    new: !donor.badges.includes('first_donation') && donationCount >= 1
+                    condition: () => donationCount >= 1
                 },
                 {
                     id: 'bronze_donor',
@@ -874,8 +946,7 @@
                     description: 'Reached 5 total donations',
                     icon: 'fa-medal',
                     color: 'text-amber-600',
-                    condition: () => donationCount >= 5,
-                    new: !donor.badges.includes('bronze_donor') && donationCount >= 5
+                    condition: () => donationCount >= 5
                 },
                 {
                     id: 'silver_donor',
@@ -883,8 +954,7 @@
                     description: 'Reached 10 total donations',
                     icon: 'fa-medal',
                     color: 'text-gray-400',
-                    condition: () => donationCount >= 10,
-                    new: !donor.badges.includes('silver_donor') && donationCount >= 10
+                    condition: () => donationCount >= 10
                 },
                 {
                     id: 'gold_donor',
@@ -892,8 +962,7 @@
                     description: 'Reached 25 total donations',
                     icon: 'fa-medal',
                     color: 'text-yellow-500',
-                    condition: () => donationCount >= 25,
-                    new: !donor.badges.includes('gold_donor') && donationCount >= 25
+                    condition: () => donationCount >= 25
                 },
                 {
                     id: 'platinum_donor',
@@ -901,8 +970,7 @@
                     description: 'Reached 50 total donations',
                     icon: 'fa-medal',
                     color: 'text-blue-400',
-                    condition: () => donationCount >= 50,
-                    new: !donor.badges.includes('platinum_donor') && donationCount >= 50
+                    condition: () => donationCount >= 50
                 },
                 {
                     id: 'streak_starter',
@@ -910,8 +978,7 @@
                     description: 'Maintained a 3-donation streak',
                     icon: 'fa-fire',
                     color: 'text-orange-500',
-                    condition: () => streakCount >= 3,
-                    new: !donor.badges.includes('streak_starter') && streakCount >= 3
+                    condition: () => streakCount >= 3
                 },
                 {
                     id: 'streak_champion',
@@ -919,8 +986,7 @@
                     description: 'Maintained a 10-donation streak',
                     icon: 'fa-fire',
                     color: 'text-red-500',
-                    condition: () => streakCount >= 10,
-                    new: !donor.badges.includes('streak_champion') && streakCount >= 10
+                    condition: () => streakCount >= 10
                 },
                 {
                     id: 'rare_type',
@@ -928,8 +994,7 @@
                     description: 'Has a rare blood type (AB-)',
                     icon: 'fa-star',
                     color: 'text-purple-500',
-                    condition: () => donor.bloodGroup === 'AB-',
-                    new: !donor.badges.includes('rare_type') && donor.bloodGroup === 'AB-'
+                    condition: () => donor.bloodGroup === 'AB-'
                 },
                 {
                     id: 'universal_donor',
@@ -937,8 +1002,7 @@
                     description: 'Has O- blood type',
                     icon: 'fa-globe',
                     color: 'text-green-500',
-                    condition: () => donor.bloodGroup === 'O-',
-                    new: !donor.badges.includes('universal_donor') && donor.bloodGroup === 'O-'
+                    condition: () => donor.bloodGroup === 'O-'
                 },
                 {
                     id: 'plasma_pro',
@@ -946,8 +1010,7 @@
                     description: 'Donated plasma 5 times',
                     icon: 'fa-flask',
                     color: 'text-blue-500',
-                    condition: () => donor.donationHistory.filter(d => d.type && d.type.toLowerCase().includes('plasma')).length >= 5,
-                    new: !donor.badges.includes('plasma_pro') && donor.donationHistory.filter(d => d.type && d.type.toLowerCase().includes('plasma')).length >= 5
+                    condition: () => donor.donationHistory.filter(d => d.type && d.type.toLowerCase().includes('plasma')).length >= 5
                 },
                 {
                     id: 'platelet_pro',
@@ -955,8 +1018,7 @@
                     description: 'Donated platelets 5 times',
                     icon: 'fa-microscope',
                     color: 'text-purple-500',
-                    condition: () => donor.donationHistory.filter(d => d.type && d.type.toLowerCase().includes('platelet')).length >= 5,
-                    new: !donor.badges.includes('platelet_pro') && donor.donationHistory.filter(d => d.type && d.type.toLowerCase().includes('platelet')).length >= 5
+                    condition: () => donor.donationHistory.filter(d => d.type && d.type.toLowerCase().includes('platelet')).length >= 5
                 },
                 {
                     id: 'multi_type',
@@ -976,20 +1038,7 @@
                             }
                         });
                         return types.size >= 3;
-                    },
-                    new: !donor.badges.includes('multi_type') && (() => {
-                        const types = new Set();
-                        donor.donationHistory.forEach(d => {
-                            if (d.type) {
-                                if (d.type.toLowerCase().includes('blood')) types.add('blood');
-                                if (d.type.toLowerCase().includes('plasma')) types.add('plasma');
-                                if (d.type.toLowerCase().includes('platelet')) types.add('platelet');
-                            } else {
-                                types.add('blood');
-                            }
-                        });
-                        return types.size >= 3;
-                    })()
+                    }
                 },
                 {
                     id: 'year_commitment',
@@ -1005,16 +1054,7 @@
                             donationsByMonth.add(`${date.getFullYear()}-${date.getMonth()}`);
                         });
                         return donationsByMonth.size >= 12;
-                    },
-                    new: !donor.badges.includes('year_commitment') && (() => {
-                        if (donationCount < 12) return false;
-                        const donationsByMonth = new Set();
-                        donor.donationHistory.forEach(d => {
-                            const date = new Date(d.date);
-                            donationsByMonth.add(`${date.getFullYear()}-${date.getMonth()}`);
-                        });
-                        return donationsByMonth.size >= 12;
-                    })()
+                    }
                 },
                 {
                     id: 'holiday_hero',
@@ -1029,15 +1069,7 @@
                             const monthDay = `${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
                             return holidays.includes(monthDay);
                         });
-                    },
-                    new: !donor.badges.includes('holiday_hero') && (() => {
-                        const holidays = ['12-25', '07-04', '11-11', '01-01', '12-31'];
-                        return donor.donationHistory.some(d => {
-                            const date = new Date(d.date);
-                            const monthDay = `${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-                            return holidays.includes(monthDay);
-                        });
-                    })()
+                    }
                 },
                 {
                     id: 'emergency_responder',
@@ -1045,8 +1077,7 @@
                     description: 'Responded to at least 3 hospital requests',
                     icon: 'fa-ambulance',
                     color: 'text-red-600',
-                    condition: () => donor.messages.filter(m => m.acceptedAppointment).length >= 3,
-                    new: !donor.badges.includes('emergency_responder') && donor.messages.filter(m => m.acceptedAppointment).length >= 3
+                    condition: () => donor.messages.filter(m => m.acceptedAppointment).length >= 3
                 },
                 {
                     id: 'top_10',
@@ -1063,17 +1094,7 @@
                         });
                         const userRank = sortedDonors.findIndex(d => d.id === donor.id) + 1;
                         return userRank <= 10;
-                    },
-                    new: !donor.badges.includes('top_10') && (() => {
-                        if (allDonors.length < 10) return false;
-                        const sortedDonors = [...allDonors].sort((a, b) => {
-                            const aCount = a.donationHistory ? a.donationHistory.length : 0;
-                            const bCount = b.donationHistory ? b.donationHistory.length : 0;
-                            return bCount - aCount;
-                        });
-                        const userRank = sortedDonors.findIndex(d => d.id === donor.id) + 1;
-                        return userRank <= 10;
-                    })()
+                    }
                 },
                 {
                     id: 'first_anniversary',
@@ -1087,14 +1108,7 @@
                         const lastDonation = new Date(sortedDonations[0].date);
                         const diffYears = lastDonation.getFullYear() - firstDonation.getFullYear();
                         return diffYears >= 1;
-                    },
-                    new: !donor.badges.includes('first_anniversary') && (() => {
-                        if (donationCount < 2) return false;
-                        const firstDonation = new Date(sortedDonations[sortedDonations.length - 1].date);
-                        const lastDonation = new Date(sortedDonations[0].date);
-                        const diffYears = lastDonation.getFullYear() - firstDonation.getFullYear();
-                        return diffYears >= 1;
-                    })()
+                    }
                 },
                 {
                     id: 'five_year_club',
@@ -1108,14 +1122,7 @@
                         const lastDonation = new Date(sortedDonations[0].date);
                         const diffYears = lastDonation.getFullYear() - firstDonation.getFullYear();
                         return diffYears >= 5;
-                    },
-                    new: !donor.badges.includes('five_year_club') && (() => {
-                        if (donationCount < 2) return false;
-                        const firstDonation = new Date(sortedDonations[sortedDonations.length - 1].date);
-                        const lastDonation = new Date(sortedDonations[0].date);
-                        const diffYears = lastDonation.getFullYear() - firstDonation.getFullYear();
-                        return diffYears >= 5;
-                    })()
+                    }
                 },
                 {
                     id: 'dedicated_donor',
@@ -1130,15 +1137,7 @@
                             donationsByYear[year] = (donationsByYear[year] || 0) + 1;
                         });
                         return Object.values(donationsByYear).some(count => count >= 3);
-                    },
-                    new: !donor.badges.includes('dedicated_donor') && (() => {
-                        const donationsByYear = {};
-                        donor.donationHistory.forEach(d => {
-                            const year = new Date(d.date).getFullYear();
-                            donationsByYear[year] = (donationsByYear[year] || 0) + 1;
-                        });
-                        return Object.values(donationsByYear).some(count => count >= 3);
-                    })()
+                    }
                 },
                 {
                     id: 'social_butterfly',
@@ -1146,8 +1145,7 @@
                     description: 'Shared your donation on social media',
                     icon: 'fa-share-nodes',
                     color: 'text-blue-400',
-                    condition: () => donor.socialShares && donor.socialShares > 0,
-                    new: !donor.badges.includes('social_butterfly') && donor.socialShares && donor.socialShares > 0
+                    condition: () => donor.socialShares && donor.socialShares > 0
                 }
             ];
 
@@ -1158,31 +1156,45 @@
 
             if (newlyEarnedBadges.length > 0) {
                 newlyEarnedBadges.forEach(badge => {
+                    if (!donor.badges.includes(badge.id)) {
                     donor.badges.push(badge.id);
                     // Show modal for newly earned badges
                     showBadgeModal(badge);
+                    }
                 });
+                // Update both currentUser and the donor in the donors array
                 localStorage.setItem("currentUser", JSON.stringify(donor));
+                const allDonors = JSON.parse(localStorage.getItem("donors")) || [];
+                const donorIndex = allDonors.findIndex(d => d.id === donor.id);
+                if (donorIndex !== -1) {
+                    allDonors[donorIndex] = donor;
+                    localStorage.setItem("donors", JSON.stringify(allDonors));
+                }
             }
 
-            // Populate badges container
-            const badgesContainer = document.getElementById('badgesContainer');
+            // Get earned and unearned badges
             const earnedBadges = allBadges.filter(badge => donor.badges.includes(badge.id));
             const unearnedBadges = allBadges.filter(badge => !donor.badges.includes(badge.id));
 
             // Display earned badges first
             earnedBadges.forEach(badge => {
                 const badgeElement = document.createElement('div');
-                badgeElement.className = `badge ${badge.new ? 'animate-pulse' : ''}`;
+                badgeElement.className = 'badge';
+                
+                const iconElement = document.createElement('i');
+                iconElement.className = `fas ${badge.icon}`;
+                
                 badgeElement.innerHTML = `
                     <div class="badge-icon ${badge.color}">
-                        <i class="fas ${badge.icon}"></i>
                     </div>
                     <div class="badge-title">${badge.title}</div>
-                    ${badge.new ? '<div class="badge-new">!</div>' : ''}
                 `;
                 
-                // Add click event to show badge details
+                const badgeIconDiv = badgeElement.querySelector('.badge-icon');
+                if (badgeIconDiv) {
+                    badgeIconDiv.appendChild(iconElement);
+                }
+                
                 badgeElement.addEventListener('click', () => showBadgeModal(badge));
                 badgesContainer.appendChild(badgeElement);
             });
@@ -1191,15 +1203,22 @@
             unearnedBadges.forEach(badge => {
                 const badgeElement = document.createElement('div');
                 badgeElement.className = 'badge badge-locked';
+                
+                const iconElement = document.createElement('i');
+                iconElement.className = `fas ${badge.icon}`;
+                
                 badgeElement.innerHTML = `
                     <div class="badge-icon text-gray-400">
-                        <i class="fas ${badge.icon}"></i>
                     </div>
                     <div class="badge-title">${badge.title}</div>
                     <div class="text-xs text-gray-500 mt-1">Locked</div>
                 `;
                 
-                // Add click event to show badge details
+                const badgeIconDiv = badgeElement.querySelector('.badge-icon');
+                if (badgeIconDiv) {
+                    badgeIconDiv.appendChild(iconElement);
+                }
+                
                 badgeElement.addEventListener('click', () => showBadgeModal(badge));
                 badgesContainer.appendChild(badgeElement);
             });
@@ -1209,35 +1228,15 @@
             const totalBadges = allBadges.length;
             const progressPercent = (earnedBadgesCount / totalBadges) * 100;
 
-            document.getElementById('earnedBadgesCount').textContent = earnedBadgesCount;
-            document.getElementById('badgeProgressBar').style.width = `${progressPercent}%`;
-
-            // Badge modal functionality
-            const badgeModal = document.getElementById('badgeModal');
-            const badgeModalClose = document.getElementById('badgeModalClose');
-
-            function showBadgeModal(badge) {
-                const modalIcon = document.getElementById('badgeModalIcon');
-                const modalTitle = document.getElementById('badgeModalTitle');
-                const modalDesc = document.getElementById('badgeModalDesc');
-                
-                modalIcon.className = `badge-modal-icon ${badge.color}`;
-                modalIcon.innerHTML = `<i class="fas ${badge.icon}"></i>`;
-                modalTitle.textContent = badge.title;
-                modalDesc.textContent = badge.description;
-                
-                badgeModal.style.display = 'flex';
+            const earnedBadgesCountElement = document.getElementById('earnedBadgesCount');
+            const badgeProgressBarElement = document.getElementById('badgeProgressBar');
+            
+            if (earnedBadgesCountElement) {
+                earnedBadgesCountElement.textContent = earnedBadgesCount;
             }
-
-            badgeModalClose.addEventListener('click', () => {
-                badgeModal.style.display = 'none';
-            });
-
-            badgeModal.addEventListener('click', (e) => {
-                if (e.target === badgeModal) {
-                    badgeModal.style.display = 'none';
+            if (badgeProgressBarElement) {
+                badgeProgressBarElement.style.width = `${progressPercent}%`;
                 }
-            });
 
             function formatDateDifference(date) {
                 const now = new Date();
